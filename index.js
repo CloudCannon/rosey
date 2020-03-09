@@ -30,7 +30,7 @@ Commands:
  * arguments (in camelCase) and flags.
  */
 const inputs = meow(
-    helpMessage = helpString, 
+    helpString, 
     {
     flags: {
         // source: { 
