@@ -4,6 +4,7 @@ const meow = require('meow');
 const helpString = `
 Usage: i18n <command> <flags>
 Flags:
+    -d | --dest     The destination folder to clone the files to. Defaults to dist/prod
 
 Commands:
     --Command--                                                     --Reqd flags--
@@ -23,10 +24,10 @@ const inputs = meow(
         //     type: 'string',
         //     alias: 's'
         // },
-        // dest: {
-        //     type: 'string',
-        //     alias: 'd'
-        // },
+        dest: {
+            type: 'string',
+            alias: 'd'
+        },
         // baseurl: {
         //     type: 'string',
         //     alias: 'b'
@@ -35,10 +36,10 @@ const inputs = meow(
         //     type: 'string',
         //     alias: 'p'
         // },
-        // overwrite: {
-        //     type: 'boolean',
-        //     alias: 'o'
-        // },
+        overwrite: {
+            type: 'boolean',
+            alias: 'o'
+        }
         // split: {
         //     type: 'number',
         //     alias: null,

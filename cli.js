@@ -2,6 +2,7 @@ const runner = require("./lib/runner");
 // const path = require("path");
 const log = require('fancy-log');
 const chalk = require('chalk');
+const defaults = require("defaults");
 
 
 /**
@@ -25,8 +26,39 @@ const command = ( func, requiredFlags = []) => {
  Required flags will be checked before the command is run.
 */
 const commands = {
-    "help": command(runner.help)
+    "help": command(runner.help),
+    "clean": command(runner.clean)
 }
+
+const defaultDest = "dist/prod";
+
+var configDefaults = {
+	i18n: {
+		src: "dist/site",
+		dest: "dist/translated_site",
+
+		default_language: "en",
+		locale_src: "i18n/locales",
+		generated_locale_dest: "i18n",
+		source_version: 2,
+		source_delimeter: "\t",
+
+		legacy_path: "_locales",
+
+
+		show_duplicate_locale_warnings: true,
+		show_missing_locale_warnings: true,
+		show_skipped_updates: true,
+
+		character_based_locales: ["ja", "ja_jp", "ja-jp"],
+		google_credentials_filename: null
+	},
+	serve: {
+		port: 8000,
+		open: true,
+		path: "/"
+	}
+};
 
 let exitCode = 0;
 
@@ -52,11 +84,22 @@ module.exports = {
     * @param {Object} Flags the flags that were set by the user in the command line.
     * @return {Object} An object containing information on how to run the given CLI command.
     */
-    setOptions: function ( {flags, help} ){
-
+    setOptions: function ( {flags, help}, config){
+        config = config || {};
+        config.i18n = defaults(config.i18n, configDefaults.i18n);
+        //config.serve = defaults(config.serve, configDefaults.serve);
+        
         let options = {
             cwd: process.cwd(),
-            help
+            help,
+            
+            i18n: {
+                dest: flags["dest"] || config.i18n.dest
+            },
+
+            flags:{
+                overwrite: flags["overwrite"]
+            }
         };
 
 

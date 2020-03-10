@@ -17,25 +17,17 @@ describe("checkRequiredFlags()", function() {
 })
 
 describe("setOptions()", function() {
-    // context ("Receives flags from cli", function() {
-    //     let flags = {"baseurl": "testurl", "port": 9898, "dest": "testdest", "source": "testsource", "overwrite": true}
-    //     it ("should return with the correct flags set", function() {
-    //         let options = cli.setOptions( flags );
-    //         expect(options.dist.baseurl).to.equal("testurl");
-    //         expect(options.serve.port).to.equal(9898);
-    //         expect(options.dist.dest).to.equal("testdest");
-    //         expect(options.dist.src).to.equal("testsource");
+    context ("Receives flags from cli", function() {
+        let flags = {"dest": "testdest", "overwrite": true}
+        it ("should return with the correct flags set", function() {
+            let options = cli.setOptions( {flags} );
+            expect(options.i18n.dest).to.equal("testdest");
 
-    //         expect(options.flags.split).to.equal(1);
-    //         expect(options.flags.partition).to.equal(1);
-    //     })
-    // })
+            expect(options.flags.overwrite).to.equal(true);
+        })
+    })
     context ("Receives default options", function() {
         let flags = {}
-        // let opts = {
-        //     flags:flags,
-        //     help:"helpMessage"
-        // };
         it ("should return with the correct default settings", function() {
 
             let options = cli.setOptions( {flags, help:"helpMessage"} );

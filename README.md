@@ -114,7 +114,6 @@ $ i18n check
 ```
 
 ## Clean
-TODO:
 ##### ```clean```
 
 Deletes the contents of the `dest` folder.
