@@ -2,9 +2,9 @@
 The CLI for the CloudCannon i18n package.
 
 Requires node >=10.0.0
-<!-- 
-[![Build Status](https://travis-ci.com/CloudCannon/cli-dist.svg?token=PCpTqbePqYxMDyjhMTKF&branch=master)](https://travis-ci.com/CloudCannon/cli-dist)
-[![codecov](https://codecov.io/gh/CloudCannon/cli-dist/branch/master/graph/badge.svg?token=Q4yyn9DLZ6)](https://codecov.io/gh/CloudCannon/cli-dist) -->
+
+[![Build Status](https://travis-ci.com/CloudCannon/cli-i18n.svg?token=jVQhfYdhP37TyCuAVfft&branch=master)](https://travis-ci.com/CloudCannon/cli-i18n)
+[![codecov](https://codecov.io/gh/CloudCannon/cli-i18n/branch/master/graph/badge.svg?token=SLXCH04SAM)](https://codecov.io/gh/CloudCannon/cli-i18n)
 
 
 
