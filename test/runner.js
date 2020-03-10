@@ -1,3 +1,4 @@
+const defaults = require("defaults");
 const runner = require("../lib/runner.js");
 const path = require("path");
 let expect = require('chai').expect;
@@ -9,27 +10,18 @@ let options = {
     cwd: "/",
 
     i18n: {
-        src: "test/src",
+        source: "test/src",
         dest: "test/dest",
-        locale_src: "test/locales",
-        full_locale_src: "test/locales"
+        locale_source: "test/locales",
+        full_locale_source: "test/locales"
     },
     flags: {
         overwrite: true
     }               
 };
-// TESTOP IS NEVER CHANGED
-let testOp = {
-    cwd: "/",
+modifiedOptions = {};
+modifiedOptions = defaults(modifiedOptions, options);
 
-    dist: {
-        src: "test/src",
-        dest: "test/dest"
-    },
-    flags: {
-        overwrite: true
-    }            
-};
 
 describe("_askYesNo", function() {
     context("Response is affirmative", function(){
@@ -43,7 +35,7 @@ describe("_askYesNo", function() {
         it("should return false", async function(){
             let response = await runner._askYesNo("question", "N");
             expect(response).to.equal(false);
-        })
+        }) 
     })
 })
 
@@ -63,9 +55,9 @@ describe ("clean", async function() {
 
     
     context("invalid directory name", function () {
-        options.i18n.dest = "thisdoesntexist";
+        modifiedOptions.i18n.dest = "thisdoesntexist";
         it("should return an empty array", async function () {
-            let res = await runner.clean(options);
+            let res = await runner.clean(modifiedOptions);
             expect(res).to.eql([]);
         });
     })
@@ -79,13 +71,12 @@ describe ("clean", async function() {
 
 describe("_loadLocales", function() {
     before(function () {
-        fs.mkdirSync(options.i18n.locale_src);
-        locale = {
-            "bottom-title": "Última tecnologia, ótimo desempenho",
-            "contact-us": "Entre em contato"
-        }
-        fs.writeJSONSync(options.i18n.locale_src+"/pt-BR.json",locale)
-        fs.writeFileSync(options.i18n.locale_src+"/pt-PT.json","Wrong Json")
+        fs.mkdirSync(options.i18n.locale_source);
+        // locale = {
+        //     "bottom-title": "Última tecnologia, ótimo desempenho",
+        //     "contact-us": "Entre em contato"
+        // }
+        // fs.writeFileSync(options.i18n.locale_source+"/pt-PT.json","Wrong Json")
     })
 
     context("Locale folder exists", function () {
@@ -98,9 +89,12 @@ describe("_loadLocales", function() {
     
     // context("Locale file exists", function () {
     //     it("it should return no error", async function () {
+    //         fs.writeJsonSync(options.i18n.locale_source+"/pt-BR.json",locale)
     //         let response = await runner._loadLocales(options);
     //         console.log(response);
-    //         expect(response).to.equal(null);//TODO
+    //         //expect(response).to.equal(null);//TODO
+
+    //         fs.remove(options.i18n.locale_source+"/pt-BR.json")
     //     });
     // })
 
@@ -114,17 +108,45 @@ describe("_loadLocales", function() {
     // })
 
     
-    // context("Locale folder doens't exists", function () {
-    //     options.i18n.full_locale_src = "thisdoesntexist";
-    //     it("it should return an error", async function () {
-    //         let response = await runner._loadLocales(options);
-    //         console.log(response);
-    //         expect(response).to.equal(error);
-    //     });
-    // })
-
-    after(function () {
-        fs.removeSync(options.i18n.locale_src, {recursive: true})
+    context("Locale folder doens't exists", function () {
+        modifiedOptions.i18n.full_locale_source = "/thisdoesntexist";
+        it("it should return an error", async function () {
+            let response = await runner._loadLocales(modifiedOptions);
+            console.log(response);
+            expect(response).to.equal(undefined);
+        });
     })
 
+    after(function () {
+        fs.removeSync(options.i18n.locale_source);
+    })
+ 
+})
+
+
+describe("build", function() {
+    before(function () {
+        fs.mkdirSync(options.i18n.locale_source);
+        locale = {
+            "bottom-title": "Última tecnologia, ótimo desempenho",
+            "contact-us": "Entre em contato"
+        };
+        fs.writeJsonSync(options.i18n.locale_source+"/pt-BR.json",locale);
+        fs.writeFileSync(options.i18n.locale_source+"/pt-pt.json","Wrong JSON");
+        fs.writeFileSync(options.i18n.locale_source+"/invalid.INVALID","Wrong JSON");
+    })
+
+    context ("building with valid configs", function(){
+        it("should return 0", async function(){
+            let res = await runner.build( options );
+            
+            expect(res).to.equal(0);
+        })
+    })
+
+    after(function () {
+        //fs.removeSync(options.i18n.locale_source+"/pt-BR.json");
+        fs.remove(options.i18n.locale_source);
+    })
+ 
 })

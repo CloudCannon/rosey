@@ -37,11 +37,11 @@ const defaultDest = "dist/prod";
 
 var optionsDefaults = {
 	i18n: {
-		src: "dist/site",
+		source: "dist/site",
 		dest: "dist/translated_site",
 
 		default_language: "en",
-		locale_src: "i18n/locales",
+		locale_source: "i18n/locales",
 		generated_locale_dest: "i18n",
 		source_version: 2,
 		source_delimeter: "\t",
@@ -92,18 +92,23 @@ module.exports = {
         options.i18n = defaults(options.i18n, optionsDefaults.i18n);
         //options.serve = defaults(options.serve, optionsDefaults.serve);
         
-        var cwd = process.cwd();
-        
+        log("default source: " + options.i18n.source);
+        log("flag source: " + flags["source"]);
+        let cwd = process.cwd();
+        let dest = flags["dest"] || options.i18n.dest;
+        let source = flags["source"] || options.i18n.source;
         options = {
             cwd,
             help,
             
             i18n: {
-                dest: flags["dest"] || options.i18n.dest,
+                dest,
+                source,
 
-                full_src : path.join(cwd, options.i18n.src),
-                full_dest : path.join(cwd, options.i18n.dest),
-                full_locale_src : path.join(cwd, options.i18n.locale_src),
+                full_dest : path.join(cwd, dest),
+                full_source : path.join(cwd, source),
+                
+                full_locale_source : path.join(cwd, options.i18n.locale_source),
                 full_generated_locale_dest : path.join(cwd, options.i18n.generated_locale_dest),
                 full_legacy_path : path.join(cwd, options.i18n.legacy_path),
                 
@@ -115,17 +120,19 @@ module.exports = {
         };
 
         
+        log("updated source:" + options.i18n.source);
+        log("updated full_source:" + options.i18n.full_source);
 
         return options;
     },
 
     /**
-     * Takes the command line arguments and runs the appropriate commands.
-     * 
-     * @param {Object} cli The meow object that handled the user input.
-     * @return {int} Returns the exit code of the operation. (0) means no error,
-     * non-zero means an error occured.
-     */
+     ** Takes the command line arguments and runs the appropriate commands.
+     ** 
+     ** @param {Object} cli The meow object that handled the user input.
+     ** @return {int} Returns the exit code of the operation. (0) means no error,
+     ** non-zero means an error occured.
+     **/
     run: async function ( cli ) {
         exitCode = 0;
 

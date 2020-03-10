@@ -22,10 +22,22 @@ Requires node >=10.0.0
     <li> <a href="#add-character-based-wordwraps">Add character based wordwraps</a>
 </ul>
 
-# Commands
+## Install
+
+```
+$ npm install @cloudcannon/i18n
+```
+
+## Synopsis
+
+```
+$ i18n <command> [args]
+```
+
+## Usage
 
 
-## Help
+### Help
 ##### ```help```
 Present the list of available commands
 
@@ -35,18 +47,18 @@ Present the list of available commands
 $ i18n help
 ```
 
-## I18n
+### I18n
 TODO:
 ##### ```i18n```
-Create translated version of your website for each "locale" file on the `i19n/locales/` folder. 
+Create translated version of your website for each "locale" file on the `i18n/locales/` folder. 
 
 #### Example:
 
 ```
-$ i18n
+$ i18n [<source>|<dest>|<override>]
 ```
 
-##  Build
+### Build
 TODO:
 ##### ```build```
 Builds the translated sites to the `dest` folder.
@@ -54,10 +66,10 @@ Builds the translated sites to the `dest` folder.
 #### Example:
 
 ```
-$ i18n build
+$ i18n build [<source>|<dest>|<override>]
 ```
 
-## Serve
+### Serve
 TODO:
 ##### ```serve```
 Runs a local webserver on the `dest` folder.
@@ -68,7 +80,7 @@ Runs a local webserver on the `dest` folder.
 $ i18n serve
 ```
 
-## Watch
+### Watch
 TODO:
 ##### ```watch```
 Watches the `src` and `locale_src` folder to trigger builds.
@@ -79,7 +91,7 @@ Watches the `src` and `locale_src` folder to trigger builds.
 $ i18n watch
 ```
 
-## Legacy Update
+### Legacy Update
 TODO:
 ##### ```legacy-update```
 Converts locales to the legacy system.
@@ -90,7 +102,7 @@ Converts locales to the legacy system.
 $ i18n legacy-update
 ```
 
-## Generate
+### Generate
 TODO:
 ##### ```generate```
 Generates a lookup table, called a “locale”, for these keys. The locale determines the content to be shown for each `data-i18n` key.
@@ -102,7 +114,7 @@ This generated locale is saved at `i18n/source.json`.
 $ i18n generate
 ```
 
-## Check
+### Check
 TODO:
 ##### ```check```
 Generates a comparison of i`18n/source.json` and `i18n/locales/*.json` at `i18n/checks.json`. This is not run as part of the `i18n` command.
@@ -113,7 +125,7 @@ Generates a comparison of i`18n/source.json` and `i18n/locales/*.json` at `i18n/
 $ i18n check
 ```
 
-## Clean
+### Clean
 ##### ```clean```
 
 Deletes the contents of the `dest` folder.
@@ -121,10 +133,10 @@ Deletes the contents of the `dest` folder.
 #### Example:
 
 ```
-$ i18n clean
+$ i18n clean [<dest>]
 ```
 
-## Add character based wordwraps
+### Add character based wordwraps
 TODO:
 ##### ```add-character-based-wordwraps```
 Creates a new locale for Japanese translations at `i18n/wrapped/`. This new locale has added span tags to wordwrap characters more appropriately. This requires a Google Cloud Natural Language API key to be set:
