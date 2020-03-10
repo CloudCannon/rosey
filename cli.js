@@ -1,8 +1,9 @@
 const runner = require("./lib/runner");
-// const path = require("path");
-const log = require('fancy-log');
+
 const chalk = require('chalk');
 const defaults = require("defaults");
+const log = require('fancy-log');
+const path = require("path");
 
 
 /**
@@ -27,12 +28,14 @@ const command = ( func, requiredFlags = []) => {
 */
 const commands = {
     "help": command(runner.help),
-    "clean": command(runner.clean)
+    "clean": command(runner.clean),
+    "build": command(runner.build)
+    
 }
 
 const defaultDest = "dist/prod";
 
-var configDefaults = {
+var optionsDefaults = {
 	i18n: {
 		src: "dist/site",
 		dest: "dist/translated_site",
@@ -84,17 +87,26 @@ module.exports = {
     * @param {Object} Flags the flags that were set by the user in the command line.
     * @return {Object} An object containing information on how to run the given CLI command.
     */
-    setOptions: function ( {flags, help}, config){
-        config = config || {};
-        config.i18n = defaults(config.i18n, configDefaults.i18n);
-        //config.serve = defaults(config.serve, configDefaults.serve);
+    setOptions: function ( {flags, help}){
+        let options = {};
+        options.i18n = defaults(options.i18n, optionsDefaults.i18n);
+        //options.serve = defaults(options.serve, optionsDefaults.serve);
         
-        let options = {
-            cwd: process.cwd(),
+        var cwd = process.cwd();
+        
+        options = {
+            cwd,
             help,
             
             i18n: {
-                dest: flags["dest"] || config.i18n.dest
+                dest: flags["dest"] || options.i18n.dest,
+
+                full_src : path.join(cwd, options.i18n.src),
+                full_dest : path.join(cwd, options.i18n.dest),
+                full_locale_src : path.join(cwd, options.i18n.locale_src),
+                full_generated_locale_dest : path.join(cwd, options.i18n.generated_locale_dest),
+                full_legacy_path : path.join(cwd, options.i18n.legacy_path),
+                
             },
 
             flags:{
@@ -102,6 +114,7 @@ module.exports = {
             }
         };
 
+        
 
         return options;
     },
