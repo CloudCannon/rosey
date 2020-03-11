@@ -55,7 +55,9 @@ var optionsDefaults = {
 
 		character_based_locales: ["ja", "ja_jp", "ja-jp"],
 		google_credentials_filename: null
-	},
+    },
+    flags: {
+    },
 	serve: {
 		port: 8000,
 		open: true,
@@ -88,41 +90,35 @@ module.exports = {
     * @return {Object} An object containing information on how to run the given CLI command.
     */
     setOptions: function ( {flags, help}){
+        
         let options = {};
-        options.i18n = defaults(options.i18n, optionsDefaults.i18n);
+        options = defaults(options, optionsDefaults);
+        //options.flags = defaults(options.flags, optionsDefaults.flags);
         //options.serve = defaults(options.serve, optionsDefaults.serve);
         
-        log("default source: " + options.i18n.source);
-        log("flag source: " + flags["source"]);
         let cwd = process.cwd();
         let dest = flags["dest"] || options.i18n.dest;
         let source = flags["source"] || options.i18n.source;
-        options = {
-            cwd,
-            help,
-            
-            i18n: {
-                dest,
-                source,
-
-                full_dest : path.join(cwd, dest),
-                full_source : path.join(cwd, source),
-                
-                full_locale_source : path.join(cwd, options.i18n.locale_source),
-                full_generated_locale_dest : path.join(cwd, options.i18n.generated_locale_dest),
-                full_legacy_path : path.join(cwd, options.i18n.legacy_path),
-                
-            },
-
-            flags:{
-                overwrite: flags["overwrite"]
-            }
-        };
 
         
-        log("updated source:" + options.i18n.source);
-        log("updated full_source:" + options.i18n.full_source);
 
+        options.cwd = cwd;
+        options.help = help;
+
+        options.i18n.dest = dest;
+        options.i18n.source = source;
+        options.i18n.full_dest = path.join(cwd, dest);
+        options.i18n.full_source = path.join(cwd, source);
+        options.i18n.full_locale_source = path.join(cwd, options.i18n.locale_source);
+        options.i18n.full_generated_locale_dest = path.join(cwd, options.i18n.generated_locale_dest);
+        options.i18n.full_legacy_path = path.join(cwd, options.i18n.legacy_path);
+
+        options.flags.overwrite = flags["overwrite"];
+
+
+        
+
+        
         return options;
     },
 

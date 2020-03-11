@@ -2,15 +2,16 @@
 const cli = require('./cli');
 const meow = require('meow');
 const helpString = `
-Usage: i18n <command> <flags>
-Flags:
+Usage: i18n <command> [args]
+Args:
     -s | --source       The source folder to clone. Defaults to dist/site.
     -d | --dest         The destination folder to clone the files to. Defaults to dist/translated_site
     -o | --override     Overrides the user convirmation requiest to Y
 
 Commands:
-    --Command--                                                     --Reqd flags--
+    --Command--                                                     
     clean           Removes all files from the dest folder.            
+    build           Generates a translated version of your website to the dest folder.
 `
 
 
@@ -30,10 +31,6 @@ const inputs = meow(
             type: 'string',
             alias: 'd'
         },
-        // baseurl: {
-        //     type: 'string',
-        //     alias: 'b'
-        // },
         // port: {
         //     type: 'string',
         //     alias: 'p'
