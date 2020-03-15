@@ -273,6 +273,11 @@ describe("build", function() {
             
         })
 
+        
+        it("should have the assets copied to dest", async function(){
+            expect(fs.existsSync(options.i18n.full_dest+"/assets/image2.jpg")).to.equal(true);
+        })
+
         it("should have a pt-BR folder on the dest", async function(){
             expect(fs.existsSync(options.i18n.full_dest+"/pt-BR/")).to.equal(true);
         })
@@ -290,6 +295,17 @@ describe("build", function() {
         it("should NOT have an es folder on the dest", async function(){
             expect(fs.existsSync(options.i18n.full_dest+"/es/")).to.equal(false);
         })
+
+        it("should have the pre localized files copied to dest", async function(){
+            expect(fs.existsSync(options.i18n.full_dest+"/pt-BR/preLocalized.html")).to.equal(true);
+        })
+
+        it("should have a redirect index.html file on the root of the dest", async function(){
+            expect(fs.existsSync(options.i18n.full_dest+"/index.html")).to.equal(true);
+        })
+
+        
+
     })
 
     after(function () {
