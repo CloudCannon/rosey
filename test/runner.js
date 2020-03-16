@@ -1,11 +1,16 @@
 const cli = require("../cli.js");
 const runner = require("../lib/runner.js");
+const wordwrap = require("../lib/plugins/wordwrap-json");
 
 const defaults = require("defaults");
-const expect = require('chai').expect;
+const chai = require('chai')
+const spies = require('chai-spies');
 const fs = require("fs-extra");
 const path = require("path");
 
+chai.use(spies);
+
+const expect = chai.expect;
 
 //Load default settings
 let flags = {overwrite: true};
@@ -36,6 +41,9 @@ options.i18n.full_legacy_path = path.join(cwd, legacy_path);
 modifiedOptions = {};
 modifiedOptions = defaults(modifiedOptions, options);
 
+function original () {
+    // do something cool
+  }
 
 describe("_askYesNo", function() {
     context("Response is affirmative", function(){
@@ -262,11 +270,186 @@ describe("build", function() {
         fs.writeJsonSync(options.i18n.locale_source+"/fr.json",localeFR);
         fs.writeFileSync(options.i18n.locale_source+"/es.json","Wrong JSON");
         fs.writeFileSync(options.i18n.locale_source+"/invalid.INVALID","Wrong JSON");
+
+        process.env.GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json'
+
+        localeJA = {
+            "bottom-title": "翻訳されるランダムな説明"
+        };
+        fs.writeJsonSync(options.i18n.locale_source+"/ja.json",localeJA);
+        fs.writeJsonSync(options.i18n.locale_source+"/ja-jp.json",localeJA);
+        
+        //fs.mkdirSync(path.join(options.i18n.locale_source, "../wrapped"));
+        //fs.writeJsonSync(path.join(options.i18n.locale_source, "../wrapped")+"/ja.json",localeJA);
+
+
     })
 
     context ("building with valid configs", function(){
         it("should return 0", async function(){
 
+            chai.spy.on(wordwrap, 'callClientApi', function(requestBody){
+                console.log("Spy on analyzeSyntax");
+                return new Promise(resolve => {
+                    /* Returns JSON data of annotations retrieved from the given text. */                   
+                    resolve([{
+                        sentences: [{}],
+                        tokens: [{
+                                text: {
+                                    content: '翻訳',
+                                    beginOffset: 0
+                                },
+                                partOfSpeech: {
+                                    tag: 'NOUN',
+                                    aspect: 'ASPECT_UNKNOWN',
+                                    case: 'CASE_UNKNOWN',
+                                    form: 'FORM_UNKNOWN',
+                                    gender: 'GENDER_UNKNOWN',
+                                    mood: 'MOOD_UNKNOWN',
+                                    number: 'NUMBER_UNKNOWN',
+                                    person: 'PERSON_UNKNOWN',
+                                    proper: 'NOT_PROPER',
+                                    reciprocity: 'RECIPROCITY_UNKNOWN',
+                                    tense: 'TENSE_UNKNOWN',
+                                    voice: 'VOICE_UNKNOWN'
+                                },
+                                dependencyEdge: {
+                                    headTokenIndex: 5,
+                                    label: 'RCMOD'
+                                },
+                                lemma: '翻訳'
+                            },
+                            {
+                                text: {
+                                    content: 'さ',
+                                    beginOffset: 2
+                                },
+                                partOfSpeech: {
+                                    tag: 'VERB',
+                                    aspect: 'ASPECT_UNKNOWN',
+                                    case: 'CASE_UNKNOWN',
+                                    form: 'IRREALIS',
+                                    gender: 'GENDER_UNKNOWN',
+                                    mood: 'MOOD_UNKNOWN',
+                                    number: 'NUMBER_UNKNOWN',
+                                    person: 'PERSON_UNKNOWN',
+                                    proper: 'NOT_PROPER',
+                                    reciprocity: 'RECIPROCITY_UNKNOWN',
+                                    tense: 'TENSE_UNKNOWN',
+                                    voice: 'VOICE_UNKNOWN'
+                                },
+                                dependencyEdge: {
+                                    headTokenIndex: 0,
+                                    label: 'MWV'
+                                },
+                                lemma: 'さ'
+                            },
+                            {
+                                text: {
+                                    content: 'れる',
+                                    beginOffset: 3
+                                },
+                                partOfSpeech: {
+                                    tag: 'VERB',
+                                    aspect: 'ASPECT_UNKNOWN',
+                                    case: 'CASE_UNKNOWN',
+                                    form: 'ADNOMIAL',
+                                    gender: 'GENDER_UNKNOWN',
+                                    mood: 'MOOD_UNKNOWN',
+                                    number: 'NUMBER_UNKNOWN',
+                                    person: 'PERSON_UNKNOWN',
+                                    proper: 'NOT_PROPER',
+                                    reciprocity: 'RECIPROCITY_UNKNOWN',
+                                    tense: 'TENSE_UNKNOWN',
+                                    voice: 'PASSIVE'
+                                },
+                                dependencyEdge: {
+                                    headTokenIndex: 0,
+                                    label: 'AUXPASS'
+                                },
+                                lemma: 'れる'
+                            },
+                            {
+                                text: {
+                                    content: 'ランダム',
+                                    beginOffset: 5
+                                },
+                                partOfSpeech: {
+                                    tag: 'ADJ',
+                                    aspect: 'ASPECT_UNKNOWN',
+                                    case: 'CASE_UNKNOWN',
+                                    form: 'FORM_UNKNOWN',
+                                    gender: 'GENDER_UNKNOWN',
+                                    mood: 'MOOD_UNKNOWN',
+                                    number: 'NUMBER_UNKNOWN',
+                                    person: 'PERSON_UNKNOWN',
+                                    proper: 'NOT_PROPER',
+                                    reciprocity: 'RECIPROCITY_UNKNOWN',
+                                    tense: 'TENSE_UNKNOWN',
+                                    voice: 'VOICE_UNKNOWN'
+                                },
+                                dependencyEdge: {
+                                    headTokenIndex: 5,
+                                    label: 'AMOD'
+                                },
+                                lemma: 'ランダム'
+                            },
+                            {
+                                text: {
+                                    content: 'な',
+                                    beginOffset: 9
+                                },
+                                partOfSpeech: {
+                                    tag: 'VERB',
+                                    aspect: 'ASPECT_UNKNOWN',
+                                    case: 'CASE_UNKNOWN',
+                                    form: 'ADNOMIAL',
+                                    gender: 'GENDER_UNKNOWN',
+                                    mood: 'MOOD_UNKNOWN',
+                                    number: 'NUMBER_UNKNOWN',
+                                    person: 'PERSON_UNKNOWN',
+                                    proper: 'NOT_PROPER',
+                                    reciprocity: 'RECIPROCITY_UNKNOWN',
+                                    tense: 'TENSE_UNKNOWN',
+                                    voice: 'VOICE_UNKNOWN'
+                                },
+                                dependencyEdge: {
+                                    headTokenIndex: 3,
+                                    label: 'AUX'
+                                },
+                                lemma: 'だ'
+                            },
+                            {
+                                text: {
+                                    content: '説明',
+                                    beginOffset: 10
+                                },
+                                partOfSpeech: {
+                                    tag: 'NOUN',
+                                    aspect: 'ASPECT_UNKNOWN',
+                                    case: 'CASE_UNKNOWN',
+                                    form: 'FORM_UNKNOWN',
+                                    gender: 'GENDER_UNKNOWN',
+                                    mood: 'MOOD_UNKNOWN',
+                                    number: 'NUMBER_UNKNOWN',
+                                    person: 'PERSON_UNKNOWN',
+                                    proper: 'NOT_PROPER',
+                                    reciprocity: 'RECIPROCITY_UNKNOWN',
+                                    tense: 'TENSE_UNKNOWN',
+                                    voice: 'VOICE_UNKNOWN'
+                                },
+                                dependencyEdge: {
+                                    headTokenIndex: 5,
+                                    label: 'ROOT'
+                                },
+                                lemma: '説明'
+                            }
+                        ],
+                        language: 'ja'
+                    }]);
+                });
+            })
+            
             let res = await runner.build( options );
             
             expect(res).to.equal(0);

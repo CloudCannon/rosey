@@ -29,7 +29,8 @@ const command = ( func, requiredFlags = []) => {
 const commands = {
     "help": command(runner.help),
     "clean": command(runner.clean),
-    "build": command(runner.build)
+    "build": command(runner.build),
+    "addCharacterBasedWordwraps": command(runner.addCharacterBasedWordwraps)
     
 }
 

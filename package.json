@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/CloudCannon/cli-i18n#readme",
   "dependencies": {
+    "@google-cloud/language": "^3.8.0",
     "async": "^3.2.0",
     "chalk": "^3.0.0",
     "cheerio": "^1.0.0-rc.3",
@@ -47,11 +48,13 @@
     "plugin-error": "^1.0.1",
     "readline-sync": "^1.4.10",
     "through2": "^3.0.1",
+    "unicharadata": "^9.0.0-alpha.6",
     "vinyl": "^2.2.0",
     "vinyl-fs": "^3.0.3"
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "chai-spies": "^1.0.0",
     "codecov": "^3.6.5",
     "istanbul": "^0.4.5",
     "mocha": "^7.1.0",
