@@ -18,12 +18,27 @@ describe("checkRequiredFlags()", function() {
 
 describe("setOptions()", function() {
     context ("Receives flags from cli", function() {
-        let flags = {"dest": "testdest", "overwrite": true}
+        let flags = {"dest": "testdest", "overwrite": true, "port": "9000"}
         it ("should return with the correct flags set", function() {
             let options = cli.setOptions( {flags} );
             expect(options.i18n.dest).to.equal("testdest");
 
             expect(options.flags.overwrite).to.equal(true);
+            expect(options.serve.port).to.equal(9000);
+        })
+    })
+    context ("Receives a string as a port number from cli", function() {
+        let flags = {"port": "NotAPortNumber"}
+        it ("should revert to default port number", function() {
+            let options = cli.setOptions( {flags} );
+            expect(options.serve.port).to.equal(8000);
+        })
+    })
+    context ("Receives an incorrect port number from cli", function() {
+        let flags = {"port": "999"}
+        it ("should revert to default port number", function() {
+            let options = cli.setOptions( {flags} );
+            expect(options.serve.port).to.equal(8000);
         })
     })
     context ("Receives default options", function() {

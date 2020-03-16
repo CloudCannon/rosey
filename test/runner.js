@@ -450,7 +450,10 @@ describe("build", function() {
                 });
             })
             
-            let res = await runner.build( options );
+            chai.spy.on(runner, 'serve', function(options){console.log("Ignoring serve on tests.")});
+            chai.spy.on(runner, 'watch', function(options){console.log("Ignoring watch on tests.")});
+
+            let res = await runner.i18n( options );
             
             expect(res).to.equal(0);
             

@@ -27,10 +27,12 @@ const command = ( func, requiredFlags = []) => {
  Required flags will be checked before the command is run.
 */
 const commands = {
-    "help": command(runner.help),
-    "clean": command(runner.clean),
     "build": command(runner.build),
+    "clean": command(runner.clean),
+    "help": command(runner.help),
+    "i18n": command(runner.i18n),
     "serve": command(runner.serve),
+    "watch": command(runner.watch),
     "wrapCharacters": command(runner.wrapCharacters)
     
 }
@@ -84,7 +86,34 @@ module.exports = {
         exitCode = 1;
         return false;
     },
-    
+
+    /**
+     * Checks a given port number to see if it is valid.
+     * 
+     * @param {string} portString
+     * @returns {number} The number representation of portString on no-error.
+     *                  Returns the default port number on error.
+     */
+    checkPortNumber: function ( portString ) {
+        if ( !portString ) return;
+
+        let port = parseInt(portString);
+        let defaultString = "Reverting to default port (" + optionsDefaults.serve.port + ").";
+
+        if ( !port ){
+            log.error(chalk.yellow(portString + " is not a valid port number."));
+            log.error(chalk.yellow(defaultString));
+            return;
+        }
+
+        if ( port < 1024 || port > 65535 ) {
+            log.error(chalk.yellow("Port number outside of allowed range. (1024 - 65535)."));
+            log.error(chalk.yellow(defaultString));
+            return;
+        }
+
+        return port;
+    },    
     /**
     * Function that ajusts the options that the cli runs on.
     * 
@@ -101,12 +130,14 @@ module.exports = {
         let cwd = process.cwd();
         let dest = flags["dest"] || options.i18n.dest;
         let source = flags["source"] || options.i18n.source;
+        let port = this.checkPortNumber(flags["port"]) || options.serve.port;
 
         
 
         options.cwd = cwd;
         options.help = help;
 
+        //i18n
         options.i18n.dest = dest;
         options.i18n.source = source;
         options.i18n.full_dest = path.join(cwd, dest);
@@ -115,7 +146,11 @@ module.exports = {
         options.i18n.full_generated_locale_dest = path.join(cwd, options.i18n.generated_locale_dest);
         options.i18n.full_legacy_path = path.join(cwd, options.i18n.legacy_path);
 
+        //flags
         options.flags.overwrite = flags["overwrite"];
+
+        //port
+        options.serve.port = port;
 
 
         
