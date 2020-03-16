@@ -6,12 +6,15 @@ Usage: i18n <command> [args]
 Args:
     -s | --source       The source folder to clone. Defaults to dist/site.
     -d | --dest         The destination folder to clone the files to. Defaults to dist/translated_site
-    -o | --override     Overrides the user convirmation requiest to Y
+    -o | --override     Overrides the user convirmation request to Y
 
 Commands:
     --Command--                                                     
     clean           Removes all files from the dest folder.            
     build           Generates a translated version of your website to the dest folder.
+    serve           Runs a local webserver on the dest folder.
+    watch           Watches the src folder and triggers builds.
+    wrapCharacters  Creates a new locale for Japanese translations at i18n/wrapped/.
 `
 
 

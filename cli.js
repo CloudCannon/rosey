@@ -30,7 +30,8 @@ const commands = {
     "help": command(runner.help),
     "clean": command(runner.clean),
     "build": command(runner.build),
-    "addCharacterBasedWordwraps": command(runner.addCharacterBasedWordwraps)
+    "serve": command(runner.serve),
+    "wrapCharacters": command(runner.wrapCharacters)
     
 }
 
