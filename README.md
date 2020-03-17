@@ -48,7 +48,6 @@ $ i18n help
 ```
 
 ### I18n
-TODO:
 ##### ```i18n```
 Create translated version of your website for each "locale" file on the `i18n/locales/` folder. 
 
@@ -59,7 +58,6 @@ $ i18n [<source>|<dest>|<override>]
 ```
 
 ### Build
-TODO:
 ##### ```build```
 Builds the translated sites to the `dest` folder.
 
@@ -70,7 +68,6 @@ $ i18n build [<source>|<dest>|<override>]
 ```
 
 ### Serve
-TODO:
 ##### ```serve```
 Runs a local webserver on the `dest` folder.
 
@@ -103,7 +100,6 @@ $ i18n legacy-update
 ```
 
 ### Generate
-TODO:
 ##### ```generate```
 Generates a lookup table, called a “locale”, for these keys. The locale determines the content to be shown for each `data-i18n` key.
 This generated locale is saved at `i18n/source.json`.
@@ -137,7 +133,6 @@ $ i18n clean [<dest>]
 ```
 
 ### Add character based wordwraps
-TODO:
 ##### ```add-character-based-wordwraps```
 Creates a new locale for Japanese translations at `i18n/wrapped/`. This new locale has added span tags to wordwrap characters more appropriately. This requires a Google Cloud Natural Language API key to be set:
 

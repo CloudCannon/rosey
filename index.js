@@ -39,6 +39,11 @@ const inputs = meow(
             type: 'string',
             alias: 'p'
         },
+        version: {
+            type: 'number',
+            alias: 'v',
+            default: 2
+        },
         overwrite: {
             type: 'boolean',
             alias: 'o'

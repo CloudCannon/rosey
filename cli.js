@@ -29,6 +29,7 @@ const command = ( func, requiredFlags = []) => {
 const commands = {
     "build": command(runner.build),
     "clean": command(runner.clean),
+    "generate": command(runner.generate),
     "help": command(runner.help),
     "i18n": command(runner.i18n),
     "serve": command(runner.serve),
@@ -130,6 +131,7 @@ module.exports = {
         let cwd = process.cwd();
         let dest = flags["dest"] || options.i18n.dest;
         let source = flags["source"] || options.i18n.source;
+        let sourceVersion = flags["version"] || options.i18n.source_version;
         let port = this.checkPortNumber(flags["port"]) || options.serve.port;
 
         
@@ -145,6 +147,8 @@ module.exports = {
         options.i18n.full_locale_source = path.join(cwd, options.i18n.locale_source);
         options.i18n.full_generated_locale_dest = path.join(cwd, options.i18n.generated_locale_dest);
         options.i18n.full_legacy_path = path.join(cwd, options.i18n.legacy_path);
+
+        options.i18n.source_version = sourceVersion;
 
         //flags
         options.flags.overwrite = flags["overwrite"];
