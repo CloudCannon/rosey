@@ -28,6 +28,7 @@ const command = ( func, requiredFlags = []) => {
 */
 const commands = {
     "build": command(runner.build),
+    "check": command(runner.check),
     "clean": command(runner.clean),
     "generate": command(runner.generate),
     "help": command(runner.help),

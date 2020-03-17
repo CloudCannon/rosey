@@ -11,6 +11,7 @@ const path = require("path");
 chai.use(spies);
 
 const expect = chai.expect;
+var should = chai.should;
 
 //Load default settings
 let flags = {overwrite: true};
@@ -369,8 +370,7 @@ describe ("generate", async function() {
     })
 
     context("Generate version 2 document", function () {
-        it("source.json file should not exist", async function () {
-
+        it("i18n generated locale path file should not exist", async function () {
             expect(fs.existsSync(options.i18n.full_generated_locale_dest)).to.equal(false);
         });
 
@@ -385,8 +385,7 @@ describe ("generate", async function() {
     
     context("Generate version 1 document", function () {
 
-        it("source.json file should not exist", async function () {
-
+        it("i18n generated locale path file should not exist", async function () {
             expect(fs.existsSync(options.i18n.full_generated_locale_dest)).to.equal(false);
         });
 
@@ -400,11 +399,97 @@ describe ("generate", async function() {
         });
     })
 
-    this.afterEach(function () {
+    afterEach(function () {
         
         fs.removeSync(options.i18n.full_generated_locale_dest);
     })
 
+
+    
+    after(function () {
+        cleanUpFilesAfterTest();
+    })
+ 
+    
+})
+
+describe ("check", async function() {
+    before(function () {
+       createTestingStructure();
+       createLocales();
+    })
+
+    
+    // context("Check on wrong locales folder", function () {
+
+        
+    //     it("should return 1 ", async function (done) {
+            
+    //         modifiedOptions.i18n.locale_source = "/WrongFolderPath/";
+            
+    //         runner.check(modifiedOptions).should.be.resolve;
+            
+    //         //expect(res).to.equal();
+    //     });
+    // })
+
+    context("Check against version 2 document", function () {
+
+
+        it("i18n generated locale path file should not exist", function () {
+            //Remove before starting
+            fs.removeSync(options.i18n.full_generated_locale_dest+"/source.json");
+            fs.removeSync(options.i18n.full_generated_locale_dest+"/checks.json");
+
+            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(false);
+            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(false);
+        });
+
+        it("should create the source.json file", async function () {
+            
+            let res = runner.generate(options);
+            await res;
+            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(true);
+        });
+
+        
+        it("should create the checks.json file", async function () {
+            
+            let res = runner.check(options);
+            await res;
+            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(true);
+        });
+    })
+
+    
+    context("Check against version 1 document", function () {
+
+
+        it(" generated locale path file should not exist", function () {
+            //Remove before starting
+            fs.removeSync(options.i18n.full_generated_locale_dest+"/source.json");
+            fs.removeSync(options.i18n.full_generated_locale_dest+"/checks.json");
+
+            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(false);
+            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(false);
+        });
+
+        it("should create the source.json file", async function () {
+
+            modifiedOptions.i18n.source_version = 1;
+            
+            let res = runner.generate(modifiedOptions);
+            await res;
+            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(true);
+        });
+
+        it("should create the checks.json file", async function () {
+            
+            let res = runner.check(options);
+            await res;
+            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(true);
+        });
+    })
 
     
     after(function () {
