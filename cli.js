@@ -34,8 +34,7 @@ const commands = {
     "help": command(runner.help),
     "i18n": command(runner.i18n),
     "serve": command(runner.serve),
-    "watch": command(runner.watch),
-    "wrapCharacters": command(runner.wrapCharacters)
+    "watch": command(runner.watch)
     
 }
 

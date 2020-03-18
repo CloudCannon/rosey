@@ -15,11 +15,9 @@ Requires node >=10.0.0
     <li> <a href="#build">Build</a>
     <li> <a href="#serve">Serve</a>
     <li> <a href="#watch">Watch</a>
-    <li> <a href="#legacy-update">Legacy Update</a>
     <li> <a href="#generate">Generate</a>
     <li> <a href="#check">Check</a>
     <li> <a href="#clean">Clean</a>
-    <li> <a href="#add-character-based-wordwraps">Add character based wordwraps</a>
 </ul>
 
 ## Install
@@ -50,11 +48,12 @@ $ i18n help
 ### I18n
 ##### ```i18n```
 Create translated version of your website for each "locale" file on the `i18n/locales/` folder. 
+Serves the translated version on a local browser and watches for changes.
 
 #### Example:
 
 ```
-$ i18n [<source>|<dest>|<override>]
+$ i18n [<source>|<dest>|<override>|<version>]
 ```
 
 ### Build
@@ -67,6 +66,17 @@ Builds the translated sites to the `dest` folder.
 $ i18n build [<source>|<dest>|<override>]
 ```
 
+##### Japanese translations
+When translating for a Japanese website the translated content from the locales folder will have span tags added to wordwrap characters more appropriately. 
+This requires a [Google Cloud Natural Language API key](https://cloud.google.com/natural-language/docs/quickstart) to be set. 
+
+#### Example:
+
+```
+$ export GOOGLE_APPLICATION_CREDENTIALS='/PATH/TO/CREDENTIALS/credentials.json'
+```
+
+
 ### Serve
 ##### ```serve```
 Runs a local webserver on the `dest` folder.
@@ -74,29 +84,19 @@ Runs a local webserver on the `dest` folder.
 #### Example:
 
 ```
-$ i18n serve
+$ i18n serve [<dest>|<version>]
 ```
 
 ### Watch
-TODO:
 ##### ```watch```
-Watches the `src` and `locale_src` folder to trigger builds.
+Watches the `source` and `locale_source` folders.
+A ``build`` is triggered when the `source` files are modified.
+A ``generate`` is triggered when the `locale_source` files are modified.
 
 #### Example:
 
 ```
-$ i18n watch
-```
-
-### Legacy Update
-TODO:
-##### ```legacy-update```
-Converts locales to the legacy system.
-
-#### Example:
-
-```
-$ i18n legacy-update
+$ i18n watch [<source>|<dest>|<override>|<version>]
 ```
 
 ### Generate
@@ -107,18 +107,17 @@ This generated locale is saved at `i18n/source.json`.
 #### Example:
 
 ```
-$ i18n generate
+$ i18n generate [<source>|<version>]
 ```
 
 ### Check
-TODO:
 ##### ```check```
-Generates a comparison of i`18n/source.json` and `i18n/locales/*.json` at `i18n/checks.json`. This is not run as part of the `i18n` command.
+Generates a comparison of `i18n/source.json` and `i18n/locales/*.json` at `i18n/checks.json`. This is not run as part of the `i18n` command.
 
 #### Example:
 
 ```
-$ i18n check
+$ i18n check [<version>]
 ```
 
 ### Clean
@@ -130,15 +129,4 @@ Deletes the contents of the `dest` folder.
 
 ```
 $ i18n clean [<dest>]
-```
-
-### Add character based wordwraps
-##### ```add-character-based-wordwraps```
-Creates a new locale for Japanese translations at `i18n/wrapped/`. This new locale has added span tags to wordwrap characters more appropriately. This requires a Google Cloud Natural Language API key to be set:
-
-#### Example:
-
-```
-$ export GOOGLE_APPLICATION_CREDENTIALS='/PATH/TO/CREDENTIALS/credentials.json'
-$ i18n add-character-based-wordwraps
 ```

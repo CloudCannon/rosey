@@ -284,9 +284,26 @@ function createLocales(){
         }
 
     };
+    localeRS = {
+        "04tmqDG7henk7K5vSmNiixjYP7r5IAsk7+ydpCIFAT8": "missing",
+        "2Mw5uqkD1RzJOweTkphkABZvn2XOprsSRAUucXOU6FI": "missing",
+        "EBGethTK4RpfYrsCM3tPVUzTCHWa6Fc6cqv7k+wocQM": "missing",
+        "G8Sml3Xk+qzoyW12YizhjYAf9GhJjh1Q5pb9TzIFToc": "missing",
+        "contact-us": "missing",
+        "hnJ2VFmNPYxM2JD+jAWFXrERNtH8YYcGgRny/zBtB2Y": "missing",
+        "homepage-company-description": "missing",
+        "homepage-title": "missing",
+        "homepage-title.descript": "missing",
+        "menu-portfolio": "missing",
+        "portfolio-description": "missing",
+        "some-of-our-work": "missing",
+        "some-of-our-work.alt": "missing",
+        "view-portfolio": "missing",
+    }
     fs.writeJsonSync(options.i18n.locale_source+"/pt-BR.json",localeBR);
     fs.writeJsonSync(options.i18n.locale_source+"/pt-PT.json",localePT);
     fs.writeJsonSync(options.i18n.locale_source+"/fr.json",localeFR);
+    fs.writeJsonSync(options.i18n.locale_source+"/rs.json",localeRS);
     fs.writeFileSync(options.i18n.locale_source+"/es.json","Wrong JSON");
     fs.writeFileSync(options.i18n.locale_source+"/invalid.INVALID","Wrong JSON");
 
