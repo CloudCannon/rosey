@@ -11,7 +11,6 @@ const path = require("path");
 chai.use(spies);
 
 const expect = chai.expect;
-var should = chai.should;
 
 //Load default settings
 let flags = {overwrite: true};
@@ -420,18 +419,32 @@ describe ("check", async function() {
     })
 
     
-    // context("Check on wrong locales folder", function () {
+    context("Check on wrong locales folder", function () {
 
         
-    //     it("should return 1 ", async function (done) {
+        it("should reject the promise ", async function () {
             
-    //         modifiedOptions.i18n.locale_source = "/WrongFolderPath/";
+            modifiedOptions.i18n.locale_source = "/WrongFolderPath/";
             
-    //         runner.check(modifiedOptions).should.be.resolve;
+            var isResolved = null;
+            var expectedResult = false;
             
-    //         //expect(res).to.equal();
-    //     });
-    // })
+            await runner.check(modifiedOptions)
+            .then(()=>{
+                console.log("promise is resolved");
+                isResolved = true;
+            }).catch((err)=>{
+                console.log("promise is rejected");
+                isResolved = false;
+            })
+
+             expect(isResolved).to.equal(expectedResult);
+
+            //Revert modified settings
+            modifiedOptions.i18n.locale_source = options.i18n.locale_source;
+
+        });
+    })
 
     context("Check against version 2 document", function () {
 
@@ -447,16 +460,40 @@ describe ("check", async function() {
 
         it("should create the source.json file", async function () {
             
-            let res = runner.generate(options);
-            await res;
+            var isResolved = null;
+            var expectedResult = true;
+            
+            await runner.generate(options)
+            .then(()=>{
+                console.log("promise is resolved");
+                isResolved = true;
+            }).catch((err)=>{
+                console.log("promise is rejected");
+                isResolved = false;
+            })
+
+            expect(isResolved).to.equal(expectedResult);
+
             expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(true);
         });
 
         
         it("should create the checks.json file", async function () {
+                        
+            var isResolved = null;
+            var expectedResult = true;
             
-            let res = runner.check(options);
-            await res;
+            await runner.check(options)
+            .then(()=>{
+                console.log("promise is resolved");
+                isResolved = true;
+            }).catch((err)=>{
+                console.log("promise is rejected");
+                isResolved = false;
+            })
+
+            expect(isResolved).to.equal(expectedResult);
+
             expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(true);
         });
     })
@@ -478,16 +515,50 @@ describe ("check", async function() {
 
             modifiedOptions.i18n.source_version = 1;
             
-            let res = runner.generate(modifiedOptions);
-            await res;
+            var isResolved = null;
+            var expectedResult = true;
+            
+            await runner.generate(modifiedOptions)
+            .then(()=>{
+                console.log("promise is resolved");
+                isResolved = true;
+            }).catch((err)=>{
+                console.log("promise is rejected");
+                isResolved = false;
+            })
+
+            expect(isResolved).to.equal(expectedResult);
+
             expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(true);
+            
+            //revert the modified options
+            modifiedOptions.i18n.source_version = options.i18n.source_version;
         });
 
         it("should create the checks.json file", async function () {
             
-            let res = runner.check(options);
-            await res;
+            
+            modifiedOptions.i18n.source_version = 1;
+            
+            var isResolved = null;
+            var expectedResult = true;
+            
+            await runner.check(modifiedOptions)
+            .then(()=>{
+                console.log("promise is resolved");
+                isResolved = true;
+            }).catch((err)=>{
+                console.log("promise is rejected");
+                isResolved = false;
+            })
+
+            expect(isResolved).to.equal(expectedResult);
+
             expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(true);
+
+            //revert the modified options
+            modifiedOptions.i18n.source_version = options.i18n.source_version;
+
         });
     })
 
