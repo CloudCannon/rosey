@@ -5,17 +5,19 @@ const helpString = `
 Usage: i18n <command> [args]
 Args:
     -s | --source       The source folder to clone. Defaults to dist/site.
-    -d | --dest         The destination folder to clone the files to. Defaults to dist/translated_site
-    -p | --port         The port number to serve the site on.
-    -o | --override     Overrides the user convirmation request to Y
+    -d | --dest         The destination folder to clone the files to. Defaults to dist/translated_site.
+    -p | --port         The port number to serve the site on. Defaults to 8000.
+    -v | --version      The version number of the locale file. Defaults to 2.
+    -o | --override     Overrides the user convirmation request to Y.
 
 Commands:
     --Command--                                                     
-    clean           Removes all files from the dest folder.            
     build           Generates a translated version of your website to the dest folder.
+    clean           Removes all files from the dest folder.
+    check           Generates a comparison between source and locales files.
+    generate        Generates a lookup table for the marked keys.
     serve           Runs a local webserver on the dest folder.
     watch           Watches the dest folder and reload the local webserver.
-    wrapCharacters  Creates a new locale for Japanese translations at i18n/wrapped/.
 `
 
 
@@ -41,8 +43,7 @@ const inputs = meow(
         },
         version: {
             type: 'number',
-            alias: 'v',
-            default: 2
+            alias: 'v'
         },
         overwrite: {
             type: 'boolean',

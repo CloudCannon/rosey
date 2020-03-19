@@ -53,7 +53,7 @@ Serves the translated version on a local browser and watches for changes.
 #### Example:
 
 ```
-$ i18n [<source>|<dest>|<override>|<version>]
+$ i18n [<source>|<dest>|<port>|<version>|<override>]
 ```
 
 ### Build
@@ -84,7 +84,7 @@ Runs a local webserver on the `dest` folder.
 #### Example:
 
 ```
-$ i18n serve [<dest>|<version>]
+$ i18n serve [<dest>|<port>|<version>]
 ```
 
 ### Watch
@@ -96,7 +96,7 @@ A ``generate`` is triggered when the `locale_source` files are modified.
 #### Example:
 
 ```
-$ i18n watch [<source>|<dest>|<override>|<version>]
+$ i18n watch [<source>|<dest>|<version>|<override>]
 ```
 
 ### Generate

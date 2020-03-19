@@ -285,7 +285,7 @@ function createLocales(){
 
     };
     localeRS = {
-        "04tmqDG7henk7K5vSmNiixjYP7r5IAsk7+ydpCIFAT8": "missing",
+        "04tmqDG7henk7K5vSmNiixjYP7r5IAsk7+ydpCIFAT8": "<p>With tags</p>",
         "2Mw5uqkD1RzJOweTkphkABZvn2XOprsSRAUucXOU6FI": "missing",
         "EBGethTK4RpfYrsCM3tPVUzTCHWa6Fc6cqv7k+wocQM": "missing",
         "G8Sml3Xk+qzoyW12YizhjYAf9GhJjh1Q5pb9TzIFToc": "missing",
@@ -437,7 +437,6 @@ describe ("check", async function() {
 
     
     context("Check on wrong locales folder", function () {
-
         
         it("should reject the promise ", async function () {
             
@@ -459,6 +458,28 @@ describe ("check", async function() {
 
             //Revert modified settings
             modifiedOptions.i18n.locale_source = options.i18n.locale_source;
+
+        });
+    })
+    
+    context("Check on missing source.json file", function () {
+        
+        it("should reject the promise ", async function () {
+                        
+            var isResolved = null;
+            var expectedResult = false;
+            
+            await runner.check(options)
+            .then(()=>{
+                console.log("promise is resolved");
+                isResolved = true;
+            }).catch((err)=>{
+                console.log("promise is rejected");
+                isResolved = false;
+            })
+
+             expect(isResolved).to.equal(expectedResult);
+
 
         });
     })
