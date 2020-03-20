@@ -59,6 +59,9 @@
     "chai": "^4.2.0",
     "chai-spies": "^1.0.0",
     "codecov": "^3.6.5",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1",
     "istanbul": "^0.4.5",
     "mocha": "^7.1.0",
     "nyc": "^15.0.0"

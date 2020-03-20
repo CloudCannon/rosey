@@ -1,49 +1,49 @@
-const cli = require("../cli.js");
-const runner = require("../lib/runner.js");
-const wordwrap = require("../lib/plugins/wordwrap-json");
-
-const defaults = require("defaults");
-const chai = require('chai')
+const defaults = require('defaults');
+const chai = require('chai');
 const spies = require('chai-spies');
-const fs = require("fs-extra");
-const path = require("path");
+const fs = require('fs-extra');
+const log = require('fancy-log');
+const path = require('path');
+const wordwrap = require('../lib/plugins/wordwrap-json');
+const runner = require('../lib/runner.js');
+const cli = require('../cli.js');
+
 
 chai.use(spies);
 
-const expect = chai.expect;
+const { expect } = chai;
 
-//Load default settings
-let flags = {overwrite: true};
-let options = cli.setOptions( {flags} );
+// Load default settings
+const flags = { yes: true };
+const options = cli.setOptions({ flags });
 
-//Modify paths for test purpose
+// Modify paths for test purpose
 
-let cwd = process.cwd();
-let dest = "test/dest";
-let source = "test/source";
-let locale_source = "test/i18n/locale";
-let generated_locale_dest = "test/i18n";
-let legacy_path = "test/_locales";
+const cwd = process.cwd();
+const dest = 'test/dest';
+const source = 'test/source';
+const localeSource = 'test/i18n/locale';
+const generatedLocaleDest = 'test/i18n';
+const legacyPath = 'test/_locales';
 
 options.i18n.dest = dest;
 options.i18n.source = source;
-options.i18n.locale_source = locale_source;
-options.i18n.generated_locale_dest = generated_locale_dest;
-options.i18n.legacy_path = legacy_path;
+options.i18n.locale_source = localeSource;
+options.i18n.generated_locale_dest = generatedLocaleDest;
+options.i18n.legacy_path = legacyPath;
 
 options.i18n.full_dest = path.join(cwd, dest);
 options.i18n.full_source = path.join(cwd, source);
-options.i18n.full_locale_source = path.join(cwd, locale_source);
-options.i18n.full_generated_locale_dest = path.join(cwd, generated_locale_dest);
-options.i18n.full_legacy_path = path.join(cwd, legacy_path);
+options.i18n.full_locale_source = path.join(cwd, localeSource);
+options.i18n.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
+options.i18n.full_legacy_path = path.join(cwd, legacyPath);
 
 
-modifiedOptions = {};
+let modifiedOptions = {};
 modifiedOptions = defaults(modifiedOptions, options);
 
-function createTestingStructure () {
-
-    let html = `
+function createTestingStructure() {
+  const html = `
     <!doctype html>
         <html lang="en">
             <head>
@@ -103,7 +103,7 @@ function createTestingStructure () {
                         </div>
                     </div>
                     <div class="legal-line">
-                        <p class="container">&copy; 2020 Urban Ltd	&bull;	Template by <a href="https://cloudcannon.com/">CloudCannon</a>
+                        <p class="container">&copy; 2020 Urban Ltd &bull; Template by <a href="https://cloudcannon.com/">CloudCannon</a>
                         </p>
                     </div>
                 </footer>                
@@ -116,7 +116,7 @@ function createTestingStructure () {
             </body>
         </html>
         `;
-    let html2 = `
+  const html2 = `
     <!doctype html>
         <html lang="en">
             <head>
@@ -186,7 +186,7 @@ function createTestingStructure () {
                         </div>
                     </div>
                     <div class="legal-line">
-                        <p class="container">&copy; 2020 Urban Ltd	&bull;	Template by <a href="https://cloudcannon.com/">CloudCannon</a>
+                        <p class="container">&copy; 2020 Urban Ltd &bull; Template by <a href="https://cloudcannon.com/">CloudCannon</a>
                         </p>
                     </div>
                 </footer>                
@@ -199,8 +199,8 @@ function createTestingStructure () {
             </body>
         </html>
         `;
-        
-    let preLocalized = `
+
+  const preLocalized = `
     <!doctype html>
         <html lang="en">
             <head>
@@ -240,593 +240,556 @@ function createTestingStructure () {
         `;
 
 
-    //Creat Source Files
-    fs.mkdirSync(options.i18n.source);
-    fs.mkdirSync(options.i18n.source+"/assets");
-    fs.mkdirSync(options.i18n.source+"/css");
-    fs.mkdirSync(options.i18n.source+"/html");
-    fs.mkdirSync(options.i18n.source+"/pt-BR/");
-    fs.writeFileSync(options.i18n.source+"/image.jpg", "image");
-    fs.writeFileSync(options.i18n.source+"/assets/image2.jpg", "image");
-    fs.writeFileSync(options.i18n.source+"/style.css", "css");
-    fs.writeFileSync(options.i18n.source+"/css/style2.css", "css");
-    fs.writeFileSync(options.i18n.source+"/index.html", html);
-    fs.writeFileSync(options.i18n.source+"/html/index2.html", html2);
-    fs.writeFileSync(options.i18n.source+"/pt-BR/preLocalized.html", preLocalized);
-    
+  // Creat Source Files
+  fs.mkdirSync(options.i18n.source);
+  fs.mkdirSync(`${options.i18n.source}/assets`);
+  fs.mkdirSync(`${options.i18n.source}/css`);
+  fs.mkdirSync(`${options.i18n.source}/html`);
+  fs.mkdirSync(`${options.i18n.source}/pt-BR/`);
+  fs.writeFileSync(`${options.i18n.source}/image.jpg`, 'image');
+  fs.writeFileSync(`${options.i18n.source}/assets/image2.jpg`, 'image');
+  fs.writeFileSync(`${options.i18n.source}/style.css`, 'css');
+  fs.writeFileSync(`${options.i18n.source}/css/style2.css`, 'css');
+  fs.writeFileSync(`${options.i18n.source}/index.html`, html);
+  fs.writeFileSync(`${options.i18n.source}/html/index2.html`, html2);
+  fs.writeFileSync(`${options.i18n.source}/pt-BR/preLocalized.html`, preLocalized);
 }
 
-function createLocales(){
-    //Create Locales
-    fs.mkdirSync(options.i18n.generated_locale_dest);
-    fs.mkdirSync(options.i18n.locale_source);
-    localeBR = {
-        "homepage-title": "Criamos websites para você",
-        "homepage-title.descript": "Descrição aleatória a ser traduzida",
-        "contact-us": "Entre em contato",
-        "some-of-our-work": "Um pouco do nosso trabalho"
-    };
-    localePT = {
-        "homepage-title": "POISH, Criamos websites para você"
-    };
-    localeFR = {
-        "homepage-title": {
-            original: "We build nice website",
-            value: "Nous construisons de beaux sites Web"
-        },
-        "homepage-title.descript": {
-            original: "random description to be translated",
-            value: "Nous construisons de beaux sites Web"
-        },
-        "contact-us": {
-            original: "Contact Us",
-            value: "Nous contacter"
-        }
+function createLocales() {
+  // Create Locales
+  fs.mkdirSync(options.i18n.generated_locale_dest);
+  fs.mkdirSync(options.i18n.locale_source);
+  const localeBR = {
+    'homepage-title': 'Criamos websites para você',
+    'homepage-title.descript': 'Descrição aleatória a ser traduzida',
+    'contact-us': 'Entre em contato',
+    'some-of-our-work': 'Um pouco do nosso trabalho',
+  };
+  const localePT = {
+    'homepage-title': 'POISH, Criamos websites para você',
+  };
+  const localeFR = {
+    'homepage-title': {
+      original: 'We build nice website',
+      value: 'Nous construisons de beaux sites Web',
+    },
+    'homepage-title.descript': {
+      original: 'random description to be translated',
+      value: 'Nous construisons de beaux sites Web',
+    },
+    'contact-us': {
+      original: 'Contact Us',
+      value: 'Nous contacter',
+    },
 
-    };
-    localeRS = {
-        "04tmqDG7henk7K5vSmNiixjYP7r5IAsk7+ydpCIFAT8": "<p>With tags</p>",
-        "2Mw5uqkD1RzJOweTkphkABZvn2XOprsSRAUucXOU6FI": "missing",
-        "EBGethTK4RpfYrsCM3tPVUzTCHWa6Fc6cqv7k+wocQM": "missing",
-        "G8Sml3Xk+qzoyW12YizhjYAf9GhJjh1Q5pb9TzIFToc": "missing",
-        "contact-us": "missing",
-        "hnJ2VFmNPYxM2JD+jAWFXrERNtH8YYcGgRny/zBtB2Y": "missing",
-        "homepage-company-description": "missing",
-        "homepage-title": "missing",
-        "homepage-title.descript": "missing",
-        "menu-portfolio": "missing",
-        "portfolio-description": "missing",
-        "some-of-our-work": "missing",
-        "some-of-our-work.alt": "missing",
-        "view-portfolio": "missing",
-    }
-    fs.writeJsonSync(options.i18n.locale_source+"/pt-BR.json",localeBR);
-    fs.writeJsonSync(options.i18n.locale_source+"/pt-PT.json",localePT);
-    fs.writeJsonSync(options.i18n.locale_source+"/fr.json",localeFR);
-    fs.writeJsonSync(options.i18n.locale_source+"/rs.json",localeRS);
-    fs.writeFileSync(options.i18n.locale_source+"/es.json","Wrong JSON");
-    fs.writeFileSync(options.i18n.locale_source+"/invalid.INVALID","Wrong JSON");
+  };
+  const localeRS = {
+    '04tmqDG7henk7K5vSmNiixjYP7r5IAsk7+ydpCIFAT8': '<p>With tags</p>',
+    '2Mw5uqkD1RzJOweTkphkABZvn2XOprsSRAUucXOU6FI': 'missing',
+    'EBGethTK4RpfYrsCM3tPVUzTCHWa6Fc6cqv7k+wocQM': 'missing',
+    'G8Sml3Xk+qzoyW12YizhjYAf9GhJjh1Q5pb9TzIFToc': 'missing',
+    'contact-us': 'missing',
+    'hnJ2VFmNPYxM2JD+jAWFXrERNtH8YYcGgRny/zBtB2Y': 'missing',
+    'homepage-company-description': 'missing',
+    'homepage-title': 'missing',
+    'homepage-title.descript': 'missing',
+    'menu-portfolio': 'missing',
+    'portfolio-description': 'missing',
+    'some-of-our-work': 'missing',
+    'some-of-our-work.alt': 'missing',
+    'view-portfolio': 'missing',
+  };
+  fs.writeJsonSync(`${options.i18n.locale_source}/pt-BR.json`, localeBR);
+  fs.writeJsonSync(`${options.i18n.locale_source}/pt-PT.json`, localePT);
+  fs.writeJsonSync(`${options.i18n.locale_source}/fr.json`, localeFR);
+  fs.writeJsonSync(`${options.i18n.locale_source}/rs.json`, localeRS);
+  fs.writeFileSync(`${options.i18n.locale_source}/es.json`, 'Wrong JSON');
+  fs.writeFileSync(`${options.i18n.locale_source}/invalid.INVALID`, 'Wrong JSON');
 
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json'
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json';
 
-    localeJA = {
-        "bottom-title": "翻訳されるランダムな説明"
-    };
-    fs.writeJsonSync(options.i18n.locale_source+"/ja.json",localeJA);
-    fs.writeJsonSync(options.i18n.locale_source+"/ja-jp.json",localeJA);
-    
-    //fs.mkdirSync(path.join(options.i18n.locale_source, "../wrapped"));
-    //fs.writeJsonSync(path.join(options.i18n.locale_source, "../wrapped")+"/ja.json",localeJA);
+  const localeJA = {
+    'bottom-title': '翻訳されるランダムな説明',
+  };
+  fs.writeJsonSync(`${options.i18n.locale_source}/ja.json`, localeJA);
+  fs.writeJsonSync(`${options.i18n.locale_source}/ja-jp.json`, localeJA);
 
+  // fs.mkdirSync(path.join(options.i18n.locale_source, "../wrapped"));
+  // fs.writeJsonSync(path.join(options.i18n.locale_source, "../wrapped")+"/ja.json",localeJA);
 }
 
-function cleanUpFilesAfterTest(){
+function cleanUpFilesAfterTest() {
+  fs.removeSync(options.i18n.dest);
 
-    fs.removeSync(options.i18n.dest);
+  fs.removeSync(options.i18n.source);
+  fs.removeSync(`${options.i18n.source}/assets`);
+  fs.removeSync(`${options.i18n.source}/css`);
+  fs.removeSync(`${options.i18n.source}/html`);
 
-    fs.removeSync(options.i18n.source);
-    fs.removeSync(options.i18n.source+"/assets");
-    fs.removeSync(options.i18n.source+"/css");
-    fs.removeSync(options.i18n.source+"/html");
-
-    fs.removeSync(options.i18n.generated_locale_dest);
-    fs.removeSync(options.i18n.locale_source);
+  fs.removeSync(options.i18n.generated_locale_dest);
+  fs.removeSync(options.i18n.locale_source);
 }
 
-describe("_askYesNo", function() {
-    context("Response is affirmative", function(){
-        it("should return true", async function(){
-            let response = await runner._askYesNo("question", "Y");
-            expect(response).to.equal(true);
-        })
-    })
+describe('askYesNo', () => {
+  context('Response is affirmative', () => {
+    it('should return true', async () => {
+      const response = await runner.askYesNo('question', 'Y');
+      expect(response).to.equal(true);
+    });
+  });
 
-    context("Response is negative", function(){
-        it("should return false", async function(){
-            let response = await runner._askYesNo("question", "N");
-            expect(response).to.equal(false);
-        }) 
-    })
-})
+  context('Response is negative', () => {
+    it('should return false', async () => {
+      const response = await runner.askYesNo('question', 'N');
+      expect(response).to.equal(false);
+    });
+  });
+});
 
-describe ("clean", async function() {
-    before(function () {
-        fs.mkdirSync(options.i18n.dest);//TODO: move to options variable
-    })
+describe('clean', async () => {
+  before(() => {
+    fs.mkdirSync(options.i18n.dest);// TODO: move to options variable
+  });
 
-    context("Removing a file", function () {
-        it("should remove the directory", async function () {
-            //options.i18n.dest = dest;
-            let res = await runner.clean(options);
-            console.log(res);
-            expect(res).to.eql([path.resolve(options.i18n.dest)]);
-        });
-    })
-
-    
-    context("invalid directory name", function () {
-        modifiedOptions.i18n.dest = "thisdoesntexist";
-        it("should return an empty array", async function () {
-            let res = await runner.clean(modifiedOptions);
-            expect(res).to.eql([]);
-        });
-    })
-
-    
-    after(function () {
-        fs.removeSync(options.i18n.dest, {recursive: true})//TODO: move to options variable
-    })
-    
-})
+  context('Removing a file', () => {
+    it('should remove the directory', async () => {
+      // options.i18n.dest = dest;
+      const res = await runner.clean(options);
+      log(res);
+      expect(res).to.eql([path.resolve(options.i18n.dest)]);
+    });
+  });
 
 
-describe ("generate", async function() {
-    before(function () {
-       createTestingStructure();
-    })
-
-    context("Generate version 2 document", function () {
-        it("i18n generated locale path file should not exist", async function () {
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest)).to.equal(false);
-        });
-
-        it("should create the source.json file", async function () {
-            
-            let res = runner.generate(options);
-            await res;
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(true);
-        });
-    })
-
-    
-    context("Generate version 1 document", function () {
-
-        it("i18n generated locale path file should not exist", async function () {
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest)).to.equal(false);
-        });
-
-        it("should create the source.json file", async function () {
-
-            modifiedOptions.i18n.source_version = 1;
-            
-            let res = runner.generate(modifiedOptions);
-            await res;
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(true);
-        });
-    })
-
-    afterEach(function () {
-        
-        fs.removeSync(options.i18n.full_generated_locale_dest);
-    })
+  context('invalid directory name', () => {
+    modifiedOptions.i18n.dest = 'thisdoesntexist';
+    it('should return an empty array', async () => {
+      const res = await runner.clean(modifiedOptions);
+      expect(res).to.eql([]);
+    });
+  });
 
 
-    
-    after(function () {
-        cleanUpFilesAfterTest();
-    })
- 
-    
-})
-
-describe ("check", async function() {
-    before(function () {
-       createTestingStructure();
-       createLocales();
-    })
-
-    
-    context("Check on wrong locales folder", function () {
-        
-        it("should reject the promise ", async function () {
-            
-            modifiedOptions.i18n.locale_source = "/WrongFolderPath/";
-            
-            var isResolved = null;
-            var expectedResult = false;
-            
-            await runner.check(modifiedOptions)
-            .then(()=>{
-                console.log("promise is resolved");
-                isResolved = true;
-            }).catch((err)=>{
-                console.log("promise is rejected");
-                isResolved = false;
-            })
-
-             expect(isResolved).to.equal(expectedResult);
-
-            //Revert modified settings
-            modifiedOptions.i18n.locale_source = options.i18n.locale_source;
-
-        });
-    })
-    
-    context("Check on missing source.json file", function () {
-        
-        it("should reject the promise ", async function () {
-                        
-            var isResolved = null;
-            var expectedResult = false;
-            
-            await runner.check(options)
-            .then(()=>{
-                console.log("promise is resolved");
-                isResolved = true;
-            }).catch((err)=>{
-                console.log("promise is rejected");
-                isResolved = false;
-            })
-
-             expect(isResolved).to.equal(expectedResult);
+  after(() => {
+    fs.removeSync(options.i18n.dest, { recursive: true });// TODO: move to options variable
+  });
+});
 
 
-        });
-    })
+describe('generate', async () => {
+  before(() => {
+    createTestingStructure();
+  });
 
-    context("Check against version 2 document", function () {
+  context('Generate version 2 document', () => {
+    it('i18n generated locale path file should not exist', async () => {
+      expect(fs.existsSync(options.i18n.full_generated_locale_dest)).to.equal(false);
+    });
+
+    it('should create the source.json file', async () => {
+      const res = runner.generate(options);
+      await res;
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(true);
+    });
+  });
 
 
-        it("i18n generated locale path file should not exist", function () {
-            //Remove before starting
-            fs.removeSync(options.i18n.full_generated_locale_dest+"/source.json");
-            fs.removeSync(options.i18n.full_generated_locale_dest+"/checks.json");
+  context('Generate version 1 document', () => {
+    it('i18n generated locale path file should not exist', async () => {
+      expect(fs.existsSync(options.i18n.full_generated_locale_dest)).to.equal(false);
+    });
 
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(false);
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(false);
+    it('should create the source.json file', async () => {
+      modifiedOptions.i18n.source_version = 1;
+
+      const res = runner.generate(modifiedOptions);
+      await res;
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(true);
+    });
+  });
+
+  afterEach(() => {
+    fs.removeSync(options.i18n.full_generated_locale_dest);
+  });
+
+
+  after(() => {
+    cleanUpFilesAfterTest();
+  });
+});
+
+describe('check', async () => {
+  before(() => {
+    createTestingStructure();
+    createLocales();
+  });
+
+
+  context('Check on wrong locales folder', () => {
+    it('should reject the promise ', async () => {
+      modifiedOptions.i18n.locale_source = '/WrongFolderPath/';
+
+      let isResolved = null;
+      const expectedResult = false;
+
+      await runner.check(modifiedOptions)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
         });
 
-        it("should create the source.json file", async function () {
-            
-            var isResolved = null;
-            var expectedResult = true;
-            
-            await runner.generate(options)
-            .then(()=>{
-                console.log("promise is resolved");
-                isResolved = true;
-            }).catch((err)=>{
-                console.log("promise is rejected");
-                isResolved = false;
-            })
+      expect(isResolved).to.equal(expectedResult);
 
-            expect(isResolved).to.equal(expectedResult);
+      // Revert modified settings
+      modifiedOptions.i18n.locale_source = options.i18n.locale_source;
+    });
+  });
 
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(true);
+  context('Check on missing source.json file', () => {
+    it('should reject the promise ', async () => {
+      let isResolved = null;
+      const expectedResult = false;
+
+      await runner.check(options)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch((err) => {
+          log('promise is rejected');
+          isResolved = false;
         });
 
-        
-        it("should create the checks.json file", async function () {
-                        
-            var isResolved = null;
-            var expectedResult = true;
-            
-            await runner.check(options)
-            .then(()=>{
-                console.log("promise is resolved");
-                isResolved = true;
-            }).catch((err)=>{
-                console.log("promise is rejected");
-                isResolved = false;
-            })
+      expect(isResolved).to.equal(expectedResult);
+    });
+  });
 
-            expect(isResolved).to.equal(expectedResult);
+  context('Check against version 2 document', () => {
+    it('i18n generated locale path file should not exist', () => {
+      // Remove before starting
+      fs.removeSync(`${options.i18n.full_generated_locale_dest}/source.json`);
+      fs.removeSync(`${options.i18n.full_generated_locale_dest}/checks.json`);
 
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(true);
-        });
-    })
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(false);
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/checks.json`)).to.equal(false);
+    });
 
-    
-    context("Check against version 1 document", function () {
+    it('should create the source.json file', async () => {
+      let isResolved = null;
+      const expectedResult = true;
 
-
-        it(" generated locale path file should not exist", function () {
-            //Remove before starting
-            fs.removeSync(options.i18n.full_generated_locale_dest+"/source.json");
-            fs.removeSync(options.i18n.full_generated_locale_dest+"/checks.json");
-
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(false);
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(false);
+      await runner.generate(options)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch((err) => {
+          log('promise is rejected');
+          isResolved = false;
         });
 
-        it("should create the source.json file", async function () {
+      expect(isResolved).to.equal(expectedResult);
 
-            modifiedOptions.i18n.source_version = 1;
-            
-            var isResolved = null;
-            var expectedResult = true;
-            
-            await runner.generate(modifiedOptions)
-            .then(()=>{
-                console.log("promise is resolved");
-                isResolved = true;
-            }).catch((err)=>{
-                console.log("promise is rejected");
-                isResolved = false;
-            })
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(true);
+    });
 
-            expect(isResolved).to.equal(expectedResult);
 
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/source.json")).to.equal(true);
-            
-            //revert the modified options
-            modifiedOptions.i18n.source_version = options.i18n.source_version;
+    it('should create the checks.json file', async () => {
+      let isResolved = null;
+      const expectedResult = true;
+
+      await runner.check(options)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch((err) => {
+          log('promise is rejected');
+          isResolved = false;
         });
 
-        it("should create the checks.json file", async function () {
-            
-            
-            modifiedOptions.i18n.source_version = 1;
-            
-            var isResolved = null;
-            var expectedResult = true;
-            
-            await runner.check(modifiedOptions)
-            .then(()=>{
-                console.log("promise is resolved");
-                isResolved = true;
-            }).catch((err)=>{
-                console.log("promise is rejected");
-                isResolved = false;
-            })
+      expect(isResolved).to.equal(expectedResult);
 
-            expect(isResolved).to.equal(expectedResult);
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/checks.json`)).to.equal(true);
+    });
+  });
 
-            expect(fs.existsSync(options.i18n.full_generated_locale_dest+"/checks.json")).to.equal(true);
 
-            //revert the modified options
-            modifiedOptions.i18n.source_version = options.i18n.source_version;
+  context('Check against version 1 document', () => {
+    it(' generated locale path file should not exist', () => {
+      // Remove before starting
+      fs.removeSync(`${options.i18n.full_generated_locale_dest}/source.json`);
+      fs.removeSync(`${options.i18n.full_generated_locale_dest}/checks.json`);
 
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(false);
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/checks.json`)).to.equal(false);
+    });
+
+    it('should create the source.json file', async () => {
+      modifiedOptions.i18n.source_version = 1;
+
+      let isResolved = null;
+      const expectedResult = true;
+
+      await runner.generate(modifiedOptions)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
         });
-    })
 
-    
-    after(function () {
-        cleanUpFilesAfterTest();
-    })
- 
-    
-})
+      expect(isResolved).to.equal(expectedResult);
 
-describe("build", function() {
-    before(function () {
-       createTestingStructure();
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(true);
 
-        createLocales();
+      // revert the modified options
+      modifiedOptions.i18n.source_version = options.i18n.source_version;
+    });
 
-    })
+    it('should create the checks.json file', async () => {
+      modifiedOptions.i18n.source_version = 1;
 
-    context ("building with valid configs", function(){
-        it("should return 0", async function(){
+      let isResolved = null;
+      const expectedResult = true;
 
-            chai.spy.on(wordwrap, 'callClientApi', function(requestBody){
-                console.log("Spy on analyzeSyntax");
-                return new Promise(resolve => {
-                    /* Returns JSON data of annotations retrieved from the given text. */                   
-                    resolve([{
-                        sentences: [{}],
-                        tokens: [{
-                                text: {
-                                    content: '翻訳',
-                                    beginOffset: 0
-                                },
-                                partOfSpeech: {
-                                    tag: 'NOUN',
-                                    aspect: 'ASPECT_UNKNOWN',
-                                    case: 'CASE_UNKNOWN',
-                                    form: 'FORM_UNKNOWN',
-                                    gender: 'GENDER_UNKNOWN',
-                                    mood: 'MOOD_UNKNOWN',
-                                    number: 'NUMBER_UNKNOWN',
-                                    person: 'PERSON_UNKNOWN',
-                                    proper: 'NOT_PROPER',
-                                    reciprocity: 'RECIPROCITY_UNKNOWN',
-                                    tense: 'TENSE_UNKNOWN',
-                                    voice: 'VOICE_UNKNOWN'
-                                },
-                                dependencyEdge: {
-                                    headTokenIndex: 5,
-                                    label: 'RCMOD'
-                                },
-                                lemma: '翻訳'
-                            },
-                            {
-                                text: {
-                                    content: 'さ',
-                                    beginOffset: 2
-                                },
-                                partOfSpeech: {
-                                    tag: 'VERB',
-                                    aspect: 'ASPECT_UNKNOWN',
-                                    case: 'CASE_UNKNOWN',
-                                    form: 'IRREALIS',
-                                    gender: 'GENDER_UNKNOWN',
-                                    mood: 'MOOD_UNKNOWN',
-                                    number: 'NUMBER_UNKNOWN',
-                                    person: 'PERSON_UNKNOWN',
-                                    proper: 'NOT_PROPER',
-                                    reciprocity: 'RECIPROCITY_UNKNOWN',
-                                    tense: 'TENSE_UNKNOWN',
-                                    voice: 'VOICE_UNKNOWN'
-                                },
-                                dependencyEdge: {
-                                    headTokenIndex: 0,
-                                    label: 'MWV'
-                                },
-                                lemma: 'さ'
-                            },
-                            {
-                                text: {
-                                    content: 'れる',
-                                    beginOffset: 3
-                                },
-                                partOfSpeech: {
-                                    tag: 'VERB',
-                                    aspect: 'ASPECT_UNKNOWN',
-                                    case: 'CASE_UNKNOWN',
-                                    form: 'ADNOMIAL',
-                                    gender: 'GENDER_UNKNOWN',
-                                    mood: 'MOOD_UNKNOWN',
-                                    number: 'NUMBER_UNKNOWN',
-                                    person: 'PERSON_UNKNOWN',
-                                    proper: 'NOT_PROPER',
-                                    reciprocity: 'RECIPROCITY_UNKNOWN',
-                                    tense: 'TENSE_UNKNOWN',
-                                    voice: 'PASSIVE'
-                                },
-                                dependencyEdge: {
-                                    headTokenIndex: 0,
-                                    label: 'AUXPASS'
-                                },
-                                lemma: 'れる'
-                            },
-                            {
-                                text: {
-                                    content: 'ランダム',
-                                    beginOffset: 5
-                                },
-                                partOfSpeech: {
-                                    tag: 'ADJ',
-                                    aspect: 'ASPECT_UNKNOWN',
-                                    case: 'CASE_UNKNOWN',
-                                    form: 'FORM_UNKNOWN',
-                                    gender: 'GENDER_UNKNOWN',
-                                    mood: 'MOOD_UNKNOWN',
-                                    number: 'NUMBER_UNKNOWN',
-                                    person: 'PERSON_UNKNOWN',
-                                    proper: 'NOT_PROPER',
-                                    reciprocity: 'RECIPROCITY_UNKNOWN',
-                                    tense: 'TENSE_UNKNOWN',
-                                    voice: 'VOICE_UNKNOWN'
-                                },
-                                dependencyEdge: {
-                                    headTokenIndex: 5,
-                                    label: 'AMOD'
-                                },
-                                lemma: 'ランダム'
-                            },
-                            {
-                                text: {
-                                    content: 'な',
-                                    beginOffset: 9
-                                },
-                                partOfSpeech: {
-                                    tag: 'VERB',
-                                    aspect: 'ASPECT_UNKNOWN',
-                                    case: 'CASE_UNKNOWN',
-                                    form: 'ADNOMIAL',
-                                    gender: 'GENDER_UNKNOWN',
-                                    mood: 'MOOD_UNKNOWN',
-                                    number: 'NUMBER_UNKNOWN',
-                                    person: 'PERSON_UNKNOWN',
-                                    proper: 'NOT_PROPER',
-                                    reciprocity: 'RECIPROCITY_UNKNOWN',
-                                    tense: 'TENSE_UNKNOWN',
-                                    voice: 'VOICE_UNKNOWN'
-                                },
-                                dependencyEdge: {
-                                    headTokenIndex: 3,
-                                    label: 'AUX'
-                                },
-                                lemma: 'だ'
-                            },
-                            {
-                                text: {
-                                    content: '説明',
-                                    beginOffset: 10
-                                },
-                                partOfSpeech: {
-                                    tag: 'NOUN',
-                                    aspect: 'ASPECT_UNKNOWN',
-                                    case: 'CASE_UNKNOWN',
-                                    form: 'FORM_UNKNOWN',
-                                    gender: 'GENDER_UNKNOWN',
-                                    mood: 'MOOD_UNKNOWN',
-                                    number: 'NUMBER_UNKNOWN',
-                                    person: 'PERSON_UNKNOWN',
-                                    proper: 'NOT_PROPER',
-                                    reciprocity: 'RECIPROCITY_UNKNOWN',
-                                    tense: 'TENSE_UNKNOWN',
-                                    voice: 'VOICE_UNKNOWN'
-                                },
-                                dependencyEdge: {
-                                    headTokenIndex: 5,
-                                    label: 'ROOT'
-                                },
-                                lemma: '説明'
-                            }
-                        ],
-                        language: 'ja'
-                    }]);
-                });
-            })
-            
-            chai.spy.on(runner, 'serve', function(options){console.log("Ignoring serve on tests.")});
-            chai.spy.on(runner, 'watch', function(options){console.log("Ignoring watch on tests.")});
+      await runner.check(modifiedOptions)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch((err) => {
+          log('promise is rejected');
+          isResolved = false;
+        });
 
-            let res = await runner.i18n( options );
-            
-            expect(res).to.equal(0);
-            
-        })
+      expect(isResolved).to.equal(expectedResult);
 
-        
-        it("should have the assets copied to dest", async function(){
-            expect(fs.existsSync(options.i18n.full_dest+"/assets/image2.jpg")).to.equal(true);
-        })
+      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/checks.json`)).to.equal(true);
 
-        it("should have a pt-BR folder on the dest", async function(){
-            expect(fs.existsSync(options.i18n.full_dest+"/pt-BR/")).to.equal(true);
-        })
-        it("should have a pt-PT folder on the dest", async function(){
-            expect(fs.existsSync(options.i18n.full_dest+"/pt-PT/")).to.equal(true);
-        })
-        it("should have a fr folder on the dest", async function(){
-            expect(fs.existsSync(options.i18n.full_dest+"/fr/")).to.equal(true);
-        })
-        
-        it("should have an en folder on the dest", async function(){
-            expect(fs.existsSync(options.i18n.full_dest+"/en/")).to.equal(true);
-        })
-        
-        it("should NOT have an es folder on the dest", async function(){
-            expect(fs.existsSync(options.i18n.full_dest+"/es/")).to.equal(false);
-        })
+      // revert the modified options
+      modifiedOptions.i18n.source_version = options.i18n.source_version;
+    });
+  });
 
-        it("should have the pre localized files copied to dest", async function(){
-            expect(fs.existsSync(options.i18n.full_dest+"/pt-BR/preLocalized.html")).to.equal(true);
-        })
 
-        it("should have a redirect index.html file on the root of the dest", async function(){
-            expect(fs.existsSync(options.i18n.full_dest+"/index.html")).to.equal(true);
-        })
+  after(() => {
+    cleanUpFilesAfterTest();
+  });
+});
 
-        
+describe('build', () => {
+  before(() => {
+    createTestingStructure();
 
-    })
+    createLocales();
+  });
 
-    after(function () {
-        cleanUpFilesAfterTest();
-    })
- 
-})
+  context('building with valid configs', () => {
+    it('should return 0', async () => {
+      chai.spy.on(wordwrap, 'callClientApi', () => {
+        log('Spy on analyzeSyntax');
+        return new Promise((resolve) => {
+          /* Returns JSON data of annotations retrieved from the given text. */
+          resolve([{
+            sentences: [{}],
+            tokens: [{
+              text: {
+                content: '翻訳',
+                beginOffset: 0,
+              },
+              partOfSpeech: {
+                tag: 'NOUN',
+                aspect: 'ASPECT_UNKNOWN',
+                case: 'CASE_UNKNOWN',
+                form: 'FORM_UNKNOWN',
+                gender: 'GENDER_UNKNOWN',
+                mood: 'MOOD_UNKNOWN',
+                number: 'NUMBER_UNKNOWN',
+                person: 'PERSON_UNKNOWN',
+                proper: 'NOT_PROPER',
+                reciprocity: 'RECIPROCITY_UNKNOWN',
+                tense: 'TENSE_UNKNOWN',
+                voice: 'VOICE_UNKNOWN',
+              },
+              dependencyEdge: {
+                headTokenIndex: 5,
+                label: 'RCMOD',
+              },
+              lemma: '翻訳',
+            },
+            {
+              text: {
+                content: 'さ',
+                beginOffset: 2,
+              },
+              partOfSpeech: {
+                tag: 'VERB',
+                aspect: 'ASPECT_UNKNOWN',
+                case: 'CASE_UNKNOWN',
+                form: 'IRREALIS',
+                gender: 'GENDER_UNKNOWN',
+                mood: 'MOOD_UNKNOWN',
+                number: 'NUMBER_UNKNOWN',
+                person: 'PERSON_UNKNOWN',
+                proper: 'NOT_PROPER',
+                reciprocity: 'RECIPROCITY_UNKNOWN',
+                tense: 'TENSE_UNKNOWN',
+                voice: 'VOICE_UNKNOWN',
+              },
+              dependencyEdge: {
+                headTokenIndex: 0,
+                label: 'MWV',
+              },
+              lemma: 'さ',
+            },
+            {
+              text: {
+                content: 'れる',
+                beginOffset: 3,
+              },
+              partOfSpeech: {
+                tag: 'VERB',
+                aspect: 'ASPECT_UNKNOWN',
+                case: 'CASE_UNKNOWN',
+                form: 'ADNOMIAL',
+                gender: 'GENDER_UNKNOWN',
+                mood: 'MOOD_UNKNOWN',
+                number: 'NUMBER_UNKNOWN',
+                person: 'PERSON_UNKNOWN',
+                proper: 'NOT_PROPER',
+                reciprocity: 'RECIPROCITY_UNKNOWN',
+                tense: 'TENSE_UNKNOWN',
+                voice: 'PASSIVE',
+              },
+              dependencyEdge: {
+                headTokenIndex: 0,
+                label: 'AUXPASS',
+              },
+              lemma: 'れる',
+            },
+            {
+              text: {
+                content: 'ランダム',
+                beginOffset: 5,
+              },
+              partOfSpeech: {
+                tag: 'ADJ',
+                aspect: 'ASPECT_UNKNOWN',
+                case: 'CASE_UNKNOWN',
+                form: 'FORM_UNKNOWN',
+                gender: 'GENDER_UNKNOWN',
+                mood: 'MOOD_UNKNOWN',
+                number: 'NUMBER_UNKNOWN',
+                person: 'PERSON_UNKNOWN',
+                proper: 'NOT_PROPER',
+                reciprocity: 'RECIPROCITY_UNKNOWN',
+                tense: 'TENSE_UNKNOWN',
+                voice: 'VOICE_UNKNOWN',
+              },
+              dependencyEdge: {
+                headTokenIndex: 5,
+                label: 'AMOD',
+              },
+              lemma: 'ランダム',
+            },
+            {
+              text: {
+                content: 'な',
+                beginOffset: 9,
+              },
+              partOfSpeech: {
+                tag: 'VERB',
+                aspect: 'ASPECT_UNKNOWN',
+                case: 'CASE_UNKNOWN',
+                form: 'ADNOMIAL',
+                gender: 'GENDER_UNKNOWN',
+                mood: 'MOOD_UNKNOWN',
+                number: 'NUMBER_UNKNOWN',
+                person: 'PERSON_UNKNOWN',
+                proper: 'NOT_PROPER',
+                reciprocity: 'RECIPROCITY_UNKNOWN',
+                tense: 'TENSE_UNKNOWN',
+                voice: 'VOICE_UNKNOWN',
+              },
+              dependencyEdge: {
+                headTokenIndex: 3,
+                label: 'AUX',
+              },
+              lemma: 'だ',
+            },
+            {
+              text: {
+                content: '説明',
+                beginOffset: 10,
+              },
+              partOfSpeech: {
+                tag: 'NOUN',
+                aspect: 'ASPECT_UNKNOWN',
+                case: 'CASE_UNKNOWN',
+                form: 'FORM_UNKNOWN',
+                gender: 'GENDER_UNKNOWN',
+                mood: 'MOOD_UNKNOWN',
+                number: 'NUMBER_UNKNOWN',
+                person: 'PERSON_UNKNOWN',
+                proper: 'NOT_PROPER',
+                reciprocity: 'RECIPROCITY_UNKNOWN',
+                tense: 'TENSE_UNKNOWN',
+                voice: 'VOICE_UNKNOWN',
+              },
+              dependencyEdge: {
+                headTokenIndex: 5,
+                label: 'ROOT',
+              },
+              lemma: '説明',
+            },
+            ],
+            language: 'ja',
+          }]);
+        });
+      });
+
+      chai.spy.on(runner, 'serve', () => { log('Ignoring serve on tests.'); });
+      chai.spy.on(runner, 'watch', () => { log('Ignoring watch on tests.'); });
+
+      const res = await runner.i18n(options);
+
+      expect(res).to.equal(0);
+    });
+
+
+    it('should have the assets copied to dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/assets/image2.jpg`)).to.equal(true);
+    });
+
+    it('should have a pt-BR folder on the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/`)).to.equal(true);
+    });
+    it('should have a pt-PT folder on the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/pt-PT/`)).to.equal(true);
+    });
+    it('should have a fr folder on the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/fr/`)).to.equal(true);
+    });
+
+    it('should have an en folder on the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/en/`)).to.equal(true);
+    });
+
+    it('should NOT have an es folder on the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/es/`)).to.equal(false);
+    });
+
+    it('should have the pre localized files copied to dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
+    });
+
+    it('should have a redirect index.html file on the root of the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/index.html`)).to.equal(true);
+    });
+  });
+
+  after(() => {
+    cleanUpFilesAfterTest();
+  });
+});

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-const cli = require('./cli');
+/* eslint-disable no-console */
 const meow = require('meow');
+const cli = require('./cli');
+
 const helpString = `
 Usage: i18n <command> [args]
 Args:
@@ -8,7 +10,7 @@ Args:
     -d | --dest         The destination folder to clone the files to. Defaults to dist/translated_site.
     -p | --port         The port number to serve the site on. Defaults to 8000.
     -v | --version      The version number of the locale file. Defaults to 2.
-    -o | --override     Overrides the user convirmation request to Y.
+    -y | --yes          Overrides the user confirmation request to Y.
 
 Commands:
     --Command--                                                     
@@ -18,7 +20,7 @@ Commands:
     generate        Generates a lookup table for the marked keys.
     serve           Runs a local webserver on the dest folder.
     watch           Watches the dest folder and reload the local webserver.
-`
+`;
 
 
 /**
@@ -26,41 +28,39 @@ Commands:
  * arguments (in camelCase) and flags.
  */
 const inputs = meow(
-    helpString, 
-    {
+  helpString,
+  {
     flags: {
-        source: { 
-            type: 'string',
-            alias: 's'
-        },
-        dest: {
-            type: 'string',
-            alias: 'd'
-        },
-        port: {
-            type: 'string',
-            alias: 'p'
-        },
-        version: {
-            type: 'number',
-            alias: 'v'
-        },
-        overwrite: {
-            type: 'boolean',
-            alias: 'o'
-        }
-    }
-});
+      source: {
+        type: 'string',
+        alias: 's',
+      },
+      dest: {
+        type: 'string',
+        alias: 'd',
+      },
+      port: {
+        type: 'string',
+        alias: 'p',
+      },
+      version: {
+        type: 'number',
+        alias: 'v',
+      },
+      yes: {
+        type: 'boolean',
+        alias: 'y',
+      },
+    },
+  },
+);
 
 /**
  * Passes inputs to cli.js
  */
-async function run(){
-    
-    const exitCode = await cli.run( inputs );
-    console.log("exit code: " + exitCode);
-    if (exitCode) process.exit(exitCode);
+async function run() {
+  const exitCode = await cli.run(inputs);
+  console.log(`exit code: ${exitCode}`);
+  if (exitCode) process.exit(exitCode);
 }
 run();
-
-
