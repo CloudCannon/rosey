@@ -347,7 +347,7 @@ describe('askYesNo', () => {
 });
 
 describe('clean', () => {
-  before(() => {
+  before(async () => {
     fs.mkdirSync(options.i18n.dest);// TODO: move to options variable
   });
 
@@ -370,14 +370,14 @@ describe('clean', () => {
   });
 
 
-  after(() => {
+  after(async () => {
     fs.removeSync(options.i18n.dest, { recursive: true });// TODO: move to options variable
   });
 });
 
 
 describe('generate', () => {
-  before(() => {
+  before(async () => {
     createTestingStructure();
   });
 
@@ -408,18 +408,18 @@ describe('generate', () => {
     });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     fs.removeSync(options.i18n.full_generated_locale_dest);
   });
 
 
-  after(() => {
+  after(async () => {
     cleanUpFilesAfterTest();
   });
 });
 
 describe('check', () => {
-  before(() => {
+  before(async () => {
     createTestingStructure();
     createLocales();
   });
@@ -467,7 +467,7 @@ describe('check', () => {
   });
 
   context('Check against version 2 document', () => {
-    it('i18n generated locale path file should not exist', () => {
+    it('i18n generated locale path file should not exist', async () => {
       // Remove before starting
       fs.removeSync(`${options.i18n.full_generated_locale_dest}/source.json`);
       fs.removeSync(`${options.i18n.full_generated_locale_dest}/checks.json`);
@@ -516,7 +516,7 @@ describe('check', () => {
 
 
   context('Check against version 1 document', () => {
-    it(' generated locale path file should not exist', () => {
+    it(' generated locale path file should not exist', async () => {
       // Remove before starting
       fs.removeSync(`${options.i18n.full_generated_locale_dest}/source.json`);
       fs.removeSync(`${options.i18n.full_generated_locale_dest}/checks.json`);
@@ -573,13 +573,13 @@ describe('check', () => {
   });
 
 
-  after(() => {
+  after(async () => {
     cleanUpFilesAfterTest();
   });
 });
 
 describe('build', () => {
-  before(() => {
+  before(async () => {
     createTestingStructure();
 
     createLocales();
@@ -789,7 +789,7 @@ describe('build', () => {
     });
   });
 
-  after(() => {
+  after(async () => {
     cleanUpFilesAfterTest();
   });
 });

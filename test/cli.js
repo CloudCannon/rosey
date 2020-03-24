@@ -19,7 +19,7 @@ describe('checkRequiredFlags()', () => {
 describe('setOptions()', () => {
   context('Receives flags from cli', () => {
     const flags = { dest: 'testdest', yes: true, port: '9000' };
-    it('should return with the correct flags set', () => {
+    it('should return with the correct flags set', async () => {
       const options = cli.setOptions({ flags });
       expect(options.i18n.dest).to.equal('testdest');
 
@@ -29,21 +29,21 @@ describe('setOptions()', () => {
   });
   context('Receives a string as a port number from cli', () => {
     const flags = { port: 'NotAPortNumber' };
-    it('should revert to default port number', () => {
+    it('should revert to default port number', async () => {
       const options = cli.setOptions({ flags });
       expect(options.serve.port).to.equal(8000);
     });
   });
   context('Receives an incorrect port number from cli', () => {
     const flags = { port: '999' };
-    it('should revert to default port number', () => {
+    it('should revert to default port number', async () => {
       const options = cli.setOptions({ flags });
       expect(options.serve.port).to.equal(8000);
     });
   });
   context('Receives default options', () => {
     const flags = {};
-    it('should return with the correct default settings', () => {
+    it('should return with the correct default settings', async () => {
       const options = cli.setOptions({ flags, help: 'helpMessage' });
       expect(options.cwd).to.equal(process.cwd());
       expect(options.help).to.equal('helpMessage');
