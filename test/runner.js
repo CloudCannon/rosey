@@ -346,7 +346,7 @@ describe('askYesNo', () => {
   });
 });
 
-describe('clean', async () => {
+describe('clean', () => {
   before(() => {
     fs.mkdirSync(options.i18n.dest);// TODO: move to options variable
   });
@@ -362,8 +362,8 @@ describe('clean', async () => {
 
 
   context('invalid directory name', () => {
-    modifiedOptions.i18n.dest = 'thisdoesntexist';
     it('should return an empty array', async () => {
+      modifiedOptions.i18n.dest = 'thisdoesntexist';
       const res = await runner.clean(modifiedOptions);
       expect(res).to.eql([]);
     });
@@ -376,7 +376,7 @@ describe('clean', async () => {
 });
 
 
-describe('generate', async () => {
+describe('generate', () => {
   before(() => {
     createTestingStructure();
   });
@@ -418,7 +418,7 @@ describe('generate', async () => {
   });
 });
 
-describe('check', async () => {
+describe('check', () => {
   before(() => {
     createTestingStructure();
     createLocales();
@@ -457,7 +457,7 @@ describe('check', async () => {
         .then(() => {
           log('promise is resolved');
           isResolved = true;
-        }).catch((err) => {
+        }).catch(() => {
           log('promise is rejected');
           isResolved = false;
         });
@@ -484,7 +484,7 @@ describe('check', async () => {
         .then(() => {
           log('promise is resolved');
           isResolved = true;
-        }).catch((err) => {
+        }).catch(() => {
           log('promise is rejected');
           isResolved = false;
         });
@@ -503,7 +503,7 @@ describe('check', async () => {
         .then(() => {
           log('promise is resolved');
           isResolved = true;
-        }).catch((err) => {
+        }).catch(() => {
           log('promise is rejected');
           isResolved = false;
         });
@@ -558,7 +558,7 @@ describe('check', async () => {
         .then(() => {
           log('promise is resolved');
           isResolved = true;
-        }).catch((err) => {
+        }).catch(() => {
           log('promise is rejected');
           isResolved = false;
         });

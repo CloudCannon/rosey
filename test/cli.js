@@ -74,7 +74,7 @@ describe('run()', () => {
   });
 
   // context ("Command runs but fails", function() {
-  //     let inputs = {flags: {"baseurl": "test", "source": "test/invalidplace", "dest": "test/forTesting"}, input: ["clone-assets"]}
+  //     let inputs = {flags: {"source": "test/invalidplace"}, input: ["clone-assets"]}
   //     it("Should exit with code (1)", async function() {
   //         let exitCode = await cli.run( inputs );
   //         expect(exitCode).to.equal(1);

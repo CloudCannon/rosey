@@ -90,7 +90,7 @@ module.exports = {
      *                  Returns the default port number on error.
      */
   checkPortNumber(portString) {
-    if (!portString) return;
+    if (!portString) return optionsDefaults.serve.port;
 
     const port = parseInt(portString, 10);
     const defaultString = `Reverting to default port (${optionsDefaults.serve.port}).`;
@@ -98,13 +98,13 @@ module.exports = {
     if (!port) {
       log.error(chalk.yellow(`${portString} is not a valid port number.`));
       log.error(chalk.yellow(defaultString));
-      return;
+      return optionsDefaults.serve.port;
     }
 
     if (port < 1024 || port > 65535) {
       log.error(chalk.yellow('Port number outside of allowed range. (1024 - 65535).'));
       log.error(chalk.yellow(defaultString));
-      return;
+      return optionsDefaults.serve.port;
     }
 
     return port;
