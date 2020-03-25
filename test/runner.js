@@ -318,16 +318,11 @@ function createLocales() {
   // fs.writeJsonSync(path.join(options.i18n.locale_source, "../wrapped")+"/ja.json",localeJA);
 }
 
-function cleanUpFilesAfterTest() {
-  fs.removeSync(options.i18n.dest);
-
-  fs.removeSync(options.i18n.source);
-  fs.removeSync(`${options.i18n.source}/assets`);
-  fs.removeSync(`${options.i18n.source}/css`);
-  fs.removeSync(`${options.i18n.source}/html`);
-
-  fs.removeSync(options.i18n.generated_locale_dest);
-  fs.removeSync(options.i18n.locale_source);
+async function cleanUpFilesAfterTest() {
+  await fs.remove(options.i18n.generated_locale_dest);
+  await fs.remove(options.i18n.locale_source);
+  await fs.remove(options.i18n.source);
+  await fs.remove(options.i18n.dest);
 }
 
 describe('askYesNo', () => {
@@ -348,7 +343,7 @@ describe('askYesNo', () => {
 
 describe('clean', () => {
   before(async () => {
-    fs.mkdirSync(options.i18n.dest);// TODO: move to options variable
+    fs.mkdirSync(options.i18n.dest);
   });
 
   context('Removing a file', () => {
@@ -414,7 +409,7 @@ describe('generate', () => {
 
 
   after(async () => {
-    cleanUpFilesAfterTest();
+    await cleanUpFilesAfterTest();
   });
 });
 
@@ -574,7 +569,7 @@ describe('check', () => {
 
 
   after(async () => {
-    cleanUpFilesAfterTest();
+    await cleanUpFilesAfterTest();
   });
 });
 
@@ -790,6 +785,78 @@ describe('build', () => {
   });
 
   after(async () => {
-    cleanUpFilesAfterTest();
+    await cleanUpFilesAfterTest();
+  });
+});
+
+describe('base', () => {
+  before(async () => {
+    createTestingStructure();
+    createLocales();
+  });
+
+  context('running the base command', () => {
+    it('should return 0', async () => {
+      const res = await runner.base(options);
+      expect(res).to.equal(0);
+    });
+
+    it('should have the assets copied to dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/assets/image2.jpg`)).to.equal(true);
+    });
+    it('should have pt-BR folder on the dest due to the preLocalized files', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/`)).to.equal(true);
+    });
+
+    it('should NOT have any language specific folder on the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/pt-PT/`)).to.equal(false);
+      expect(fs.existsSync(`${options.i18n.full_dest}/fr/`)).to.equal(false);
+      expect(fs.existsSync(`${options.i18n.full_dest}/en/`)).to.equal(false);
+    });
+  });
+
+  after(async () => {
+    await cleanUpFilesAfterTest();
+  });
+});
+
+describe('translate', () => {
+  before(async () => {
+    modifiedOptions = options;
+    createTestingStructure();
+    createLocales();
+  });
+
+  context('running the base command', () => {
+    it('should return 0', async () => {
+      modifiedOptions.flags.partialLanguages = ['PT-BR', 'FR'];
+      const res = await runner.translate(modifiedOptions);
+      expect(res).to.equal(0);
+      modifiedOptions.flags.partialLanguages = null;
+    });
+
+    it('should NOT have the assets copied to dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/assets/image2.jpg`)).to.equal(false);
+    });
+
+    it('should have a pt-BR folder on the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/`)).to.equal(true);
+    });
+    it('should have a fr folder on the dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/fr/`)).to.equal(true);
+    });
+    it('should have the pre localized files copied to dest', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
+    });
+
+    it('should NOT have a the folders not part of the specified languages', async () => {
+      expect(fs.existsSync(`${options.i18n.full_dest}/pt-PT/`)).to.equal(false);
+      expect(fs.existsSync(`${options.i18n.full_dest}/en/`)).to.equal(false);
+      expect(fs.existsSync(`${options.i18n.full_dest}/es/`)).to.equal(false);
+    });
+  });
+
+  after(async () => {
+    await cleanUpFilesAfterTest();
   });
 });

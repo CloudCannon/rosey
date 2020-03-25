@@ -20,17 +20,19 @@ const command = (func, requiredFlags = []) => ({
 
 
 /**
- The different commands for operation. New commands can be specified here.
- Each command requires a function to run, and a lsi of required flags.
- Required flags will be checked before the command is run.
+* The different commands for operation. New commands can be specified here.
+* Each command requires a function to run, and a lsi of required flags.
+* Required flags will be checked before the command is run.
 */
 const commands = {
   build: command(runner.build),
+  base: command(runner.base),
   check: command(runner.check),
   clean: command(runner.clean),
   generate: command(runner.generate),
   help: command(runner.help),
   i18n: command(runner.i18n),
+  translate: command(runner.translate, ['languages']),
   serve: command(runner.serve),
   watch: command(runner.watch),
 };
@@ -118,15 +120,13 @@ module.exports = {
   setOptions({ flags, help }) {
     let options = {};
     options = defaults(options, optionsDefaults);
-    // options.flags = defaults(options.flags, optionsDefaults.flags);
-    // options.serve = defaults(options.serve, optionsDefaults.serve);
 
     const cwd = process.cwd();
     const dest = flags.dest || options.i18n.dest;
     const source = flags.source || options.i18n.source;
     const sourceVersion = flags.version || options.i18n.source_version;
     const port = this.checkPortNumber(flags.port) || options.serve.port;
-
+    const partialLanguages = flags.languages ? flags.languages.toUpperCase().split(',') : null;
 
     options.cwd = cwd;
     options.help = help;
@@ -144,6 +144,7 @@ module.exports = {
 
     // flags
     options.flags.yes = flags.yes;
+    options.flags.partialLanguages = partialLanguages;
 
     // port
     options.serve.port = port;
