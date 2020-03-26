@@ -1,5 +1,5 @@
-# cli-i18n
-The CLI for the CloudCannon i18n package.
+# rosey
+The CLI for the CloudCannon rosey package.
 
 Requires node >=10.0.0
 
@@ -11,7 +11,7 @@ Requires node >=10.0.0
 ## Contents
 <ul>
     <li> <a href="#help">Help</a>
-    <li> <a href="#i18n">I18n</a>
+    <li> <a href="#rosey">Rosey</a>
     <li> <a href="#build">Build</a>
     <li> <a href="#serve">Serve</a>
     <li> <a href="#watch">Watch</a>
@@ -23,13 +23,13 @@ Requires node >=10.0.0
 ## Install
 
 ```
-$ npm install @cloudcannon/i18n
+$ npm install @cloudcannon/rosey
 ```
 
 ## Synopsis
 
 ```
-$ i18n <command> [args]
+$ rosey <command> [args]
 ```
 
 ## Usage
@@ -42,18 +42,18 @@ Present the list of available commands
 #### Example:
 
 ```
-$ i18n help
+$ rosey help
 ```
 
-### I18n
-##### ```i18n```
-Create translated version of your website for each "locale" file on the `i18n/locales/` folder. 
+### Rosey
+##### ```rosey```
+Create translated version of your website for each "locale" file on the `rosey/locales/` folder. 
 Serves the translated version on a local browser and watches for changes.
 
 #### Example:
 
 ```
-$ i18n [<source>|<dest>|<port>|<version>|<override>]
+$ rosey [<source>|<dest>|<port>|<version>|<override>]
 ```
 
 ### Build
@@ -63,7 +63,7 @@ Builds the translated sites to the `dest` folder.
 #### Example:
 
 ```
-$ i18n build [<source>|<dest>|<override>]
+$ rosey build [<source>|<dest>|<override>]
 ```
 
 ##### Japanese translations
@@ -84,7 +84,7 @@ Runs a local webserver on the `dest` folder.
 #### Example:
 
 ```
-$ i18n serve [<dest>|<port>|<version>]
+$ rosey serve [<dest>|<port>|<version>]
 ```
 
 ### Watch
@@ -96,28 +96,28 @@ A ``generate`` is triggered when the `locale_source` files are modified.
 #### Example:
 
 ```
-$ i18n watch [<source>|<dest>|<version>|<override>]
+$ rosey watch [<source>|<dest>|<version>|<override>]
 ```
 
 ### Generate
 ##### ```generate```
-Generates a lookup table, called a “locale”, for these keys. The locale determines the content to be shown for each `data-i18n` key.
-This generated locale is saved at `i18n/source.json`.
+Generates a lookup table, called a “locale”, for these keys. The locale determines the content to be shown for each `data-rosey` key.
+This generated locale is saved at `rosey/source.json`.
 
 #### Example:
 
 ```
-$ i18n generate [<source>|<version>]
+$ rosey generate [<source>|<version>]
 ```
 
 ### Check
 ##### ```check```
-Generates a comparison of `i18n/source.json` and `i18n/locales/*.json` at `i18n/checks.json`. This is not run as part of the `i18n` command.
+Generates a comparison of `rosey/source.json` and `rosey/locales/*.json` at `rosey/checks.json`. This is not run as part of the `rosey` command.
 
 #### Example:
 
 ```
-$ i18n check [<version>]
+$ rosey check [<version>]
 ```
 
 ### Clean
@@ -128,5 +128,5 @@ Deletes the contents of the `dest` folder.
 #### Example:
 
 ```
-$ i18n clean [<dest>]
+$ rosey clean [<dest>]
 ```

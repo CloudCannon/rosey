@@ -26,17 +26,17 @@ const localeSource = 'test/i18n/locale';
 const generatedLocaleDest = 'test/i18n';
 const legacyPath = 'test/_locales';
 
-options.i18n.dest = dest;
-options.i18n.source = source;
-options.i18n.locale_source = localeSource;
-options.i18n.generated_locale_dest = generatedLocaleDest;
-options.i18n.legacy_path = legacyPath;
+options.rosey.dest = dest;
+options.rosey.source = source;
+options.rosey.locale_source = localeSource;
+options.rosey.generated_locale_dest = generatedLocaleDest;
+options.rosey.legacy_path = legacyPath;
 
-options.i18n.full_dest = path.join(cwd, dest);
-options.i18n.full_source = path.join(cwd, source);
-options.i18n.full_locale_source = path.join(cwd, localeSource);
-options.i18n.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
-options.i18n.full_legacy_path = path.join(cwd, legacyPath);
+options.rosey.full_dest = path.join(cwd, dest);
+options.rosey.full_source = path.join(cwd, source);
+options.rosey.full_locale_source = path.join(cwd, localeSource);
+options.rosey.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
+options.rosey.full_legacy_path = path.join(cwd, legacyPath);
 
 
 let modifiedOptions = {};
@@ -241,24 +241,24 @@ function createTestingStructure() {
 
 
   // Creat Source Files
-  fs.mkdirSync(options.i18n.source);
-  fs.mkdirSync(`${options.i18n.source}/assets`);
-  fs.mkdirSync(`${options.i18n.source}/css`);
-  fs.mkdirSync(`${options.i18n.source}/html`);
-  fs.mkdirSync(`${options.i18n.source}/pt-BR/`);
-  fs.writeFileSync(`${options.i18n.source}/image.jpg`, 'image');
-  fs.writeFileSync(`${options.i18n.source}/assets/image2.jpg`, 'image');
-  fs.writeFileSync(`${options.i18n.source}/style.css`, 'css');
-  fs.writeFileSync(`${options.i18n.source}/css/style2.css`, 'css');
-  fs.writeFileSync(`${options.i18n.source}/index.html`, html);
-  fs.writeFileSync(`${options.i18n.source}/html/index2.html`, html2);
-  fs.writeFileSync(`${options.i18n.source}/pt-BR/preLocalized.html`, preLocalized);
+  fs.mkdirSync(options.rosey.source);
+  fs.mkdirSync(`${options.rosey.source}/assets`);
+  fs.mkdirSync(`${options.rosey.source}/css`);
+  fs.mkdirSync(`${options.rosey.source}/html`);
+  fs.mkdirSync(`${options.rosey.source}/pt-BR/`);
+  fs.writeFileSync(`${options.rosey.source}/image.jpg`, 'image');
+  fs.writeFileSync(`${options.rosey.source}/assets/image2.jpg`, 'image');
+  fs.writeFileSync(`${options.rosey.source}/style.css`, 'css');
+  fs.writeFileSync(`${options.rosey.source}/css/style2.css`, 'css');
+  fs.writeFileSync(`${options.rosey.source}/index.html`, html);
+  fs.writeFileSync(`${options.rosey.source}/html/index2.html`, html2);
+  fs.writeFileSync(`${options.rosey.source}/pt-BR/preLocalized.html`, preLocalized);
 }
 
 function createLocales() {
   // Create Locales
-  fs.mkdirSync(options.i18n.generated_locale_dest);
-  fs.mkdirSync(options.i18n.locale_source);
+  fs.mkdirSync(options.rosey.generated_locale_dest);
+  fs.mkdirSync(options.rosey.locale_source);
   const localeBR = {
     'homepage-title': 'Criamos websites para você',
     'homepage-title.descript': 'Descrição aleatória a ser traduzida',
@@ -299,30 +299,30 @@ function createLocales() {
     'some-of-our-work.alt': 'missing',
     'view-portfolio': 'missing',
   };
-  fs.writeJsonSync(`${options.i18n.locale_source}/pt-BR.json`, localeBR);
-  fs.writeJsonSync(`${options.i18n.locale_source}/pt-PT.json`, localePT);
-  fs.writeJsonSync(`${options.i18n.locale_source}/fr.json`, localeFR);
-  fs.writeJsonSync(`${options.i18n.locale_source}/rs.json`, localeRS);
-  fs.writeFileSync(`${options.i18n.locale_source}/es.json`, 'Wrong JSON');
-  fs.writeFileSync(`${options.i18n.locale_source}/invalid.INVALID`, 'Wrong JSON');
+  fs.writeJsonSync(`${options.rosey.locale_source}/pt-BR.json`, localeBR);
+  fs.writeJsonSync(`${options.rosey.locale_source}/pt-PT.json`, localePT);
+  fs.writeJsonSync(`${options.rosey.locale_source}/fr.json`, localeFR);
+  fs.writeJsonSync(`${options.rosey.locale_source}/rs.json`, localeRS);
+  fs.writeFileSync(`${options.rosey.locale_source}/es.json`, 'Wrong JSON');
+  fs.writeFileSync(`${options.rosey.locale_source}/invalid.INVALID`, 'Wrong JSON');
 
   process.env.GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json';
 
   const localeJA = {
     'bottom-title': '翻訳されるランダムな説明',
   };
-  fs.writeJsonSync(`${options.i18n.locale_source}/ja.json`, localeJA);
-  fs.writeJsonSync(`${options.i18n.locale_source}/ja-jp.json`, localeJA);
+  fs.writeJsonSync(`${options.rosey.locale_source}/ja.json`, localeJA);
+  fs.writeJsonSync(`${options.rosey.locale_source}/ja-jp.json`, localeJA);
 
-  // fs.mkdirSync(path.join(options.i18n.locale_source, "../wrapped"));
-  // fs.writeJsonSync(path.join(options.i18n.locale_source, "../wrapped")+"/ja.json",localeJA);
+  // fs.mkdirSync(path.join(options.rosey.locale_source, "../wrapped"));
+  // fs.writeJsonSync(path.join(options.rosey.locale_source, "../wrapped")+"/ja.json",localeJA);
 }
 
 async function cleanUpFilesAfterTest() {
-  await fs.remove(options.i18n.generated_locale_dest);
-  await fs.remove(options.i18n.locale_source);
-  await fs.remove(options.i18n.source);
-  await fs.remove(options.i18n.dest);
+  await fs.remove(options.rosey.generated_locale_dest);
+  await fs.remove(options.rosey.locale_source);
+  await fs.remove(options.rosey.source);
+  await fs.remove(options.rosey.dest);
 }
 
 describe('askYesNo', () => {
@@ -343,22 +343,22 @@ describe('askYesNo', () => {
 
 describe('clean', () => {
   before(async () => {
-    fs.mkdirSync(options.i18n.dest);
+    fs.mkdirSync(options.rosey.dest);
   });
 
   context('Removing a file', () => {
     it('should remove the directory', async () => {
-      // options.i18n.dest = dest;
+      // options.rosey.dest = dest;
       const res = await runner.clean(options);
       log(res);
-      expect(res).to.eql([path.resolve(options.i18n.dest)]);
+      expect(res).to.eql([path.resolve(options.rosey.dest)]);
     });
   });
 
 
   context('invalid directory name', () => {
     it('should return an empty array', async () => {
-      modifiedOptions.i18n.dest = 'thisdoesntexist';
+      modifiedOptions.rosey.dest = 'thisdoesntexist';
       const res = await runner.clean(modifiedOptions);
       expect(res).to.eql([]);
     });
@@ -366,7 +366,7 @@ describe('clean', () => {
 
 
   after(async () => {
-    fs.removeSync(options.i18n.dest, { recursive: true });// TODO: move to options variable
+    fs.removeSync(options.rosey.dest, { recursive: true });// TODO: move to options variable
   });
 });
 
@@ -378,33 +378,33 @@ describe('generate', () => {
 
   context('Generate version 2 document', () => {
     it('i18n generated locale path file should not exist', async () => {
-      expect(fs.existsSync(options.i18n.full_generated_locale_dest)).to.equal(false);
+      expect(fs.existsSync(options.rosey.full_generated_locale_dest)).to.equal(false);
     });
 
     it('should create the source.json file', async () => {
       const res = runner.generate(options);
       await res;
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
     });
   });
 
 
   context('Generate version 1 document', () => {
     it('i18n generated locale path file should not exist', async () => {
-      expect(fs.existsSync(options.i18n.full_generated_locale_dest)).to.equal(false);
+      expect(fs.existsSync(options.rosey.full_generated_locale_dest)).to.equal(false);
     });
 
     it('should create the source.json file', async () => {
-      modifiedOptions.i18n.source_version = 1;
+      modifiedOptions.rosey.source_version = 1;
 
       const res = runner.generate(modifiedOptions);
       await res;
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
     });
   });
 
   afterEach(async () => {
-    fs.removeSync(options.i18n.full_generated_locale_dest);
+    fs.removeSync(options.rosey.full_generated_locale_dest);
   });
 
 
@@ -422,7 +422,7 @@ describe('check', () => {
 
   context('Check on wrong locales folder', () => {
     it('should reject the promise ', async () => {
-      modifiedOptions.i18n.locale_source = '/WrongFolderPath/';
+      modifiedOptions.rosey.locale_source = '/WrongFolderPath/';
 
       let isResolved = null;
       const expectedResult = false;
@@ -439,7 +439,7 @@ describe('check', () => {
       expect(isResolved).to.equal(expectedResult);
 
       // Revert modified settings
-      modifiedOptions.i18n.locale_source = options.i18n.locale_source;
+      modifiedOptions.rosey.locale_source = options.rosey.locale_source;
     });
   });
 
@@ -464,11 +464,11 @@ describe('check', () => {
   context('Check against version 2 document', () => {
     it('i18n generated locale path file should not exist', async () => {
       // Remove before starting
-      fs.removeSync(`${options.i18n.full_generated_locale_dest}/source.json`);
-      fs.removeSync(`${options.i18n.full_generated_locale_dest}/checks.json`);
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
 
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(false);
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/checks.json`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(false);
     });
 
     it('should create the source.json file', async () => {
@@ -486,7 +486,7 @@ describe('check', () => {
 
       expect(isResolved).to.equal(expectedResult);
 
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
     });
 
 
@@ -505,7 +505,7 @@ describe('check', () => {
 
       expect(isResolved).to.equal(expectedResult);
 
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/checks.json`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(true);
     });
   });
 
@@ -513,15 +513,15 @@ describe('check', () => {
   context('Check against version 1 document', () => {
     it(' generated locale path file should not exist', async () => {
       // Remove before starting
-      fs.removeSync(`${options.i18n.full_generated_locale_dest}/source.json`);
-      fs.removeSync(`${options.i18n.full_generated_locale_dest}/checks.json`);
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
 
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(false);
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/checks.json`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(false);
     });
 
     it('should create the source.json file', async () => {
-      modifiedOptions.i18n.source_version = 1;
+      modifiedOptions.rosey.source_version = 1;
 
       let isResolved = null;
       const expectedResult = true;
@@ -537,14 +537,14 @@ describe('check', () => {
 
       expect(isResolved).to.equal(expectedResult);
 
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/source.json`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
 
       // revert the modified options
-      modifiedOptions.i18n.source_version = options.i18n.source_version;
+      modifiedOptions.rosey.source_version = options.rosey.source_version;
     });
 
     it('should create the checks.json file', async () => {
-      modifiedOptions.i18n.source_version = 1;
+      modifiedOptions.rosey.source_version = 1;
 
       let isResolved = null;
       const expectedResult = true;
@@ -560,10 +560,10 @@ describe('check', () => {
 
       expect(isResolved).to.equal(expectedResult);
 
-      expect(fs.existsSync(`${options.i18n.full_generated_locale_dest}/checks.json`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(true);
 
       // revert the modified options
-      modifiedOptions.i18n.source_version = options.i18n.source_version;
+      modifiedOptions.rosey.source_version = options.rosey.source_version;
     });
   });
 
@@ -747,40 +747,40 @@ describe('build', () => {
       chai.spy.on(runner, 'serve', () => { log('Ignoring serve on tests.'); });
       chai.spy.on(runner, 'watch', () => { log('Ignoring watch on tests.'); });
 
-      const res = await runner.i18n(options);
+      const res = await runner.rosey(options);
 
       expect(res).to.equal(0);
     });
 
 
     it('should have the assets copied to dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/assets/image2.jpg`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/assets/image2.jpg`)).to.equal(true);
     });
 
     it('should have a pt-BR folder on the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/pt-BR/`)).to.equal(true);
     });
     it('should have a pt-PT folder on the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/pt-PT/`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/pt-PT/`)).to.equal(true);
     });
     it('should have a fr folder on the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/fr/`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/fr/`)).to.equal(true);
     });
 
     it('should have an en folder on the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/en/`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/en/`)).to.equal(true);
     });
 
     it('should NOT have an es folder on the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/es/`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_dest}/es/`)).to.equal(false);
     });
 
     it('should have the pre localized files copied to dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
     });
 
     it('should have a redirect index.html file on the root of the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/index.html`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/index.html`)).to.equal(true);
     });
   });
 
@@ -802,16 +802,16 @@ describe('base', () => {
     });
 
     it('should have the assets copied to dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/assets/image2.jpg`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/assets/image2.jpg`)).to.equal(true);
     });
     it('should have pt-BR folder on the dest due to the preLocalized files', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/pt-BR/`)).to.equal(true);
     });
 
     it('should NOT have any language specific folder on the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/pt-PT/`)).to.equal(false);
-      expect(fs.existsSync(`${options.i18n.full_dest}/fr/`)).to.equal(false);
-      expect(fs.existsSync(`${options.i18n.full_dest}/en/`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_dest}/pt-PT/`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_dest}/fr/`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_dest}/en/`)).to.equal(false);
     });
   });
 
@@ -836,23 +836,23 @@ describe('translate', () => {
     });
 
     it('should NOT have the assets copied to dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/assets/image2.jpg`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_dest}/assets/image2.jpg`)).to.equal(false);
     });
 
     it('should have a pt-BR folder on the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/pt-BR/`)).to.equal(true);
     });
     it('should have a fr folder on the dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/fr/`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/fr/`)).to.equal(true);
     });
     it('should have the pre localized files copied to dest', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
+      expect(fs.existsSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
     });
 
     it('should NOT have a the folders not part of the specified languages', async () => {
-      expect(fs.existsSync(`${options.i18n.full_dest}/pt-PT/`)).to.equal(false);
-      expect(fs.existsSync(`${options.i18n.full_dest}/en/`)).to.equal(false);
-      expect(fs.existsSync(`${options.i18n.full_dest}/es/`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_dest}/pt-PT/`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_dest}/en/`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_dest}/es/`)).to.equal(false);
     });
   });
 

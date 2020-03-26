@@ -21,7 +21,7 @@ describe('setOptions()', () => {
     const flags = { dest: 'testdest', yes: true, port: '9000' };
     it('should return with the correct flags set', async () => {
       const options = cli.setOptions({ flags });
-      expect(options.i18n.dest).to.equal('testdest');
+      expect(options.rosey.dest).to.equal('testdest');
 
       expect(options.flags.yes).to.equal(true);
       expect(options.serve.port).to.equal(9000);

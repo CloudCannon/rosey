@@ -31,22 +31,23 @@ const commands = {
   clean: command(runner.clean),
   generate: command(runner.generate),
   help: command(runner.help),
-  i18n: command(runner.i18n),
+  rosey: command(runner.rosey),
   translate: command(runner.translate, ['languages']),
   serve: command(runner.serve),
   watch: command(runner.watch),
 };
 
 const optionsDefaults = {
-  i18n: {
+  rosey: {
     source: 'dist/site',
     dest: 'dist/translated_site',
 
     default_language: 'en',
-    locale_source: 'i18n/locales',
-    generated_locale_dest: 'i18n',
+    locale_source: 'rosey/locales',
+    generated_locale_dest: 'rosey',
     source_version: 2,
     source_delimeter: '\t',
+    data_tag: 'data-rosey',
 
     legacy_path: '_locales',
 
@@ -122,33 +123,31 @@ module.exports = {
     options = defaults(options, optionsDefaults);
 
     const cwd = process.cwd();
-    const dest = flags.dest || options.i18n.dest;
-    const source = flags.source || options.i18n.source;
-    const sourceVersion = flags.version || options.i18n.source_version;
-    const port = this.checkPortNumber(flags.port) || options.serve.port;
-    const partialLanguages = flags.languages ? flags.languages.toUpperCase().split(',') : null;
+    const dest = flags.dest || options.rosey.dest;
+    const source = flags.source || options.rosey.source;
 
     options.cwd = cwd;
     options.help = help;
 
-    // i18n
-    options.i18n.dest = dest;
-    options.i18n.source = source;
-    options.i18n.full_dest = path.join(cwd, dest);
-    options.i18n.full_source = path.join(cwd, source);
-    options.i18n.full_locale_source = path.join(cwd, options.i18n.locale_source);
-    options.i18n.full_generated_locale_dest = path.join(cwd, options.i18n.generated_locale_dest);
-    options.i18n.full_legacy_path = path.join(cwd, options.i18n.legacy_path);
-    options.i18n.credentials = flags.credentials;
+    // rosey
+    options.rosey.dest = dest;
+    options.rosey.source = source;
+    options.rosey.full_dest = path.join(cwd, dest);
+    options.rosey.full_source = path.join(cwd, source);
+    options.rosey.full_locale_source = path.join(cwd, options.rosey.locale_source);
+    options.rosey.full_generated_locale_dest = path.join(cwd, options.rosey.generated_locale_dest);
+    options.rosey.full_legacy_path = path.join(cwd, options.rosey.legacy_path);
+    options.rosey.credentials = flags.credentials;
+    options.rosey.data_tag = flags.data_tag || options.rosey.data_tag;
 
-    options.i18n.source_version = sourceVersion;
+    options.rosey.source_version = flags.version || options.rosey.source_version;
 
     // flags
     options.flags.yes = flags.yes;
-    options.flags.partialLanguages = partialLanguages;
+    options.flags.partialLanguages = flags.languages ? flags.languages.toUpperCase().split(',') : null;
 
     // port
-    options.serve.port = port;
+    options.serve.port = this.checkPortNumber(flags.port) || options.serve.port;
 
     return options;
   },
@@ -169,7 +168,7 @@ module.exports = {
     const date = new Date();
     const startTime = date.getTime();
 
-    const cmd = cli.input[0] || 'i18n';
+    const cmd = cli.input[0] || 'rosey';
 
     if (commands[cmd]) {
       if (this.checkRequiredFlags(cli.flags, commands[cmd].requiredFlags)) {

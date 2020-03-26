@@ -4,12 +4,14 @@ const meow = require('meow');
 const cli = require('./cli');
 
 const helpString = `
-Usage: i18n <command> [args]
+Usage: rosey <command> [args]
 Args:
     -s | --source       The source folder to copy. Defaults to dist/site.
     -d | --dest         The destination folder to output the files to. Defaults to dist/translated_site.
     -l | --languages    Filter for the specific languages to be translated. When specified, 
                           only the language specific subfolders are generated.
+    -c | --credentials  Path to the location for the Google API Credendials json file.
+    -t | --tag          Name for the rosey tag used on the HTML. Defaults to data-rosey.
     -p | --port         The port number to serve the site on. Defaults to 8000.
     -v | --version      The version number of the locale file. Defaults to 2.
     -y | --yes          Overrides the user confirmation request to Y.
@@ -48,6 +50,11 @@ const inputs = meow(
       credentials: {
         type: 'string',
         alias: 'c',
+      },
+      },
+      tag: {
+        type: 'string',
+        alias: 't',
       },
       port: {
         type: 'string',
