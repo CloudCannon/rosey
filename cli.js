@@ -139,6 +139,7 @@ module.exports = {
     options.i18n.full_locale_source = path.join(cwd, options.i18n.locale_source);
     options.i18n.full_generated_locale_dest = path.join(cwd, options.i18n.generated_locale_dest);
     options.i18n.full_legacy_path = path.join(cwd, options.i18n.legacy_path);
+    options.i18n.credentials = flags.credentials;
 
     options.i18n.source_version = sourceVersion;
 
@@ -148,7 +149,6 @@ module.exports = {
 
     // port
     options.serve.port = port;
-
 
     return options;
   },

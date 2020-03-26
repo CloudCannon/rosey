@@ -45,6 +45,10 @@ const inputs = meow(
         type: 'string',
         alias: 'l',
       },
+      credentials: {
+        type: 'string',
+        alias: 'c',
+      },
       port: {
         type: 'string',
         alias: 'p',
