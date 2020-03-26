@@ -51,7 +51,6 @@ const inputs = meow(
         type: 'string',
         alias: 'c',
       },
-      },
       tag: {
         type: 'string',
         alias: 't',

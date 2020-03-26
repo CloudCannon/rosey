@@ -1,5 +1,5 @@
 {
-  "name": "@cloudcannon/i18n",
+  "name": "@cloudcannon/rosey",
   "version": "0.0.1",
   "description": "Generate a translated version of your website based on the translation of tagged elements.",
   "main": "index.js",
@@ -16,13 +16,14 @@
     "Cloud",
     "Cannon",
     "i18n",
+    "rosey",
     "translation",
     "localisation"
   ],
   "author": "Jonatah Benatti",
   "license": "ISC",
   "bin": {
-    "i18n": "./index.js"
+    "rosey": "./index.js"
   },
   "engines": {
     "node": ">=10.0.0"

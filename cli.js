@@ -138,7 +138,7 @@ module.exports = {
     options.rosey.full_generated_locale_dest = path.join(cwd, options.rosey.generated_locale_dest);
     options.rosey.full_legacy_path = path.join(cwd, options.rosey.legacy_path);
     options.rosey.credentials = flags.credentials;
-    options.rosey.data_tag = flags.data_tag || options.rosey.data_tag;
+    options.rosey.data_tag = flags.tag || options.rosey.data_tag;
 
     options.rosey.source_version = flags.version || options.rosey.source_version;
 

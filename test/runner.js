@@ -1,9 +1,12 @@
-const defaults = require('defaults');
+/* eslint-disable quote-props */
 const chai = require('chai');
-const spies = require('chai-spies');
+const defaults = require('defaults');
 const fs = require('fs-extra');
 const log = require('fancy-log');
 const path = require('path');
+// const { promisify } = require('util');
+const spies = require('chai-spies');
+
 const wordwrap = require('../lib/plugins/wordwrap-json');
 const runner = require('../lib/runner.js');
 const cli = require('../cli.js');
@@ -12,6 +15,7 @@ const cli = require('../cli.js');
 chai.use(spies);
 
 const { expect } = chai;
+// const readFile = promisify(fs.readFile);
 
 // Load default settings
 const flags = { yes: true };
@@ -22,8 +26,8 @@ const options = cli.setOptions({ flags });
 const cwd = process.cwd();
 const dest = 'test/dest';
 const source = 'test/source';
-const localeSource = 'test/i18n/locale';
-const generatedLocaleDest = 'test/i18n';
+const localeSource = 'test/rosey/locale';
+const generatedLocaleDest = 'test/rosey';
 const legacyPath = 'test/_locales';
 
 options.rosey.dest = dest;
@@ -37,6 +41,7 @@ options.rosey.full_source = path.join(cwd, source);
 options.rosey.full_locale_source = path.join(cwd, localeSource);
 options.rosey.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
 options.rosey.full_legacy_path = path.join(cwd, legacyPath);
+// options.rosey.data_tag = 'data-i18n';
 
 
 let modifiedOptions = {};
@@ -58,7 +63,7 @@ function createTestingStructure() {
                         <nav>
                             <a class="nav-toggle" id="open-nav" href="#">&#9776;</a>
                             <ul>
-                                <li><a data-i18n="menu-portfolio" href="/portfolio/" class="" >Portfolio</a></li>
+                                <li><a data-rosey="menu-portfolio" href="/portfolio/" class="" >Portfolio</a></li>
                                 <li><a href="/blog/" class="" >Blog</a></li>
                                 <li><a href="/about/" class="" >About</a></li>
                                 <li><a href="/contact/" class="" >Contact</a></li>
@@ -68,14 +73,14 @@ function createTestingStructure() {
                 </header>
                 <section class="hero diagonal">
                     <div class="container">
-                        <h2 data-i18n="homepage-title" data-i18n-attrs="descript" descript="random description to be translated" class="editable">We build nice websites</h2>
-                        <p data-i18n="homepage-company-description" class="subtext editable">This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.</p>
-                        <p><a data-i18n="contact-us" class="button alt" href="/contact/">Contact Us</a></p>
+                        <h2 data-rosey="homepage-title" data-rosey-attrs="descript" descript="random description to be translated" class="editable">We build nice websites</h2>
+                        <p data-rosey="homepage-company-description" class="subtext editable">This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.</p>
+                        <p><a data-rosey="contact-us" class="button alt" href="/contact/">Contact Us</a></p>
                     </div>
                 </section>
                 <footer class="diagonal">
                     <div class="container">
-                        <p data-i18n  class="editor-link">
+                        <p data-rosey  class="editor-link">
                             <a href="cloudcannon:collections/_data/footer.yml" class="btn">
                                 <strong>&#9998;</strong> Update Footer Sections</a>
                         </p>
@@ -85,16 +90,16 @@ function createTestingStructure() {
                                     <h2>Pages</h2>
                                 </li>
                                 <li>
-                                    <a data-i18n   href="/" >Home</a>
+                                    <a data-rosey   href="/" >Home</a>
                                 </li>
                                 <li>
-                                    <a data-i18n="menu-portfolio"  href="/portfolio/" >Portfolio</a>
+                                    <a data-rosey="menu-portfolio"  href="/portfolio/" >Portfolio</a>
                                 </li>
                                 <li>
-                                    <a data-i18n   href="/blog/" >Blog</a>
+                                    <a data-rosey   href="/blog/" >Blog</a>
                                 </li>
                                 <li>
-                                    <a data-i18n   href="/about/" >About</a>
+                                    <a data-rosey   href="/about/" >About</a>
                                 </li>
                                 <li>
                                     <a  href="/contact/" >Contact</a>
@@ -130,7 +135,7 @@ function createTestingStructure() {
                         <nav>
                             <a class="nav-toggle" id="open-nav" href="#">&#9776;</a>
                             <ul>
-                                <li><a data-i18n="menu-portfolio" href="/portfolio/" class="" >Portfolio</a></li>
+                                <li><a data-rosey="menu-portfolio" href="/portfolio/" class="" >Portfolio</a></li>
                                 <li><a href="/blog/" class="" >Blog</a></li>
                                 <li><a href="/about/" class="" >About</a></li>
                                 <li><a href="/contact/" class="" >Contact</a></li>
@@ -141,10 +146,10 @@ function createTestingStructure() {
                 <section class="diagonal patterned">
                     <div class="container halves">
                         <div>
-                            <h3 data-i18n="some-of-our-work" data-i18n-attrs="alt" class="editable">Some of our work</h3>
-                            <p data-i18n="portfolio-description" class="editable">We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.</p>
-                            <p data-i18n="view-portfolio" class="editable"><a href="/portfolio/">View Full Portfolio &rarr;</a></p>
-                            <p data-i18n class="editable"><a href="/portfolio/">Missing key?</a></p>
+                            <h3 data-rosey="some-of-our-work" data-rosey-attrs="alt" class="editable">Some of our work</h3>
+                            <p data-rosey="portfolio-description" class="editable">We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.</p>
+                            <p data-rosey="view-portfolio" class="editable"><a href="/portfolio/">View Full Portfolio &rarr;</a></p>
+                            <p data-rosey class="editable"><a href="/portfolio/">Missing key?</a></p>
                         </div>
                         <div>
                             <ul class="image-grid">
@@ -158,7 +163,7 @@ function createTestingStructure() {
                 </section>
                 <footer class="diagonal">
                     <div class="container">
-                        <p data-i18n  class="editor-link">
+                        <p data-rosey  class="editor-link">
                             <a href="cloudcannon:collections/_data/footer.yml" class="btn">
                                 <strong>&#9998;</strong> Update Footer Sections</a>
                         </p>
@@ -168,16 +173,16 @@ function createTestingStructure() {
                                     <h2>Pages</h2>
                                 </li>
                                 <li>
-                                    <a data-i18n   href="/" >Home</a>
+                                    <a data-rosey   href="/" >Home</a>
                                 </li>
                                 <li>
-                                    <a data-i18n="menu-portfolio"  href="/portfolio/" >Portfolio</a>
+                                    <a data-rosey="menu-portfolio"  href="/portfolio/" >Portfolio</a>
                                 </li>
                                 <li>
-                                    <a data-i18n   href="/blog/" >Blog</a>
+                                    <a data-rosey   href="/blog/" >Blog</a>
                                 </li>
                                 <li>
-                                    <a data-i18n   href="/about/" >About</a>
+                                    <a data-rosey   href="/about/" >About</a>
                                 </li>
                                 <li>
                                     <a  href="/contact/" >Contact</a>
@@ -284,25 +289,122 @@ function createLocales() {
 
   };
   const localeRS = {
-    '04tmqDG7henk7K5vSmNiixjYP7r5IAsk7+ydpCIFAT8': '<p>With tags</p>',
-    '2Mw5uqkD1RzJOweTkphkABZvn2XOprsSRAUucXOU6FI': 'missing',
-    'EBGethTK4RpfYrsCM3tPVUzTCHWa6Fc6cqv7k+wocQM': 'missing',
-    'G8Sml3Xk+qzoyW12YizhjYAf9GhJjh1Q5pb9TzIFToc': 'missing',
-    'contact-us': 'missing',
-    'hnJ2VFmNPYxM2JD+jAWFXrERNtH8YYcGgRny/zBtB2Y': 'missing',
-    'homepage-company-description': 'missing',
-    'homepage-title': 'missing',
-    'homepage-title.descript': 'missing',
-    'menu-portfolio': 'missing',
-    'portfolio-description': 'missing',
-    'some-of-our-work': 'missing',
-    'some-of-our-work.alt': 'missing',
-    'view-portfolio': 'missing',
+    '0Pm75CuMAuL17aHK7NygQ+K+2RcLVXa+uX7LdnO2TkQ': {
+      original: '\n                            <a href="cloudcannon:collections/_data/footer.yml" class="btn">\n                                <strong>&#9998;</strong> Update Footer Sections</a>\n                        ',
+      value: '',
+    },
+    'KON8fKUYnhjh549v0V7gTOiufsF1eYznwJNJbWG2rgY': {
+      original: 'Home',
+      value: '',
+    },
+    'LZWt/W8QjSfGY8qG29ixQyxwihJBCmn6Apz8h68EVwg': {
+      original: '<a href="/portfolio/">Missing key?</a>',
+      value: '',
+    },
+    'contact-us': {
+      original: 'Contact Us',
+      value: '',
+    },
+    'homepage-company-description': {
+      original: 'This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.',
+      value: '',
+    },
+    'homepage-title': {
+      original: 'We build nice websites',
+      value: '',
+    },
+    'homepage-title.descript': {
+      original: 'random description to be translated',
+      value: '',
+    },
+    'menu-portfolio': {
+      original: 'Portfolio',
+      value: '',
+    },
+    'portfolio-description': {
+      original: 'We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.',
+      value: '',
+    },
+    'qt8GcQ6z7SHjYxmdhirp4cddL+YA/hx6Oyfa3x4CH9Y': {
+      original: 'Blog',
+      value: '',
+    },
+    'rU81YcMaFGiZdU/ld17APEHxfVesQJ+cqofF5H2fGLQ': {
+      original: 'About',
+      value: '',
+    },
+    'some-of-our-work': {
+      original: 'Some of our work',
+      value: '',
+    },
+    'some-of-our-work.alt': {
+      original: '',
+      value: '',
+    },
+    'view-portfolio': {
+      original: '<a href="/portfolio/">View Full Portfolio &rarr;</a>',
+      value: '',
+    },
+  };
+  const localeGA = {
+    '0Pm75CuMAuL17aHK7NygQ+K+2RcLVXa+uX7LdnO2TkQ': {
+      original: '\n                            <a href="cloudcannon:collections/_data/footer.yml" class="btn">\n                                <strong>&#9998;</strong> Update Footer Sections</a>\n                        ',
+      value: '',
+    },
+    'KON8fKUYnhjh549v0V7gTOiufsF1eYznwJNJbWG2rgY': {
+      original: 'Home',
+      value: '',
+    },
+    'LZWt/W8QjSfGY8qG29ixQyxwihJBCmn6Apz8h68EVwg': {
+      original: '<a href="/portfolio/">Missing key?</a>',
+      value: '',
+    },
+    'contact-us': {
+      original: 'Contact Us',
+      value: '',
+    },
+    'homepage-company-description': {
+      original: 'This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.',
+      value: '',
+    },
+    'homepage-title': {
+      original: 'outdated',
+      value: '',
+    },
+    'homepage-title.descript': {
+      original: 'outdated',
+      value: '',
+    },
+    'unused': {
+      original: 'Portfolio',
+      value: '',
+    },
+    'qt8GcQ6z7SHjYxmdhirp4cddL+YA/hx6Oyfa3x4CH9Y': {
+      original: 'Blog',
+      value: '',
+    },
+    'rU81YcMaFGiZdU/ld17APEHxfVesQJ+cqofF5H2fGLQ': {
+      original: 'About',
+      value: '',
+    },
+    'some-of-our-work': {
+      original: 'Some of our work',
+      value: '',
+    },
+    'some-of-our-work.alt': {
+      original: '',
+      value: '',
+    },
+    'view-portfolio': {
+      original: '<a href="/portfolio/">View Full Portfolio &rarr;</a>',
+      value: '',
+    },
   };
   fs.writeJsonSync(`${options.rosey.locale_source}/pt-BR.json`, localeBR);
   fs.writeJsonSync(`${options.rosey.locale_source}/pt-PT.json`, localePT);
   fs.writeJsonSync(`${options.rosey.locale_source}/fr.json`, localeFR);
   fs.writeJsonSync(`${options.rosey.locale_source}/rs.json`, localeRS);
+  fs.writeJsonSync(`${options.rosey.locale_source}/ga.json`, localeGA);
   fs.writeFileSync(`${options.rosey.locale_source}/es.json`, 'Wrong JSON');
   fs.writeFileSync(`${options.rosey.locale_source}/invalid.INVALID`, 'Wrong JSON');
 
@@ -377,7 +479,7 @@ describe('generate', () => {
   });
 
   context('Generate version 2 document', () => {
-    it('i18n generated locale path file should not exist', async () => {
+    it('rosey generated locale path file should not exist', async () => {
       expect(fs.existsSync(options.rosey.full_generated_locale_dest)).to.equal(false);
     });
 
@@ -390,7 +492,7 @@ describe('generate', () => {
 
 
   context('Generate version 1 document', () => {
-    it('i18n generated locale path file should not exist', async () => {
+    it('rosey generated locale path file should not exist', async () => {
       expect(fs.existsSync(options.rosey.full_generated_locale_dest)).to.equal(false);
     });
 
@@ -462,7 +564,7 @@ describe('check', () => {
   });
 
   context('Check against version 2 document', () => {
-    it('i18n generated locale path file should not exist', async () => {
+    it('rosey generated locale path file should not exist', async () => {
       // Remove before starting
       fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
       fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
@@ -507,11 +609,19 @@ describe('check', () => {
 
       expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(true);
     });
+
+    it('should match the results on the checks.json file', async () => {
+      const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
+      expect(checks.ga.states.missing).to.equal(2);
+      expect(checks.ga.states.current).to.equal(10);
+      expect(checks.ga.states.outdated).to.equal(2);
+      expect(checks.ga.states.unused).to.equal(1);
+    });
   });
 
 
   context('Check against version 1 document', () => {
-    it(' generated locale path file should not exist', async () => {
+    it('generated locale path file should not exist', async () => {
       // Remove before starting
       fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
       fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
@@ -564,6 +674,14 @@ describe('check', () => {
 
       // revert the modified options
       modifiedOptions.rosey.source_version = options.rosey.source_version;
+    });
+
+    it('should match the results on the checks.json file', async () => {
+      const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
+      expect(checks.rs.states.missing).to.equal(0);
+      expect(checks.rs.states.current).to.equal(14);
+      expect(checks.rs.states.outdated).to.equal(0);
+      expect(checks.rs.states.unused).to.equal(0);
     });
   });
 
