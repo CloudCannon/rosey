@@ -41,7 +41,6 @@ options.rosey.full_source = path.join(cwd, source);
 options.rosey.full_locale_source = path.join(cwd, localeSource);
 options.rosey.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
 options.rosey.full_legacy_path = path.join(cwd, legacyPath);
-// options.rosey.data_tag = 'data-i18n';
 
 
 let modifiedOptions = {};
