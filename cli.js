@@ -49,9 +49,6 @@ const optionsDefaults = {
     source_delimeter: '\t',
     data_tag: 'data-rosey',
 
-    legacy_path: '_locales',
-
-
     show_duplicate_locale_warnings: true,
     show_missing_locale_warnings: true,
     show_skipped_updates: true,
@@ -125,6 +122,9 @@ module.exports = {
     const cwd = process.cwd();
     const dest = flags.dest || options.rosey.dest;
     const source = flags.source || options.rosey.source;
+    const localeSource = flags.localeSource || options.rosey.locale_source;
+    const localeDest = flags.localeDest || options.rosey.locale_source;
+    log(flags.localeDest);
 
     options.cwd = cwd;
     options.help = help;
@@ -132,13 +132,18 @@ module.exports = {
     // rosey
     options.rosey.dest = dest;
     options.rosey.source = source;
+    options.rosey.locale_source = localeSource;
+    options.rosey.generated_locale_dest = localeDest;
+
     options.rosey.full_dest = path.join(cwd, dest);
     options.rosey.full_source = path.join(cwd, source);
-    options.rosey.full_locale_source = path.join(cwd, options.rosey.locale_source);
-    options.rosey.full_generated_locale_dest = path.join(cwd, options.rosey.generated_locale_dest);
-    options.rosey.full_legacy_path = path.join(cwd, options.rosey.legacy_path);
+    options.rosey.full_locale_source = path.join(cwd, localeSource);
+    options.rosey.full_generated_locale_dest = path.join(cwd, localeDest);
+
     options.rosey.credentials = flags.credentials;
     options.rosey.data_tag = flags.tag || options.rosey.data_tag;
+    options.rosey.default_language = flags.defaultLanguage || options.rosey.default_language;
+    options.rosey.source_delimeter = flags.sourceDelimeter || options.rosey.source_delimeter;
 
     options.rosey.source_version = flags.version || options.rosey.source_version;
 

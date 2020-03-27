@@ -28,19 +28,16 @@ const dest = 'test/dest';
 const source = 'test/source';
 const localeSource = 'test/rosey/locale';
 const generatedLocaleDest = 'test/rosey';
-const legacyPath = 'test/_locales';
 
 options.rosey.dest = dest;
 options.rosey.source = source;
 options.rosey.locale_source = localeSource;
 options.rosey.generated_locale_dest = generatedLocaleDest;
-options.rosey.legacy_path = legacyPath;
 
 options.rosey.full_dest = path.join(cwd, dest);
 options.rosey.full_source = path.join(cwd, source);
 options.rosey.full_locale_source = path.join(cwd, localeSource);
 options.rosey.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
-options.rosey.full_legacy_path = path.join(cwd, legacyPath);
 
 
 let modifiedOptions = {};

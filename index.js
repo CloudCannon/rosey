@@ -6,24 +6,36 @@ const cli = require('./cli');
 const helpString = `
 Usage: rosey <command> [args]
 Args:
-    -s | --source       The source folder to copy. Defaults to dist/site.
-    -d | --dest         The destination folder to output the files to. Defaults to dist/translated_site.
+    -s | --source       The source folder to copythe website content. Defaults to 'dist/site'.
+    -d | --dest         The destination folder to output the files to. Defaults to 'dist/translated_site'.
     -l | --languages    Filter for the specific languages to be translated. When specified, 
                           only the language specific subfolders are generated.
     -c | --credentials  Path to the location for the Google API Credendials json file.
-    -t | --tag          Name for the rosey tag used on the HTML. Defaults to data-rosey.
-    -p | --port         The port number to serve the site on. Defaults to 8000.
-    -v | --version      The version number of the locale file. Defaults to 2.
     -y | --yes          Overrides the user confirmation request to Y.
+    -v | --version      The version number of the locale file. Defaults to '2'.
+    -p | --port         The port number to serve the site on. Defaults to '8000'.
+    -t | --tag          Name for the rosey tag used on the HTML. Defaults to 'data-rosey'.
+    --locale-source     The source folder to read the translated json files. Defaults to 'rosey/locales'.
+    --locale-dest       The destination folder to output the generated 'source.json' file. Defaults to 'rosey'.
+    --default-language  The default language for the site (i.e. the language of 'source.json'). Defaults to 'en'.
+    --source-delimiter  The character that should be used to format the 'source.json' file. Defaults to '\\t'.
 
 Commands:
-    --Command--                                                     
-    build           Generates a translated version of your website to the dest folder.
-    clean           Removes all files from the dest folder.
-    check           Generates a comparison between source and locales files.
+    --Command--                                                         --Reqd flags--
     generate        Generates a lookup table for the marked keys.
+    check           Generates a comparison between source and 
+                      locales files.
+    build           Generates a translated version of your website
+                      to the dest folder.
+    clean           Removes all files from the dest folder.
+    base            Copy assets and creates the redirect page.
+                      Use 'translate' to generate the translated
+                      websites
+    translate       Generates a translated version of the websites      --languages
+                      for the specified languages only.
     serve           Runs a local webserver on the dest folder.
-    watch           Watches the dest folder and reload the local webserver.
+    watch           Watches the dest folder and reload the local 
+                      webserver.
 `;
 
 
@@ -47,13 +59,29 @@ const inputs = meow(
         type: 'string',
         alias: 'l',
       },
+      'default-language': {
+        type: 'string',
+        alias: null,
+      },
+      'locale-source': {
+        type: 'string',
+        alias: null,
+      },
+      'locale-dest': {
+        type: 'string',
+        alias: null,
+      },
+      'source-delimeter': {
+        type: 'string',
+        alias: null,
+      },
       credentials: {
         type: 'string',
         alias: 'c',
       },
       tag: {
         type: 'string',
-        alias: 't',
+        alias: null,
       },
       port: {
         type: 'string',
