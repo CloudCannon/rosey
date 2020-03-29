@@ -1,5 +1,6 @@
 /* eslint-disable quote-props */
 const chai = require('chai');
+const cheerio = require('cheerio');
 const defaults = require('defaults');
 const fs = require('fs-extra');
 const log = require('fancy-log');
@@ -43,6 +44,147 @@ options.rosey.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
 let modifiedOptions = {};
 modifiedOptions = defaults(modifiedOptions, options);
 
+
+const localeBR = {
+  'homepage-title': 'Criamos websites para você',
+  'homepage-title.descript': 'Descrição aleatória a ser traduzida',
+  'contact-us': 'Entre em contato',
+  'some-of-our-work': 'Um pouco do nosso trabalho',
+};
+const localePT = {
+  'homepage-title': 'POISH, Criamos websites para você',
+};
+const localeFR = {
+  'homepage-title': {
+    original: 'We build nice website',
+    value: 'Nous construisons de beaux sites Web',
+  },
+  'homepage-title.descript': {
+    original: 'random description to be translated',
+    value: 'Nous construisons de beaux sites Web',
+  },
+  'contact-us': {
+    original: 'Contact Us',
+    value: 'Nous contacter',
+  },
+
+};
+const localeRS = {
+  '0Pm75CuMAuL17aHK7NygQ+K+2RcLVXa+uX7LdnO2TkQ': {
+    original: '\n                            <a href="cloudcannon:collections/_data/footer.yml" class="btn">\n                                <strong>&#9998;</strong> Update Footer Sections</a>\n                        ',
+    value: '',
+  },
+  'KON8fKUYnhjh549v0V7gTOiufsF1eYznwJNJbWG2rgY': {
+    original: 'Home',
+    value: '',
+  },
+  'LZWt/W8QjSfGY8qG29ixQyxwihJBCmn6Apz8h68EVwg': {
+    original: '<a href="/portfolio/">Missing key?</a>',
+    value: '',
+  },
+  'contact-us': {
+    original: 'Contact Us',
+    value: '',
+  },
+  'homepage-company-description': {
+    original: 'This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.',
+    value: '',
+  },
+  'homepage-title': {
+    original: 'We build nice websites',
+    value: '',
+  },
+  'homepage-title.descript': {
+    original: 'random description to be translated',
+    value: 'DescriptionValueToBeCheckedOnTheTranslatedWebsite',
+  },
+  'menu-portfolio': {
+    original: 'Portfolio',
+    value: '',
+  },
+  'portfolio-description': {
+    original: 'We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.',
+    value: '',
+  },
+  'qt8GcQ6z7SHjYxmdhirp4cddL+YA/hx6Oyfa3x4CH9Y': {
+    original: 'Blog',
+    value: '',
+  },
+  'rU81YcMaFGiZdU/ld17APEHxfVesQJ+cqofF5H2fGLQ': {
+    original: 'About',
+    value: '',
+  },
+  'some-of-our-work': {
+    original: 'Some of our work',
+    value: 'Value to be checked for the whole element',
+  },
+  'some-of-our-work.alt': {
+    original: '',
+    value: 'Value To Be Checked On The Translated Website',
+  },
+  'view-portfolio': {
+    original: '<a href="/portfolio/">View Full Portfolio &rarr;</a>',
+    value: '',
+  },
+};
+const localeGA = {
+  '0Pm75CuMAuL17aHK7NygQ+K+2RcLVXa+uX7LdnO2TkQ': {
+    original: '\n                            <a href="cloudcannon:collections/_data/footer.yml" class="btn">\n                                <strong>&#9998;</strong> Update Footer Sections</a>\n                        ',
+    value: '',
+  },
+  'KON8fKUYnhjh549v0V7gTOiufsF1eYznwJNJbWG2rgY': {
+    original: 'Home',
+    value: '',
+  },
+  'LZWt/W8QjSfGY8qG29ixQyxwihJBCmn6Apz8h68EVwg': {
+    original: '<a href="/portfolio/">Missing key?</a>',
+    value: '',
+  },
+  'contact-us': {
+    original: 'Contact Us',
+    value: '',
+  },
+  'homepage-company-description': {
+    original: 'This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.',
+    value: '',
+  },
+  'homepage-title': {
+    original: 'outdated',
+    value: '',
+  },
+  'homepage-title.descript': {
+    original: 'outdated',
+    value: '',
+  },
+  'unused': {
+    original: 'Portfolio',
+    value: '',
+  },
+  'qt8GcQ6z7SHjYxmdhirp4cddL+YA/hx6Oyfa3x4CH9Y': {
+    original: 'Blog',
+    value: '',
+  },
+  'rU81YcMaFGiZdU/ld17APEHxfVesQJ+cqofF5H2fGLQ': {
+    original: 'About',
+    value: '',
+  },
+  'some-of-our-work': {
+    original: 'Some of our work',
+    value: '',
+  },
+  'some-of-our-work.alt': {
+    original: '',
+    value: '',
+  },
+  'view-portfolio': {
+    original: '<a href="/portfolio/">View Full Portfolio &rarr;</a>',
+    value: '',
+  },
+};
+const localeJA = {
+  'bottom-title': '翻訳されるランダムな説明',
+};
+
 function createTestingStructure() {
   const html = `
     <!doctype html>
@@ -69,7 +211,7 @@ function createTestingStructure() {
                 </header>
                 <section class="hero diagonal">
                     <div class="container">
-                        <h2 data-rosey="homepage-title" data-rosey-attrs="descript" descript="random description to be translated" class="editable">We build nice websites</h2>
+                        <h2 data-rosey="homepage-title" class="editable">We build nice websites</h2>
                         <p data-rosey="homepage-company-description" class="subtext editable">This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.</p>
                         <p><a data-rosey="contact-us" class="button alt" href="/contact/">Contact Us</a></p>
                     </div>
@@ -142,7 +284,7 @@ function createTestingStructure() {
                 <section class="diagonal patterned">
                     <div class="container halves">
                         <div>
-                            <h3 data-rosey="some-of-our-work" data-rosey-attrs="alt" class="editable">Some of our work</h3>
+                            <h3 data-rosey="some-of-our-work" class="editable">Some of our work</h3>
                             <p data-rosey="portfolio-description" class="editable">We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.</p>
                             <p data-rosey="view-portfolio" class="editable"><a href="/portfolio/">View Full Portfolio &rarr;</a></p>
                             <p data-rosey class="editable"><a href="/portfolio/">Missing key?</a></p>
@@ -200,7 +342,15 @@ function createTestingStructure() {
             </body>
         </html>
         `;
-
+  const htmlAttrs = `
+      <!doctype html>
+      <html lang="en">
+    <body>
+              <h2 data-rosey="homepage-title" data-rosey-attrs="descript" descript="random description to be translated" class="editable">We build nice websites</h2>            
+      <h3 data-rosey="some-of-our-work" data-rosey-attrs="alt" class="editable">Some of our work</h3>
+          </body>
+      </html>
+      `;
   const preLocalized = `
     <!doctype html>
         <html lang="en">
@@ -252,6 +402,7 @@ function createTestingStructure() {
   fs.writeFileSync(`${options.rosey.source}/style.css`, 'css');
   fs.writeFileSync(`${options.rosey.source}/css/style2.css`, 'css');
   fs.writeFileSync(`${options.rosey.source}/index.html`, html);
+  fs.writeFileSync(`${options.rosey.source}/htmlAttrs.html`, htmlAttrs);
   fs.writeFileSync(`${options.rosey.source}/html/index2.html`, html2);
   fs.writeFileSync(`${options.rosey.source}/pt-BR/preLocalized.html`, preLocalized);
 }
@@ -260,142 +411,7 @@ function createLocales() {
   // Create Locales
   fs.mkdirSync(options.rosey.generated_locale_dest);
   fs.mkdirSync(options.rosey.locale_source);
-  const localeBR = {
-    'homepage-title': 'Criamos websites para você',
-    'homepage-title.descript': 'Descrição aleatória a ser traduzida',
-    'contact-us': 'Entre em contato',
-    'some-of-our-work': 'Um pouco do nosso trabalho',
-  };
-  const localePT = {
-    'homepage-title': 'POISH, Criamos websites para você',
-  };
-  const localeFR = {
-    'homepage-title': {
-      original: 'We build nice website',
-      value: 'Nous construisons de beaux sites Web',
-    },
-    'homepage-title.descript': {
-      original: 'random description to be translated',
-      value: 'Nous construisons de beaux sites Web',
-    },
-    'contact-us': {
-      original: 'Contact Us',
-      value: 'Nous contacter',
-    },
 
-  };
-  const localeRS = {
-    '0Pm75CuMAuL17aHK7NygQ+K+2RcLVXa+uX7LdnO2TkQ': {
-      original: '\n                            <a href="cloudcannon:collections/_data/footer.yml" class="btn">\n                                <strong>&#9998;</strong> Update Footer Sections</a>\n                        ',
-      value: '',
-    },
-    'KON8fKUYnhjh549v0V7gTOiufsF1eYznwJNJbWG2rgY': {
-      original: 'Home',
-      value: '',
-    },
-    'LZWt/W8QjSfGY8qG29ixQyxwihJBCmn6Apz8h68EVwg': {
-      original: '<a href="/portfolio/">Missing key?</a>',
-      value: '',
-    },
-    'contact-us': {
-      original: 'Contact Us',
-      value: '',
-    },
-    'homepage-company-description': {
-      original: 'This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.',
-      value: '',
-    },
-    'homepage-title': {
-      original: 'We build nice websites',
-      value: '',
-    },
-    'homepage-title.descript': {
-      original: 'random description to be translated',
-      value: '',
-    },
-    'menu-portfolio': {
-      original: 'Portfolio',
-      value: '',
-    },
-    'portfolio-description': {
-      original: 'We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.',
-      value: '',
-    },
-    'qt8GcQ6z7SHjYxmdhirp4cddL+YA/hx6Oyfa3x4CH9Y': {
-      original: 'Blog',
-      value: '',
-    },
-    'rU81YcMaFGiZdU/ld17APEHxfVesQJ+cqofF5H2fGLQ': {
-      original: 'About',
-      value: '',
-    },
-    'some-of-our-work': {
-      original: 'Some of our work',
-      value: '',
-    },
-    'some-of-our-work.alt': {
-      original: '',
-      value: '',
-    },
-    'view-portfolio': {
-      original: '<a href="/portfolio/">View Full Portfolio &rarr;</a>',
-      value: '',
-    },
-  };
-  const localeGA = {
-    '0Pm75CuMAuL17aHK7NygQ+K+2RcLVXa+uX7LdnO2TkQ': {
-      original: '\n                            <a href="cloudcannon:collections/_data/footer.yml" class="btn">\n                                <strong>&#9998;</strong> Update Footer Sections</a>\n                        ',
-      value: '',
-    },
-    'KON8fKUYnhjh549v0V7gTOiufsF1eYznwJNJbWG2rgY': {
-      original: 'Home',
-      value: '',
-    },
-    'LZWt/W8QjSfGY8qG29ixQyxwihJBCmn6Apz8h68EVwg': {
-      original: '<a href="/portfolio/">Missing key?</a>',
-      value: '',
-    },
-    'contact-us': {
-      original: 'Contact Us',
-      value: '',
-    },
-    'homepage-company-description': {
-      original: 'This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.',
-      value: '',
-    },
-    'homepage-title': {
-      original: 'outdated',
-      value: '',
-    },
-    'homepage-title.descript': {
-      original: 'outdated',
-      value: '',
-    },
-    'unused': {
-      original: 'Portfolio',
-      value: '',
-    },
-    'qt8GcQ6z7SHjYxmdhirp4cddL+YA/hx6Oyfa3x4CH9Y': {
-      original: 'Blog',
-      value: '',
-    },
-    'rU81YcMaFGiZdU/ld17APEHxfVesQJ+cqofF5H2fGLQ': {
-      original: 'About',
-      value: '',
-    },
-    'some-of-our-work': {
-      original: 'Some of our work',
-      value: '',
-    },
-    'some-of-our-work.alt': {
-      original: '',
-      value: '',
-    },
-    'view-portfolio': {
-      original: '<a href="/portfolio/">View Full Portfolio &rarr;</a>',
-      value: '',
-    },
-  };
   fs.writeJsonSync(`${options.rosey.locale_source}/pt-BR.json`, localeBR);
   fs.writeJsonSync(`${options.rosey.locale_source}/pt-PT.json`, localePT);
   fs.writeJsonSync(`${options.rosey.locale_source}/fr.json`, localeFR);
@@ -406,9 +422,6 @@ function createLocales() {
 
   process.env.GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json';
 
-  const localeJA = {
-    'bottom-title': '翻訳されるランダムな説明',
-  };
   fs.writeJsonSync(`${options.rosey.locale_source}/ja.json`, localeJA);
   fs.writeJsonSync(`${options.rosey.locale_source}/ja-jp.json`, localeJA);
 
@@ -421,6 +434,37 @@ async function cleanUpFilesAfterTest() {
   await fs.remove(options.rosey.locale_source);
   await fs.remove(options.rosey.source);
   await fs.remove(options.rosey.dest);
+}
+
+async function checkAttribute(file, selector, attribute, expectedValue) {
+  const html = await fs.readFile(file, 'utf-8');
+  // log(html);
+  const $ = cheerio.load(html,
+    {
+      _useHtmlParser2: true,
+      lowerCaseAttributeNames: false,
+      decodeEntities: false,
+    });
+
+  const $el = $(selector);
+  // log($el.attr(attribute));
+  // log(expectedValue);
+  return expect($el.attr(attribute)).to.equal(expectedValue);
+}
+
+async function checkElement(file, selector, expectedValue) {
+  const html = await fs.readFile(file, 'utf-8');
+  // log(html);
+  const $ = cheerio.load(html,
+    {
+      _useHtmlParser2: true,
+      lowerCaseAttributeNames: false,
+      decodeEntities: false,
+    });
+  const $el = $(selector);
+  // log('found:', $el.html());
+  // log('expected:', expectedValue);
+  return expect($el.html()).to.equal(expectedValue);
 }
 
 describe('askYesNo', () => {
@@ -879,6 +923,23 @@ describe('build', () => {
     });
     it('should have a fr folder on the dest', async () => {
       expect(fs.existsSync(`${options.rosey.full_dest}/fr/`)).to.equal(true);
+    });
+    it('should have the correct translation for descript attribute', async () => {
+      const selector = `[${options.rosey.data_tag}=homepage-title]`;
+      const translation = localeRS['homepage-title.descript'].value;
+      await checkAttribute(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, 'descript', translation);
+    });
+    it('should have the correct translation for alt attribute', async () => {
+      const selector = `[${options.rosey.data_tag}=some-of-our-work]`;
+      const translation = localeRS['some-of-our-work.alt'].value;
+      await checkAttribute(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, 'alt', translation);
+    });
+
+    it('should have the correct translation for the whole element', async () => {
+      const selector = `[${options.rosey.data_tag}=some-of-our-work]`;
+      const translation = localeRS['some-of-our-work'].value;
+
+      await checkElement(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, translation);
     });
 
     it('should have an en folder on the dest', async () => {
