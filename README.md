@@ -31,7 +31,7 @@ $ npm install rosey --save-dev
 or simpy run with npx
 
 ```
-$ npx rosey 
+$ npx rosey rosey
 ```
 
 ## Synopsis

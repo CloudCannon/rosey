@@ -1,6 +1,6 @@
 {
-  "name": "@cloudcannon/rosey",
-  "version": "0.0.1",
+  "name": "rosey",
+  "version": "1.0.0",
   "description": "Generate a translated version of your website based on the translation of tagged elements.",
   "main": "index.js",
   "scripts": {
