@@ -731,6 +731,177 @@ describe('check', () => {
   });
 });
 
+describe('convert', () => {
+  before(async () => {
+    createTestingStructure();
+    createLocales();
+  });
+
+
+  context('Convert on wrong locales folder', () => {
+    it('should reject the promise ', async () => {
+      modifiedOptions.rosey.generated_locale_dest = '/WrongFolderPath/';
+
+      let isResolved = null;
+      const expectedResult = false;
+
+      await runner.convert(modifiedOptions)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
+        });
+
+      expect(isResolved).to.equal(expectedResult);
+
+      // Revert modified settings
+      modifiedOptions.rosey.generated_locale_dest = options.rosey.locale_source;
+    });
+  });
+
+  context('Convert with missing source.json file', () => {
+    it('should reject the promise ', async () => {
+      let isResolved = null;
+      const expectedResult = false;
+
+      await runner.convert(options)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
+        });
+
+      expect(isResolved).to.equal(expectedResult);
+    });
+  });
+
+  context('Check against version 2 document', () => {
+    it('rosey generated locale path file should not exist', async () => {
+      // Remove before starting
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
+
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(false);
+    });
+
+    it('should create the source.json file', async () => {
+      let isResolved = null;
+      const expectedResult = true;
+
+      await runner.generate(options)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
+        });
+
+      expect(isResolved).to.equal(expectedResult);
+
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+    });
+
+
+    it('should create the converted.json files', async () => {
+      let isResolved = null;
+      const expectedResult = true;
+
+      await runner.convert(options)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
+        });
+
+      expect(isResolved).to.equal(expectedResult);
+    });
+
+    it('should have a pt-BR converted file', async () => {
+      expect(fs.existsSync(`${options.rosey.full_locale_source}/v2/pt-BR.json`)).to.equal(true);
+    });
+
+    it('should have a pt-PT converted file', async () => {
+      expect(fs.existsSync(`${options.rosey.full_locale_source}/v2/pt-PT.json`)).to.equal(true);
+    });
+
+    it('should have a ja converted file', async () => {
+      expect(fs.existsSync(`${options.rosey.full_locale_source}/v2/ja.json`)).to.equal(true);
+    });
+
+    it('should NOT have a rs converted file', async () => {
+      expect(fs.existsSync(`${options.rosey.full_locale_source}/v2/rs.json`)).to.equal(false);
+    });
+  });
+
+
+  context('Check against version 1 document', () => {
+    it('generated locale path file should not exist', async () => {
+      // Remove before starting
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
+
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(false);
+    });
+
+    it('should create the source.json file', async () => {
+      modifiedOptions.rosey.source_version = 1;
+
+      let isResolved = null;
+      const expectedResult = true;
+
+      await runner.generate(modifiedOptions)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
+        });
+
+      expect(isResolved).to.equal(expectedResult);
+
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+
+      // revert the modified options
+      modifiedOptions.rosey.source_version = options.rosey.source_version;
+    });
+
+    it('should not be able to create, expecting different version of source.json file', async () => {
+      modifiedOptions.rosey.source_version = 1;
+
+      let isResolved = null;
+      const expectedResult = false;
+
+      await runner.convert(modifiedOptions)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
+        });
+
+      expect(isResolved).to.equal(expectedResult);
+
+      // revert the modified options
+      modifiedOptions.rosey.source_version = options.rosey.source_version;
+    });
+  });
+
+
+  after(async () => {
+    await cleanUpFilesAfterTest();
+  });
+});
 describe('build', () => {
   before(async () => {
     createTestingStructure();

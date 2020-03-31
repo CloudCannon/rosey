@@ -6,11 +6,11 @@ const cli = require('./cli');
 const helpString = `
 Usage: rosey <command> [args]
 Args:
-    -s | --source       The source folder to copythe website content. Defaults to 'dist/site'.
+    -s | --source       The source folder to copy the website content. Defaults to 'dist/site'.
     -d | --dest         The destination folder to output the files to. Defaults to 'dist/translated_site'.
     -l | --languages    Filter for the specific languages to be translated. When specified, 
                           only the language specific subfolders are generated.
-    -c | --credentials  Path to the location for the Google API Credendials json file.
+    -c | --credentials  Path to the location for the Google API Credentials json file.
     -y | --yes          Overrides the user confirmation request to Y.
     -v | --version      The version number of the locale file. Defaults to '2'.
     -p | --port         The port number to serve the site on. Defaults to '8000'.
@@ -25,6 +25,8 @@ Commands:
     generate        Generates a lookup table for the marked keys.
     check           Generates a comparison between source and 
                       locales files.
+    convert         Generate the version 2 equivalent files from the
+                      current locales files.
     build           Generates a translated version of your website
                       to the dest folder.
     clean           Removes all files from the dest folder.

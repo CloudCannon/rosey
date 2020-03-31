@@ -74,6 +74,18 @@ Generates a comparison of `rosey/source.json` and `rosey/locales/*.json` at `ros
 $ rosey check [<version>|<locale-source>|<locale-dest>]
 ```
 
+### Convert
+##### ```convert```
+If you still have `locales` files using version 1, you can use the `convert` command to migrate the current translations to version 2.
+It will need an existing `source.json` file on with version 2 file as the base for the new locales files. 
+It is recommended to run `rosey generate --version 2` before using the `convert` command.
+
+#### Example:
+
+```
+$ rosey convert [<locale-source>|<locale-dest>]
+```
+
 ### Rosey
 ##### ```rosey```
 Create translated version of your website for each "locale" file on the `rosey/locales/` folder. 
