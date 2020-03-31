@@ -13,6 +13,7 @@ Requires node >=10.0.0
     <li> <a href="#help">Help</a>
     <li> <a href="#generate">Generate</a>
     <li> <a href="#check">Check</a>
+    <li> <a href="#convert">Convert</a>
     <li> <a href="#rosey">Rosey</a>
     <li> <a href="#build">Build</a>
     <li> <a href="#serve">Serve</a>
