@@ -125,7 +125,6 @@ module.exports = {
     const source = flags.source || options.rosey.source;
     const localeSource = flags.localeSource || options.rosey.locale_source;
     const localeDest = flags.localeDest || options.rosey.generated_locale_dest;
-    log(flags.localeDest);
 
     options.cwd = cwd;
     options.help = help;

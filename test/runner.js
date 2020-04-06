@@ -102,6 +102,14 @@ const localeRS = {
     original: 'Portfolio',
     value: '',
   },
+  'meta-title': {
+    original: 'HTML TITLE',
+    value: 'NewTitleToCheckOnExplicitAtribute',
+  },
+  'meta-descript': {
+    original: 'HTML DESC',
+    value: 'New Description to Check on ATTR tag',
+  },
   'portfolio-description': {
     original: 'We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.',
     value: '',
@@ -345,6 +353,13 @@ function createTestingStructure() {
   const htmlAttrs = `
       <!doctype html>
       <html lang="en">
+      <head>
+        <title data-rosey="meta-title">HTML TITLE</title>
+        <title data-rosey="meta-descript">HTML DESC</title>
+        <meta name="twitter:title" data-rosey-attrs-explicit='{"content":"meta-title"}' content="HTML TITLE">
+        <meta name="twitter:descript" data-rosey-attrs-explicit='{"description":"meta-descript"}' description="DESC">
+        <meta name="other:tag" data-rosey-attrs-explicit='{"content":"meta-title","description":"meta-descript"}' content="HTML TITLE" description="HTML DESC Different Content">
+      </head>
     <body>
               <h2 data-rosey="homepage-title" data-rosey-attrs="descript" descript="random description to be translated" class="editable">We build nice websites</h2>            
       <h3 data-rosey="some-of-our-work" data-rosey-attrs="alt" class="editable">Some of our work</h3>
@@ -438,7 +453,6 @@ async function cleanUpFilesAfterTest() {
 
 async function checkAttribute(file, selector, attribute, expectedValue) {
   const html = await fs.readFile(file, 'utf-8');
-  // log(html);
   const $ = cheerio.load(html,
     {
       _useHtmlParser2: true,
@@ -447,8 +461,8 @@ async function checkAttribute(file, selector, attribute, expectedValue) {
     });
 
   const $el = $(selector);
-  // log($el.attr(attribute));
-  // log(expectedValue);
+  log($el.attr(attribute));
+  log(expectedValue);
   return expect($el.attr(attribute)).to.equal(expectedValue);
 }
 
@@ -652,7 +666,7 @@ describe('check', () => {
 
     it('should match the results on the checks.json file', async () => {
       const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
-      expect(checks.ga.states.missing).to.equal(2);
+      expect(checks.ga.states.missing).to.equal(4);
       expect(checks.ga.states.current).to.equal(10);
       expect(checks.ga.states.outdated).to.equal(2);
       expect(checks.ga.states.unused).to.equal(1);
@@ -719,7 +733,7 @@ describe('check', () => {
     it('should match the results on the checks.json file', async () => {
       const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
       expect(checks.rs.states.missing).to.equal(0);
-      expect(checks.rs.states.current).to.equal(14);
+      expect(checks.rs.states.current).to.equal(16);
       expect(checks.rs.states.outdated).to.equal(0);
       expect(checks.rs.states.unused).to.equal(0);
     });
@@ -1104,6 +1118,19 @@ describe('build', () => {
       const selector = `[${options.rosey.data_tag}=some-of-our-work]`;
       const translation = localeRS['some-of-our-work.alt'].value;
       await checkAttribute(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, 'alt', translation);
+    });
+    it('should have the correct translation for explicit defined attribute', async () => {
+      const selector = '[name="twitter:title"]';
+      const translation = localeRS['meta-title'].value;
+      await checkAttribute(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, 'content', translation);
+    });
+    it('should have the correct translation for multiple explicit defined attribute', async () => {
+      const selector = '[name="other:tag"]';
+      let translation = localeRS['meta-title'].value;
+      await checkAttribute(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, 'content', translation);
+
+      translation = localeRS['meta-descript'].value;
+      await checkAttribute(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, 'description', translation);
     });
 
     it('should have the correct translation for the whole element', async () => {
