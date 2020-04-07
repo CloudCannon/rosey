@@ -10,6 +10,8 @@ Requires node >=10.0.0
 
 ## Contents
 <ul>
+    <li> <a href="#installation">Installation</a>
+    <li> <a href="#html-tags">HTML tags</a>
     <li> <a href="#help">Help</a>
     <li> <a href="#generate">Generate</a>
     <li> <a href="#check">Check</a>
@@ -23,23 +25,170 @@ Requires node >=10.0.0
     <li> <a href="#translate">Translate</a>
 </ul>
 
-## Install
+## Installation
 
+### Using NPX
+You can use the rosey package without installing it.
+For that, you will need to run `npx` which will download and cache a version of the package
+
+```
+$ npx rosey rosey <command> [args]
+```
+### Installing globally
+You can install it globally
+```
+$ npm install rosey -g
+```
+
+And then just run the commands from any project
+```
+$ rosey <command> [args]
+```
+### Using package.json
+You can also install rosey on a specific project only
 ```
 $ npm install rosey --save-dev
 ```
-
-or simpy run with npx
+#### Running with npx
+To run from the local package, use `npx`. It will look for the locally installed or globally installed package before downloading and caching the latest version.
 
 ```
-$ npx rosey rosey
+$ npx rosey <command> [args]
 ```
+
+#### Running with scripts
+Alternatively, you can call it using the `packages.json` scripts.
+You will need to add the following on your `packages.json` file
+```
+  "scripts": {
+    "rosey": "rosey"
+  },
+```
+And then run
+```
+$ npm run rosey <commands> [args]
+```
+
+#### Running with index.js
+Another option is calling directly the index.js file installed on the `node_modules` folder.
+```
+$ node_modules/rosey/index.js <command> [args]
+```
+
+## HTML tags
+Rosey works looking into certain html tags added into the HTML to determine which contents require transalations.
+
+### Element
+#### `data-rosey`
+
+`data-rosey` will be included on all the elements that require translation. 
+On translation, the whole HTML content between the element will be replaced with the appropriate translation.
+
+With the given example
+```
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1 data-rosey=”title”>Home page title</h1>
+    <h2 data-rosey=”sub-title”>Home page sub title</h1>
+  </body>
+</html>
+
+```
+The output translation keys generate are:
+```
+{
+  "sub-title":"",
+  "title":"",
+}
+```
+
+### Attributes
+### `data-rosey-attrs`
+```
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1 data-rosey=”title” data-rosey-attr="content,alt" content="Content attribute" alt="alt attribute">Home page title</h1>
+    <h2 data-rosey=”sub-title”>Home page sub title</h1>
+  </body>
+</html>
+
+```
+The output translation keys generate are:
+```
+{
+  "sub-title":"",
+  "title":"",
+  "title.alt":"",
+  "title.content":"",
+}
+```
+
+
+### Attributes explicit tags
+### `data-rosey-attrs-explicit`
+Using `data-rosey-attrs-explicit` you are able to explicitly define the name of the key to be used on the translation files.
+If the key name is shared with other attributes or elements, they all will have the same translation.
+
+```
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1 data-rosey=”title” data-rosey-attr='{"content":"title","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Home page title</h1>
+    <h2 data-rosey=”sub-title”>Home page sub title</h1>
+  </body>
+</html>
+
+```
+The output translation keys generate are:
+```
+{
+  "alt-tag":"",
+  "sub-title":"",
+  "title":"",
+}
+```
+
+
+### Namespace
+#### `data-rosey-ns`
+`data-rosey-ns` is used to define a namespace to be used as part of the key for the translations.
+The closest parent with `data-rosey-ns` tag will be used as the namespace. When an empty string `data-rosey-ns` tag is included, no namespace is used for the child `data-rosey` and `data-rosey-attrs` tags.
+
+
+With given example
+```
+<!DOCTYPE html>
+<html>
+  <head data-rosey-ns='home:meta'>
+    <title data-rosey='title'>Home title</title>
+  </head>
+  <body data-rosey-ns='home:content'>
+    <h1 data-rosey=”title”>Home page title</h1>
+    <div data-rosey-ns=””>
+      <p data-rosey=”contact-us”>...</p>
+    </div>
+  </body>
+</html>
+```
+
+The output translation keys generate are:
+```
+{
+  “contact-us”: ...
+  "home:meta:title": …,
+  "home:content:title": …
+}
+```
+
 
 ## Synopsis
 
 ```
 $ rosey <command> [args]
 ```
+
 
 ## Usage
 

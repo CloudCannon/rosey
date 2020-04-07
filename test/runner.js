@@ -794,7 +794,6 @@ describe('convert', () => {
   });
 
   context('Convert on wrong locales folder', () => {
-
     it('should create the source.json file', async () => {
       let isResolved = null;
       const expectedResult = true;
@@ -967,9 +966,8 @@ describe('build', () => {
     createLocales();
   });
 
-  context('build with missing locales folder', () =>{
-    it('should return 0', async () => {
-
+  context('build with missing locales folder', () => {
+    it('should return 1', async () => {
       modifiedOptions.rosey.locale_source = 'wronginexistentpath';
       modifiedOptions.rosey.full_locale_source = 'wronginexistentpath';
 
