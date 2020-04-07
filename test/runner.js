@@ -40,6 +40,7 @@ options.rosey.full_source = path.join(cwd, source);
 options.rosey.full_locale_source = path.join(cwd, localeSource);
 options.rosey.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
 
+options.rosey.credentials = '/credentials.json';
 
 let modifiedOptions = {};
 modifiedOptions = defaults(modifiedOptions, options);
@@ -82,9 +83,17 @@ const localeRS = {
     original: '<a href="/portfolio/">Missing key?</a>',
     value: '',
   },
+  'about:meta:title': {
+    original: 'About Page',
+    value: 'New About Page Title',
+  },
   'contact-us': {
     original: 'Contact Us',
     value: '',
+  },
+  'home:meta:title': {
+    original: 'Home Page',
+    value: 'New Home Page Title',
   },
   'homepage-company-description': {
     original: 'This is the <strong>Urban</strong> template from <a href="https://cloudcannon.com/">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.',
@@ -191,16 +200,18 @@ const localeGA = {
 };
 const localeJA = {
   'bottom-title': '翻訳されるランダムな説明',
+  'about:meta:title': 'ページについて',
 };
 
 function createTestingStructure() {
   const html = `
     <!doctype html>
         <html lang="en">
-            <head>
+            <head data-rosey-ns="home:meta">
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <meta http-equiv="refresh" content="0;URL='/subfolder/'" /> 
+                <title data-rosey="title">Home Page</title>
             </head>
             <body>
                 <header>
@@ -270,9 +281,10 @@ function createTestingStructure() {
   const html2 = `
     <!doctype html>
         <html lang="en">
-            <head>
+            <head data-rosey-ns="about:meta">
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title data-rosey="title">About Page</title>
             </head>
             <body>
                 <header>
@@ -361,6 +373,10 @@ function createTestingStructure() {
         <meta name="other:tag" data-rosey-attrs-explicit='{"content":"meta-title","description":"meta-descript"}' content="HTML TITLE" description="HTML DESC Different Content">
       </head>
     <body>
+              <div data-rosey-ns="home:meta">
+                    <h1 name="HomePageH1" data-rosey-attrs-explicit='{"alt":"title"}' alt="Home Page">Home Page</h1>
+                    <h2 data-rosey="title">Home Page</h2>
+              </div>
               <h2 data-rosey="homepage-title" data-rosey-attrs="descript" descript="random description to be translated" class="editable">We build nice websites</h2>            
       <h3 data-rosey="some-of-our-work" data-rosey-attrs="alt" class="editable">Some of our work</h3>
           </body>
@@ -435,7 +451,7 @@ function createLocales() {
   fs.writeFileSync(`${options.rosey.locale_source}/es.json`, 'Wrong JSON');
   fs.writeFileSync(`${options.rosey.locale_source}/invalid.INVALID`, 'Wrong JSON');
 
-  process.env.GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json';
+  // process.env.GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json';
 
   fs.writeJsonSync(`${options.rosey.locale_source}/ja.json`, localeJA);
   fs.writeJsonSync(`${options.rosey.locale_source}/ja-jp.json`, localeJA);
@@ -461,8 +477,8 @@ async function checkAttribute(file, selector, attribute, expectedValue) {
     });
 
   const $el = $(selector);
-  log($el.attr(attribute));
-  log(expectedValue);
+  // log($el.attr(attribute));
+  // log(expectedValue);
   return expect($el.attr(attribute)).to.equal(expectedValue);
 }
 
@@ -516,6 +532,7 @@ describe('clean', () => {
     it('should return an empty array', async () => {
       modifiedOptions.rosey.dest = 'thisdoesntexist';
       const res = await runner.clean(modifiedOptions);
+      modifiedOptions.rosey.dest = options.rosey.dest;
       expect(res).to.eql([]);
     });
   });
@@ -666,7 +683,7 @@ describe('check', () => {
 
     it('should match the results on the checks.json file', async () => {
       const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
-      expect(checks.ga.states.missing).to.equal(4);
+      expect(checks.ga.states.missing).to.equal(6);
       expect(checks.ga.states.current).to.equal(10);
       expect(checks.ga.states.outdated).to.equal(2);
       expect(checks.ga.states.unused).to.equal(1);
@@ -689,7 +706,6 @@ describe('check', () => {
 
       let isResolved = null;
       const expectedResult = true;
-
       await runner.generate(modifiedOptions)
         .then(() => {
           log('promise is resolved');
@@ -733,7 +749,7 @@ describe('check', () => {
     it('should match the results on the checks.json file', async () => {
       const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
       expect(checks.rs.states.missing).to.equal(0);
-      expect(checks.rs.states.current).to.equal(16);
+      expect(checks.rs.states.current).to.equal(18);
       expect(checks.rs.states.outdated).to.equal(0);
       expect(checks.rs.states.unused).to.equal(0);
     });
@@ -752,30 +768,14 @@ describe('convert', () => {
   });
 
 
-  context('Convert on wrong locales folder', () => {
-    it('should reject the promise ', async () => {
-      modifiedOptions.rosey.generated_locale_dest = '/WrongFolderPath/';
-
-      let isResolved = null;
-      const expectedResult = false;
-
-      await runner.convert(modifiedOptions)
-        .then(() => {
-          log('promise is resolved');
-          isResolved = true;
-        }).catch(() => {
-          log('promise is rejected');
-          isResolved = false;
-        });
-
-      expect(isResolved).to.equal(expectedResult);
-
-      // Revert modified settings
-      modifiedOptions.rosey.generated_locale_dest = options.rosey.locale_source;
-    });
-  });
-
   context('Convert with missing source.json file', () => {
+    it('rosey generated locale path file should not exist', async () => {
+      // Remove before starting
+      fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
+
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
+    });
+
     it('should reject the promise ', async () => {
       let isResolved = null;
       const expectedResult = false;
@@ -792,6 +792,49 @@ describe('convert', () => {
       expect(isResolved).to.equal(expectedResult);
     });
   });
+
+  context('Convert on wrong locales folder', () => {
+
+    it('should create the source.json file', async () => {
+      let isResolved = null;
+      const expectedResult = true;
+
+      await runner.generate(options)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
+        });
+
+      expect(isResolved).to.equal(expectedResult);
+
+      expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+    });
+
+    it('should reject the promise ', async () => {
+      modifiedOptions.rosey.locale_source = '/WrongFolderPath/';
+
+      let isResolved = null;
+      const expectedResult = false;
+
+      await runner.convert(modifiedOptions)
+        .then(() => {
+          log('promise is resolved');
+          isResolved = true;
+        }).catch(() => {
+          log('promise is rejected');
+          isResolved = false;
+        });
+
+      expect(isResolved).to.equal(expectedResult);
+
+      // Revert modified settings
+      modifiedOptions.rosey.locale_source = options.rosey.locale_source;
+    });
+  });
+
 
   context('Check against version 2 document', () => {
     it('rosey generated locale path file should not exist', async () => {
@@ -899,9 +942,10 @@ describe('convert', () => {
         .then(() => {
           log('promise is resolved');
           isResolved = true;
-        }).catch(() => {
+        }).catch((errVersion) => {
           log('promise is rejected');
           isResolved = false;
+          expect(errVersion.message).to.contain('Convert is only possible from a Version 2 source.json file.');
         });
 
       expect(isResolved).to.equal(expectedResult);
@@ -921,6 +965,20 @@ describe('build', () => {
     createTestingStructure();
 
     createLocales();
+  });
+
+  context('build with missing locales folder', () =>{
+    it('should return 0', async () => {
+
+      modifiedOptions.rosey.locale_source = 'wronginexistentpath';
+      modifiedOptions.rosey.full_locale_source = 'wronginexistentpath';
+
+      const res = await runner.build(modifiedOptions);
+
+      expect(res).to.equal(1);
+      modifiedOptions.rosey.locale_source = options.rosey.locale_source;
+      modifiedOptions.rosey.full_locale_source = options.rosey.full_locale_source;
+    });
   });
 
   context('building with valid configs', () => {
@@ -1124,6 +1182,11 @@ describe('build', () => {
       const translation = localeRS['meta-title'].value;
       await checkAttribute(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, 'content', translation);
     });
+    it('should have the correct translation for explicit defined attribute with namespace', async () => {
+      const selector = '[name="HomePageH1"]';
+      const translation = localeRS['home:meta:title'].value;
+      await checkAttribute(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, 'alt', translation);
+    });
     it('should have the correct translation for multiple explicit defined attribute', async () => {
       const selector = '[name="other:tag"]';
       let translation = localeRS['meta-title'].value;
@@ -1136,6 +1199,12 @@ describe('build', () => {
     it('should have the correct translation for the whole element', async () => {
       const selector = `[${options.rosey.data_tag}=some-of-our-work]`;
       const translation = localeRS['some-of-our-work'].value;
+
+      await checkElement(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, translation);
+    });
+    it('should have the correct translation for a element using namespace', async () => {
+      const selector = `[${options.rosey.data_tag}=title]`;
+      const translation = localeRS['home:meta:title'].value;
 
       await checkElement(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, translation);
     });
@@ -1200,11 +1269,14 @@ describe('translate', () => {
     createLocales();
   });
 
-  context('running the base command', () => {
+  context('running the translate command', () => {
     it('should return 0', async () => {
       modifiedOptions.flags.partialLanguages = ['PT-BR', 'FR'];
+      modifiedOptions.rosey.credentials = undefined;
+
       const res = await runner.translate(modifiedOptions);
       expect(res).to.equal(0);
+      modifiedOptions.rosey.credentials = '/credentials.json';
       modifiedOptions.flags.partialLanguages = null;
     });
 
