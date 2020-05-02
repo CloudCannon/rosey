@@ -152,28 +152,29 @@ The output translation keys generate are:
 
 
 ### Namespace
-#### `data-rosey-ns`
-`data-rosey-ns` is used to define a namespace to be used as part of the key for the translations.
-The closest parent with `data-rosey-ns` tag will be used as the namespace. When an empty string `data-rosey-ns` tag is included, no namespace is used for the child `data-rosey` and `data-rosey-attrs` tags.
+#### `data-rosey-root`
+`data-rosey-root` is used to define a SINGLE namespace to be included as part of the key for the translations.
+The closest parent with `data-rosey-root` tag will be used as the namespace. When an empty string `data-rosey-root` tag is included, no namespace is used for the child `data-rosey` and `data-rosey-attrs` tags.
+Any `data-rosey-root` tag found will take priority over the `data-rosey-ns` tags.
 
 
 With given example
 ```
 <!DOCTYPE html>
 <html>
-  <head data-rosey-ns='home:meta'>
+  <head data-rosey-root='home:meta'>
     <title data-rosey='title'>Home title</title>
   </head>
-  <body data-rosey-ns='home:content'>
+  <body data-rosey-root='home:content'>
     <h1 data-rosey=”title”>Home page title</h1>
-    <div data-rosey-ns=””>
+    <div data-rosey-root=””>
       <p data-rosey=”contact-us”>...</p>
     </div>
   </body>
 </html>
 ```
 
-The output translation keys generate are:
+The output translation keys generated are:
 ```
 {
   “contact-us”: ...
@@ -181,6 +182,57 @@ The output translation keys generate are:
   "home:content:title": …
 }
 ```
+
+#### `data-rosey-ns`
+`data-rosey-ns` is used to define nested namespaces to be included as part of the key for the translations.
+All the parents from the element with a `data-rosey-ns` tag will be used as the namespaces concatenated with a colon.
+
+
+With given example
+```
+<!DOCTYPE html>
+<html>
+  <body>
+    <div data-rosey-ns="about">
+      <div data-rosey-ns="faq">
+          <div data-rosey-ns="row-0">
+            <div data-rosey-ns="col-0">
+              <div data-rosey="title"></div>
+            </div>
+          </div>
+          <div data-rosey-ns="row-1">
+            <div data-rosey-ns="col-0">
+              <div data-rosey="title"></div>
+            </div>
+          </div>
+      </div>
+      <div data-rosey-ns="benefits">
+          <div data-rosey-ns="row-0">
+            <div data-rosey-ns="col-0">
+              <div data-rosey="title"></div>
+            </div>
+          </div>
+          <div data-rosey-ns="row-1">
+            <div data-rosey-ns="col-0">
+              <div data-rosey="title"></div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
+```
+
+The output translation keys generated are:
+```
+{
+  "about:benefits:row-0:col-0:title":…,
+  "about:benefits:row-1:col-0:title":…,
+  "about:faq:row-0:col-0:title":…,
+  "about:faq:row-1:col-0:title":…,
+}
+```
+
 
 
 ## Synopsis

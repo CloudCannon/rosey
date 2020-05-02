@@ -119,6 +119,10 @@ const localeRS = {
     original: 'HTML DESC',
     value: 'New Description to Check on ATTR tag',
   },
+  'notNested:branding': {
+    original: 'Branding title',
+    value: 'New translated title for the branding element',
+  },
   'portfolio-description': {
     original: 'We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.',
     value: '',
@@ -363,24 +367,30 @@ function createTestingStructure() {
         </html>
         `;
   const htmlAttrs = `
-      <!doctype html>
-      <html lang="en">
-      <head>
-        <title data-rosey="meta-title">HTML TITLE</title>
-        <title data-rosey="meta-descript">HTML DESC</title>
-        <meta name="twitter:title" data-rosey-attrs-explicit='{"content":"meta-title"}' content="HTML TITLE">
-        <meta name="twitter:descript" data-rosey-attrs-explicit='{"description":"meta-descript"}' description="DESC">
-        <meta name="other:tag" data-rosey-attrs-explicit='{"content":"meta-title","description":"meta-descript"}' content="HTML TITLE" description="HTML DESC Different Content">
-      </head>
-    <body>
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <title data-rosey="meta-title">HTML TITLE</title>
+              <title data-rosey="meta-descript">HTML DESC</title>
+              <meta name="twitter:title" data-rosey-attrs-explicit='{"content":"meta-title"}' content="HTML TITLE">
+              <meta name="twitter:descript" data-rosey-attrs-explicit='{"description":"meta-descript"}' description="DESC">
+              <meta name="other:tag" data-rosey-attrs-explicit='{"content":"meta-title","description":"meta-descript"}' content="HTML TITLE" description="HTML DESC Different Content">
+            </head>
+            <body>
               <div data-rosey-ns="home:meta">
-                    <h1 name="HomePageH1" data-rosey-attrs-explicit='{"alt":"title"}' alt="Home Page">Home Page</h1>
-                    <h2 data-rosey="title">Home Page</h2>
+                <h1 name="HomePageH1" data-rosey-attrs-explicit='{"alt":"title"}' alt="Home Page">Home Page</h1>
+                <h2 data-rosey="title">Home Page</h2>
               </div>
               <h2 data-rosey="homepage-title" data-rosey-attrs="descript" descript="random description to be translated" class="editable">We build nice websites</h2>            
-      <h3 data-rosey="some-of-our-work" data-rosey-attrs="alt" class="editable">Some of our work</h3>
-          </body>
-      </html>
+              <h3 data-rosey="some-of-our-work" data-rosey-attrs="alt" class="editable">Some of our work</h3>
+
+              <div data-rosey-root="notNested">
+                <div data-rosey-ns="nested">
+                  <h4 data-rosey="branding">Branding title</h2>
+                </div>
+              </div>
+            </body>
+          </html>
       `;
   const preLocalized = `
     <!doctype html>
@@ -683,7 +693,7 @@ describe('check', () => {
 
     it('should match the results on the checks.json file', async () => {
       const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
-      expect(checks.ga.states.missing).to.equal(6);
+      expect(checks.ga.states.missing).to.equal(7);
       expect(checks.ga.states.current).to.equal(10);
       expect(checks.ga.states.outdated).to.equal(2);
       expect(checks.ga.states.unused).to.equal(1);
@@ -749,7 +759,7 @@ describe('check', () => {
     it('should match the results on the checks.json file', async () => {
       const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
       expect(checks.rs.states.missing).to.equal(0);
-      expect(checks.rs.states.current).to.equal(18);
+      expect(checks.rs.states.current).to.equal(19);
       expect(checks.rs.states.outdated).to.equal(0);
       expect(checks.rs.states.unused).to.equal(0);
     });
@@ -1203,6 +1213,12 @@ describe('build', () => {
     it('should have the correct translation for a element using namespace', async () => {
       const selector = `[${options.rosey.data_tag}=title]`;
       const translation = localeRS['home:meta:title'].value;
+
+      await checkElement(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, translation);
+    });
+    it('should have the correct translation for a element using root namespace', async () => {
+      const selector = `[${options.rosey.data_tag}=branding]`;
+      const translation = localeRS['notNested:branding'].value;
 
       await checkElement(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, translation);
     });

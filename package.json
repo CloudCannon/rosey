@@ -4,11 +4,11 @@
   "description": "Generate a translated version of your website based on the translation of tagged elements.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha",
+    "test": "nyc mocha --bail --check-leaks",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "lint-autofix":"eslint --fix lib/**",
+    "lint-autofix": "eslint --fix lib/**",
     "lint-code": "eslint  lib/**",
-    "lint":"npm run lint-autofix && npm run lint-code"
+    "lint": "npm run lint-autofix && npm run lint-code"
   },
   "repository": {
     "type": "git",
