@@ -46,67 +46,67 @@ Commands:
  * arguments (in camelCase) and flags.
  */
 const inputs = meow(
-  helpString,
-  {
-    flags: {
-      source: {
-        type: 'string',
-        alias: 's',
-      },
-      dest: {
-        type: 'string',
-        alias: 'd',
-      },
-      languages: {
-        type: 'string',
-        alias: 'l',
-      },
-      'default-language': {
-        type: 'string',
-        alias: null,
-      },
-      'locale-source': {
-        type: 'string',
-        alias: null,
-      },
-      'locale-dest': {
-        type: 'string',
-        alias: null,
-      },
-      'source-delimeter': {
-        type: 'string',
-        alias: null,
-      },
-      credentials: {
-        type: 'string',
-        alias: 'c',
-      },
-      tag: {
-        type: 'string',
-        alias: null,
-      },
-      port: {
-        type: 'string',
-        alias: 'p',
-      },
-      version: {
-        type: 'number',
-        alias: 'v',
-      },
-      yes: {
-        type: 'boolean',
-        alias: 'y',
-      },
-    },
-  },
+	helpString,
+	{
+		flags: {
+			source: {
+				type: 'string',
+				alias: 's'
+			},
+			dest: {
+				type: 'string',
+				alias: 'd'
+			},
+			languages: {
+				type: 'string',
+				alias: 'l'
+			},
+			'default-language': {
+				type: 'string',
+				alias: null
+			},
+			'locale-source': {
+				type: 'string',
+				alias: null
+			},
+			'locale-dest': {
+				type: 'string',
+				alias: null
+			},
+			'source-delimeter': {
+				type: 'string',
+				alias: null
+			},
+			credentials: {
+				type: 'string',
+				alias: 'c'
+			},
+			tag: {
+				type: 'string',
+				alias: null
+			},
+			port: {
+				type: 'string',
+				alias: 'p'
+			},
+			version: {
+				type: 'number',
+				alias: 'v'
+			},
+			yes: {
+				type: 'boolean',
+				alias: 'y'
+			}
+		}
+	}
 );
 
 /**
  * Passes inputs to cli.js
  */
 async function run() {
-  const exitCode = await cli.run(inputs);
-  console.log(`exit code: ${exitCode}`);
-  if (exitCode) process.exit(exitCode);
+	const exitCode = await cli.run(inputs);
+	console.log(`exit code: ${exitCode}`);
+	if (exitCode) process.exit(exitCode);
 }
 run();

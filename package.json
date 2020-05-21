@@ -6,8 +6,8 @@
   "scripts": {
     "test": "nyc mocha --bail --check-leaks",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "lint-autofix": "eslint --fix lib/**",
-    "lint-code": "eslint  lib/**",
+    "lint-autofix": "eslint --fix lib/** test/** index.js cli.js",
+    "lint-code": "eslint  lib/** test/** index.js cli.js",
     "lint": "npm run lint-autofix && npm run lint-code"
   },
   "repository": {
