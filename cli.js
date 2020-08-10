@@ -135,10 +135,10 @@ module.exports = {
 		options.rosey.locale_source = localeSource;
 		options.rosey.generated_locale_dest = localeDest;
 
-		options.rosey.full_dest = path.join(cwd, dest);
-		options.rosey.full_source = path.join(cwd, source);
-		options.rosey.full_locale_source = path.join(cwd, localeSource);
-		options.rosey.full_generated_locale_dest = path.join(cwd, localeDest);
+		options.rosey.full_dest = path.resolve(dest);
+		options.rosey.full_source = path.resolve(source);
+		options.rosey.full_locale_source = path.resolve(localeSource);
+		options.rosey.full_generated_locale_dest = path.resolve(localeDest);
 
 		options.rosey.credentials = flags.credentials;
 		options.rosey.data_tag = flags.tag || options.rosey.data_tag;
