@@ -37,11 +37,12 @@ options.rosey.generated_locale_dest = generatedLocaleDest;
 options.rosey.generated_locale_dest_path = path.dirname(generatedLocaleDest);
 options.rosey.generated_locale_dest_file = path.basename(generatedLocaleDest);
 
-options.rosey.full_dest = path.join(cwd, dest);
-options.rosey.full_source = path.join(cwd, source);
-options.rosey.full_locale_source = path.join(cwd, localeSource);
-options.rosey.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
-options.rosey.full_generated_locale_dest_path = path.join(cwd, options.rosey.generated_locale_dest_path);
+options.rosey.full_dest = path.resolve(cwd, dest);
+options.rosey.full_source = path.resolve(cwd, source);
+options.rosey.full_locale_source = path.resolve(cwd, localeSource);
+options.rosey.full_generated_locale_dest = path.resolve(cwd, generatedLocaleDest);
+// eslint-disable-next-line max-len
+options.rosey.full_generated_locale_dest_path = path.resolve(cwd, options.rosey.generated_locale_dest_path);
 
 options.rosey.credentials = '/credentials.json';
 

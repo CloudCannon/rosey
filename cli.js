@@ -141,6 +141,7 @@ module.exports = {
 		options.rosey.full_source = path.resolve(cwd, source);
 		options.rosey.full_locale_source = path.resolve(cwd, localeSource);
 		options.rosey.full_generated_locale_dest = path.resolve(cwd, localeDest);
+		// eslint-disable-next-line max-len
 		options.rosey.full_generated_locale_dest_path = path.resolve(cwd, options.rosey.generated_locale_dest_path);
 
 		options.rosey.credentials = flags.credentials;
