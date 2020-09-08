@@ -1,6 +1,6 @@
 {
   "name": "rosey",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Generate a translated version of your website based on the translation of tagged elements.",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
     "@google-cloud/language": "^3.8.0",
     "ansi-colors": "^4.1.1",
     "async": "^3.2.0",
-    "browser-sync": "^2.26.7",
+    "browser-sync": "^2.26.12",
     "chalk": "^3.0.0",
     "cheerio": "^1.0.0-rc.3",
     "chokidar": "^3.3.1",
