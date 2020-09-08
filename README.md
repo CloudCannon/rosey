@@ -258,7 +258,7 @@ $ rosey help
 ### Generate
 ##### ```generate```
 Generates a lookup table, called a “locale”, for these keys. The locale determines the content to be shown for each `data-rosey` key.
-The generated locale source is saved at `rosey/source.json`.
+The generated locale source is saved by default at `rosey/source.json`.
 
 #### Example:
 

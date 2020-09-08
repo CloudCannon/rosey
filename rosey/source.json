@@ -1,0 +1,146 @@
+{
+	"version": 2,
+	"keys": {
+		"0Pm75CuMAuL17aHK7NygQ+K+2RcLVXa+uX7LdnO2TkQ": {
+			"original": "\n                            <a href=\"cloudcannon:collections/_data/footer.yml\" class=\"btn\">\n                                <strong>&#9998;</strong> Update Footer Sections</a>\n                        ",
+			"pages": {
+				"/index.html": 1,
+				"/html/index2.html": 1
+			},
+			"total": 2
+		},
+		"KON8fKUYnhjh549v0V7gTOiufsF1eYznwJNJbWG2rgY": {
+			"original": "Home",
+			"pages": {
+				"/index.html": 1,
+				"/html/index2.html": 1
+			},
+			"total": 2
+		},
+		"LZWt/W8QjSfGY8qG29ixQyxwihJBCmn6Apz8h68EVwg": {
+			"original": "<a href=\"/portfolio/\">Missing key?</a>",
+			"pages": {
+				"/html/index2.html": 1
+			},
+			"total": 1
+		},
+		"about:meta:title": {
+			"original": "About Page",
+			"pages": {
+				"/html/index2.html": 1
+			},
+			"total": 1
+		},
+		"contact-us": {
+			"original": "Contact Us",
+			"pages": {
+				"/index.html": 1
+			},
+			"total": 1
+		},
+		"home:meta:title": {
+			"original": "Home Page",
+			"pages": {
+				"/htmlAttrs.html": 2,
+				"/index.html": 1
+			},
+			"total": 3
+		},
+		"homepage-company-description": {
+			"original": "This is the <strong>Urban</strong> template from <a href=\"https://cloudcannon.com/\">CloudCannon</a>. Urban is a strong foundation for the web presence of your agency.",
+			"pages": {
+				"/index.html": 1
+			},
+			"total": 1
+		},
+		"homepage-title": {
+			"original": "We build nice websites",
+			"pages": {
+				"/htmlAttrs.html": 1,
+				"/index.html": 1
+			},
+			"total": 2
+		},
+		"homepage-title.descript": {
+			"original": "random description to be translated",
+			"pages": {
+				"/htmlAttrs.html": 1
+			},
+			"total": 1
+		},
+		"menu-portfolio": {
+			"original": "Portfolio",
+			"pages": {
+				"/index.html": 2,
+				"/html/index2.html": 2
+			},
+			"total": 4
+		},
+		"meta-descript": {
+			"original": "HTML DESC",
+			"pages": {
+				"/htmlAttrs.html": 3
+			},
+			"total": 3
+		},
+		"meta-title": {
+			"original": "HTML TITLE",
+			"pages": {
+				"/htmlAttrs.html": 3
+			},
+			"total": 3
+		},
+		"notNested:branding": {
+			"original": "Branding title\n                ",
+			"pages": {
+				"/htmlAttrs.html": 1
+			},
+			"total": 1
+		},
+		"portfolio-description": {
+			"original": "We take pride in our previous work and our happy customers. We cater to any sector to boost business and increase exposure.",
+			"pages": {
+				"/html/index2.html": 1
+			},
+			"total": 1
+		},
+		"qt8GcQ6z7SHjYxmdhirp4cddL+YA/hx6Oyfa3x4CH9Y": {
+			"original": "Blog",
+			"pages": {
+				"/index.html": 1,
+				"/html/index2.html": 1
+			},
+			"total": 2
+		},
+		"rU81YcMaFGiZdU/ld17APEHxfVesQJ+cqofF5H2fGLQ": {
+			"original": "About",
+			"pages": {
+				"/index.html": 1,
+				"/html/index2.html": 1
+			},
+			"total": 2
+		},
+		"some-of-our-work": {
+			"original": "Some of our work",
+			"pages": {
+				"/htmlAttrs.html": 1,
+				"/html/index2.html": 1
+			},
+			"total": 2
+		},
+		"some-of-our-work.alt": {
+			"original": "",
+			"pages": {
+				"/htmlAttrs.html": 1
+			},
+			"total": 1
+		},
+		"view-portfolio": {
+			"original": "<a href=\"/portfolio/\">View Full Portfolio &rarr;</a>",
+			"pages": {
+				"/html/index2.html": 1
+			},
+			"total": 1
+		}
+	}
+}

@@ -28,17 +28,20 @@ const cwd = process.cwd();
 const dest = 'test/dest';
 const source = 'test/source';
 const localeSource = 'test/rosey/locale';
-const generatedLocaleDest = 'test/rosey';
+const generatedLocaleDest = 'test/rosey/source.json';
 
 options.rosey.dest = dest;
 options.rosey.source = source;
 options.rosey.locale_source = localeSource;
 options.rosey.generated_locale_dest = generatedLocaleDest;
+options.rosey.generated_locale_dest_path = path.dirname(generatedLocaleDest);
+options.rosey.generated_locale_dest_file = path.basename(generatedLocaleDest);
 
 options.rosey.full_dest = path.join(cwd, dest);
 options.rosey.full_source = path.join(cwd, source);
 options.rosey.full_locale_source = path.join(cwd, localeSource);
 options.rosey.full_generated_locale_dest = path.join(cwd, generatedLocaleDest);
+options.rosey.full_generated_locale_dest_path = path.join(cwd, options.rosey.generated_locale_dest_path);
 
 options.rosey.credentials = '/credentials.json';
 
@@ -567,7 +570,9 @@ describe('generate', () => {
 		it('should create the source.json file', async () => {
 			const res = runner.generate(options);
 			await res;
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+			console.log('path expected');
+			console.log(options.rosey.full_generated_locale_dest);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 	});
 
@@ -582,7 +587,7 @@ describe('generate', () => {
 
 			const res = runner.generate(modifiedOptions);
 			await res;
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 	});
 
@@ -647,11 +652,11 @@ describe('check', () => {
 	context('Check against version 2 document', () => {
 		it('rosey generated locale path file should not exist', async () => {
 			// Remove before starting
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest}`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`)).to.equal(false);
 		});
 
 		it('should create the source.json file', async () => {
@@ -669,7 +674,7 @@ describe('check', () => {
 
 			expect(isResolved).to.equal(expectedResult);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 
 
@@ -688,11 +693,11 @@ describe('check', () => {
 
 			expect(isResolved).to.equal(expectedResult);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(true);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`)).to.equal(true);
 		});
 
 		it('should match the results on the checks.json file', async () => {
-			const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
+			const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest_path, '/checks.json'));
 			expect(checks.ga.states.missing).to.equal(7);
 			expect(checks.ga.states.current).to.equal(10);
 			expect(checks.ga.states.outdated).to.equal(2);
@@ -704,11 +709,11 @@ describe('check', () => {
 	context('Check against version 1 document', () => {
 		it('generated locale path file should not exist', async () => {
 			// Remove before starting
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest}`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`)).to.equal(false);
 		});
 
 		it('should create the source.json file', async () => {
@@ -727,7 +732,7 @@ describe('check', () => {
 
 			expect(isResolved).to.equal(expectedResult);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 
 			// revert the modified options
 			modifiedOptions.rosey.source_version = options.rosey.source_version;
@@ -750,14 +755,14 @@ describe('check', () => {
 
 			expect(isResolved).to.equal(expectedResult);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(true);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`)).to.equal(true);
 
 			// revert the modified options
 			modifiedOptions.rosey.source_version = options.rosey.source_version;
 		});
 
 		it('should match the results on the checks.json file', async () => {
-			const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest, '/checks.json'));
+			const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest_path, '/checks.json'));
 			expect(checks.rs.states.missing).to.equal(0);
 			expect(checks.rs.states.current).to.equal(19);
 			expect(checks.rs.states.outdated).to.equal(0);
@@ -781,9 +786,9 @@ describe('convert', () => {
 	context('Convert with missing source.json file', () => {
 		it('rosey generated locale path file should not exist', async () => {
 			// Remove before starting
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest}`);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(false);
 		});
 
 		it('should reject the promise ', async () => {
@@ -819,7 +824,7 @@ describe('convert', () => {
 
 			expect(isResolved).to.equal(expectedResult);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 
 		it('should reject the promise ', async () => {
@@ -848,11 +853,11 @@ describe('convert', () => {
 	context('Check against version 2 document', () => {
 		it('rosey generated locale path file should not exist', async () => {
 			// Remove before starting
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest}`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`)).to.equal(false);
 		});
 
 		it('should create the source.json file', async () => {
@@ -870,7 +875,7 @@ describe('convert', () => {
 
 			expect(isResolved).to.equal(expectedResult);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 
 
@@ -911,11 +916,11 @@ describe('convert', () => {
 	context('Check against version 1 document', () => {
 		it('generated locale path file should not exist', async () => {
 			// Remove before starting
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/source.json`);
-			fs.removeSync(`${options.rosey.full_generated_locale_dest}/checks.json`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest}`);
+			fs.removeSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(false);
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/checks.json`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(false);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest_path}/checks.json`)).to.equal(false);
 		});
 
 		it('should create the source.json file', async () => {
@@ -935,7 +940,7 @@ describe('convert', () => {
 
 			expect(isResolved).to.equal(expectedResult);
 
-			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}/source.json`)).to.equal(true);
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 
 			// revert the modified options
 			modifiedOptions.rosey.source_version = options.rosey.source_version;
@@ -954,7 +959,7 @@ describe('convert', () => {
 				}).catch((errVersion) => {
 					log('promise is rejected');
 					isResolved = false;
-					expect(errVersion.message).to.contain('Convert is only possible from a Version 2 source.json file.');
+					expect(errVersion.message).to.contain('Convert is only possible from a Version 2 source file.');
 				});
 
 			expect(isResolved).to.equal(expectedResult);

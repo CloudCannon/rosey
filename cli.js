@@ -45,7 +45,7 @@ const optionsDefaults = {
 
 		default_language: 'en',
 		locale_source: 'rosey/locales',
-		generated_locale_dest: 'rosey',
+		generated_locale_dest: 'rosey/source.json',
 		source_version: 2,
 		source_delimeter: '\t',
 		data_tag: 'data-rosey',
@@ -134,11 +134,14 @@ module.exports = {
 		options.rosey.source = source;
 		options.rosey.locale_source = localeSource;
 		options.rosey.generated_locale_dest = localeDest;
+		options.rosey.generated_locale_dest_path = path.dirname(localeDest);
+		options.rosey.generated_locale_dest_file = path.basename(localeDest);
 
 		options.rosey.full_dest = path.join(cwd, dest);
 		options.rosey.full_source = path.join(cwd, source);
 		options.rosey.full_locale_source = path.join(cwd, localeSource);
 		options.rosey.full_generated_locale_dest = path.join(cwd, localeDest);
+		options.rosey.full_generated_locale_dest_path = path.join(cwd, options.rosey.generated_locale_dest_path);
 
 		options.rosey.credentials = flags.credentials;
 		options.rosey.data_tag = flags.tag || options.rosey.data_tag;
