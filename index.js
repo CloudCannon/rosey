@@ -106,7 +106,6 @@ const inputs = meow(
  */
 async function run() {
 	const exitCode = await cli.run(inputs);
-	console.log(`exit code: ${exitCode}`);
 	if (exitCode) process.exit(exitCode);
 }
 run();

@@ -109,7 +109,7 @@ The output translation keys generate are:
 <!DOCTYPE html>
 <html>
   <body>
-    <h1 data-rosey=”title” data-rosey-attr="content,alt" content="Content attribute" alt="alt attribute">Home page title</h1>
+    <h1 data-rosey=”title” data-rosey-attrs="content,alt" content="Content attribute" alt="alt attribute">Home page title</h1>
     <h2 data-rosey=”sub-title”>Home page sub title</h1>
   </body>
 </html>
@@ -135,7 +135,7 @@ If the key name is shared with other attributes or elements, they all will have 
 <!DOCTYPE html>
 <html>
   <body>
-    <h1 data-rosey=”title” data-rosey-attr='{"content":"title","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Home page title</h1>
+    <h1 data-rosey=”title” data-rosey-attrs-explicit='{"content":"title","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Home page title</h1>
     <h2 data-rosey=”sub-title”>Home page sub title</h1>
   </body>
 </html>
