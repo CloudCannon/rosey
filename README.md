@@ -4,7 +4,7 @@ The CLI for the CloudCannon rosey package.
 Requires node >=10.0.0
 
 [![Build Status](https://travis-ci.com/CloudCannon/cli-i18n.svg?token=rzux5wJKxpiyCpqnmyMQ&branch=master)](https://travis-ci.com/CloudCannon/cli-i18n)
-[![codecov](https://codecov.io/gh/CloudCannon/cli-i18n/branch/master/graph/badge.svg?token=SLXCH04SAM)](https://codecov.io/gh/CloudCannon/cli-i18n)
+[![codecov](https://codecov.io/gh/CloudCannon/rosey/branch/master/graph/badge.svg?token=SLXCH04SAM)](https://codecov.io/gh/CloudCannon/rosey)
 
 
 

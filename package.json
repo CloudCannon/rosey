@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CloudCannon/cli-i18n.git"
+    "url": "git+https://github.com/CloudCannon/rosey.git"
   },
   "keywords": [
     "CloudCannon",
@@ -32,9 +32,9 @@
     "node": ">=10.0.0"
   },
   "bugs": {
-    "url": "https://github.com/CloudCannon/cli-i18n/issues"
+    "url": "https://github.com/CloudCannon/rosey/issues"
   },
-  "homepage": "https://github.com/CloudCannon/cli-i18n#readme",
+  "homepage": "https://github.com/CloudCannon/rosey#readme",
   "dependencies": {
     "@google-cloud/language": "^3.8.0",
     "ansi-colors": "^4.1.1",
