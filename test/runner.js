@@ -474,6 +474,45 @@ function createLocales() {
 	// fs.writeJsonSync(path.join(options.rosey.locale_source, "../wrapped")+"/ja.json",localeJA);
 }
 
+function createJsonToTranslate() {
+	const ambassadors = `
+    {
+		"ambassadors": [
+			{
+				"name": "John",
+				"details": {
+					"description": "Ambassador description",
+					"info_markdown": "#Some markdown"
+				},
+				"tags": [
+					"cool",
+					"blue",
+					"round"
+				],
+				"surname":"Mark",
+				"likes": "rum and coca-cola"
+			},
+			{
+				"name": "Samson",
+				"details": {
+					"description": "Big boi",
+					"info_markdown": "- one- two"
+				},
+				"tags": [
+					"green",
+					"yellow",
+					"red"
+				]
+			}
+		]
+	}`;
+
+
+	// Creat Source Files
+	fs.mkdirSync(options.rosey.source);
+	fs.writeFileSync(`${options.rosey.source}/ambassadors.json`, ambassadors);
+}
+
 async function cleanUpFilesAfterTest() {
 	await fs.remove(options.rosey.generated_locale_dest);
 	await fs.remove(options.rosey.locale_source);
@@ -558,7 +597,7 @@ describe('clean', () => {
 });
 
 
-describe('generate', () => {
+describe('generateFromHTML', () => {
 	before(async () => {
 		createTestingStructure();
 	});
@@ -592,6 +631,34 @@ describe('generate', () => {
 		});
 	});
 
+	afterEach(async () => {
+		fs.removeSync(options.rosey.full_generated_locale_dest);
+	});
+
+
+	after(async () => {
+		await cleanUpFilesAfterTest();
+	});
+});
+
+describe('generateFromJSON', () => {
+	before(async () => {
+		createJsonToTranslate();
+	});
+
+	context('Generate version 2 document', () => {
+		it('rosey generated locale path file should not exist', async () => {
+			expect(fs.existsSync(options.rosey.full_generated_locale_dest)).to.equal(false);
+		});
+
+		it('should create the source.json file', async () => {
+			console.log('path expected');
+			console.log(options.rosey.full_generated_locale_dest);
+			const res = runner.generate(options);
+			await res;
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
+		});
+	});
 	afterEach(async () => {
 		fs.removeSync(options.rosey.full_generated_locale_dest);
 	});
