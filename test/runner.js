@@ -504,9 +504,28 @@ function createJsonToTranslate() {
 		]
 	}`;
 
+	const schema = `
+    {
+		"ambassadors": [
+			{
+				"name": "rosey-ns|rosey:name",
+				"details": {
+					"description": "rosey:details.description",
+					"info_markdown": "rosey:details.info_markdown"
+				},
+				"tags": [ "rosey-array-ns|rosey:value" ],
+	
+				"surname":"rosey:surname",
+				"likes": "rosey:likes"
+			}
+		]
+	}`;
+
 	// Creat Source Files
 	fs.mkdirSync(options.rosey.source);
 	fs.writeFileSync(`${options.rosey.source}/ambassadors.json`, ambassadors);
+	fs.writeFileSync(`${options.rosey.source}/ambassadors.rosey.json`, schema);
+	fs.writeFileSync(`${options.rosey.source}/ambassadorsSchemaLess.json`, ambassadors);
 }
 
 async function cleanUpFilesAfterTest() {
