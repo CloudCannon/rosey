@@ -40,7 +40,6 @@ Commands:
                       webserver.
 `;
 
-
 /**
  * Takes input from user via command line and outputs an object containing
  * arguments (in camelCase) and flags.

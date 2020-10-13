@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 const cli = require('../cli.js');
 
-
 describe('checkRequiredFlags()', () => {
 	context('User misses required flag', () => {
 		it('Should return false', async () => {
@@ -63,7 +62,6 @@ describe('run()', () => {
 			expect(exitCode).to.equal(1);
 		});
 	});
-
 
 	context('User enters valid command', () => {
 		const inputs = { flags: {}, input: ['help'] };

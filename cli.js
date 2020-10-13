@@ -18,7 +18,6 @@ const command = (func, requiredFlags = []) => ({
 	requiredFlags: requiredFlags
 });
 
-
 /**
 * The different commands for operation. New commands can be specified here.
 * Each command requires a function to run, and a lsi of required flags.
@@ -67,7 +66,6 @@ const optionsDefaults = {
 };
 
 let exitCode = 0;
-
 
 module.exports = {
 	/**
@@ -170,7 +168,6 @@ module.exports = {
      * */
 	run: async function (cli) {
 		exitCode = 0;
-
 
 		const options = this.setOptions(cli);
 

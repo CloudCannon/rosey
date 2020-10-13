@@ -12,7 +12,6 @@ const wordwrap = require('../lib/plugins/wordwrap-json');
 const runner = require('../lib/runner.js');
 const cli = require('../cli.js');
 
-
 chai.use(spies);
 
 const { expect } = chai;
@@ -48,7 +47,6 @@ options.rosey.credentials = '/credentials.json';
 
 let modifiedOptions = {};
 modifiedOptions = defaults(modifiedOptions, options);
-
 
 const localeBR = {
 	'homepage-title': 'Criamos websites para você',
@@ -435,7 +433,6 @@ function createTestingStructure() {
         </html>
         `;
 
-
 	// Creat Source Files
 	fs.mkdirSync(options.rosey.source);
 	fs.mkdirSync(`${options.rosey.source}/assets`);
@@ -506,7 +503,6 @@ function createJsonToTranslate() {
 			}
 		]
 	}`;
-
 
 	// Creat Source Files
 	fs.mkdirSync(options.rosey.source);
@@ -580,7 +576,6 @@ describe('clean', () => {
 		});
 	});
 
-
 	context('invalid directory name', () => {
 		it('should return an empty array', async () => {
 			modifiedOptions.rosey.dest = 'thisdoesntexist';
@@ -590,12 +585,10 @@ describe('clean', () => {
 		});
 	});
 
-
 	after(async () => {
 		fs.removeSync(options.rosey.dest, { recursive: true });// TODO: move to options variable
 	});
 });
-
 
 describe('generateFromHTML', () => {
 	before(async () => {
@@ -616,7 +609,6 @@ describe('generateFromHTML', () => {
 		});
 	});
 
-
 	context('Generate version 1 document', () => {
 		it('rosey generated locale path file should not exist', async () => {
 			expect(fs.existsSync(options.rosey.full_generated_locale_dest)).to.equal(false);
@@ -634,7 +626,6 @@ describe('generateFromHTML', () => {
 	afterEach(async () => {
 		fs.removeSync(options.rosey.full_generated_locale_dest);
 	});
-
 
 	after(async () => {
 		await cleanUpFilesAfterTest();
@@ -663,7 +654,6 @@ describe('generateFromJSON', () => {
 		fs.removeSync(options.rosey.full_generated_locale_dest);
 	});
 
-
 	after(async () => {
 		await cleanUpFilesAfterTest();
 	});
@@ -674,7 +664,6 @@ describe('check', () => {
 		createTestingStructure();
 		createLocales();
 	});
-
 
 	context('Check on wrong locales folder', () => {
 		it('should reject the promise ', async () => {
@@ -745,7 +734,6 @@ describe('check', () => {
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 
-
 		it('should create the checks.json file', async () => {
 			let isResolved = null;
 			const expectedResult = true;
@@ -772,7 +760,6 @@ describe('check', () => {
 			expect(checks.ga.states.unused).to.equal(1);
 		});
 	});
-
 
 	context('Check against version 1 document', () => {
 		it('generated locale path file should not exist', async () => {
@@ -838,7 +825,6 @@ describe('check', () => {
 		});
 	});
 
-
 	after(async () => {
 		await cleanUpFilesAfterTest();
 	});
@@ -849,7 +835,6 @@ describe('convert', () => {
 		createTestingStructure();
 		createLocales();
 	});
-
 
 	context('Convert with missing source.json file', () => {
 		it('rosey generated locale path file should not exist', async () => {
@@ -917,7 +902,6 @@ describe('convert', () => {
 		});
 	});
 
-
 	context('Check against version 2 document', () => {
 		it('rosey generated locale path file should not exist', async () => {
 			// Remove before starting
@@ -945,7 +929,6 @@ describe('convert', () => {
 
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
-
 
 		it('should create the converted.json files', async () => {
 			let isResolved = null;
@@ -979,7 +962,6 @@ describe('convert', () => {
 			expect(fs.existsSync(`${options.rosey.full_locale_source}/v2/rs.json`)).to.equal(false);
 		});
 	});
-
 
 	context('Check against version 1 document', () => {
 		it('generated locale path file should not exist', async () => {
@@ -1036,7 +1018,6 @@ describe('convert', () => {
 			modifiedOptions.rosey.source_version = options.rosey.source_version;
 		});
 	});
-
 
 	after(async () => {
 		await cleanUpFilesAfterTest();
@@ -1233,7 +1214,6 @@ describe('build', () => {
 
 			expect(res).to.equal(0);
 		});
-
 
 		it('should have the assets copied to dest', async () => {
 			expect(fs.existsSync(`${options.rosey.full_dest}/assets/image2.jpg`)).to.equal(true);
