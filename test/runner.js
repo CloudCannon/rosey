@@ -451,7 +451,7 @@ function createTestingStructure() {
 
 function createLocales() {
 	// Create Locales
-	fs.mkdirSync(options.rosey.generated_locale_dest);
+	fs.mkdirSync(options.rosey.generated_locale_dest_path);
 	fs.mkdirSync(options.rosey.locale_source);
 
 	fs.writeJsonSync(`${options.rosey.locale_source}/pt-BR.json`, localeBR);
@@ -529,8 +529,9 @@ function createJsonToTranslate() {
 }
 
 async function cleanUpFilesAfterTest() {
-	await fs.remove(options.rosey.generated_locale_dest);
+	await fs.remove(options.rosey.generated_locale_dest_path);
 	await fs.remove(options.rosey.locale_source);
+	// await fs.remove(path.join(options.rosey.generated_locale_dest, '../wrapped'));
 	await fs.remove(options.rosey.source);
 	await fs.remove(options.rosey.dest);
 }
