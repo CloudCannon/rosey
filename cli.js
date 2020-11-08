@@ -49,9 +49,9 @@ const optionsDefaults = {
 		source_delimeter: '\t',
 		data_tag: 'data-rosey',
 
-		show_duplicate_locale_warnings: true,
-		show_missing_locale_warnings: true,
-		show_skipped_updates: true,
+		show_duplicate_locale_warnings: false,
+		show_missing_locale_warnings: false,
+		show_skipped_updates: false,
 
 		character_based_locales: ['ja', 'ja_jp', 'ja-jp'],
 		google_credentials_filename: null
@@ -148,6 +148,10 @@ module.exports = {
 		options.rosey.source_delimeter = flags.sourceDelimeter || options.rosey.source_delimeter;
 
 		options.rosey.source_version = flags.version || options.rosey.source_version;
+
+		options.rosey.show_duplicate_locale_warnings = flags.verbose;
+		options.rosey.show_missing_locale_warnings = flags.verbose;
+		options.rosey.show_skipped_updates = flags.verbose;
 
 		// flags
 		options.flags.yes = flags.yes;
