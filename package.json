@@ -69,7 +69,6 @@
     "eslint-config-cloudcannon": "^1.0.0-rc5",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-mocha": "^6.3.0",
-    "istanbul": "^0.4.5",
     "mocha": "^7.1.2",
     "nyc": "^15.0.0"
   }
