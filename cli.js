@@ -18,7 +18,6 @@ const command = (func, requiredFlags = []) => ({
 	requiredFlags: requiredFlags
 });
 
-
 /**
 * The different commands for operation. New commands can be specified here.
 * Each command requires a function to run, and a lsi of required flags.
@@ -50,9 +49,9 @@ const optionsDefaults = {
 		source_delimeter: '\t',
 		data_tag: 'data-rosey',
 
-		show_duplicate_locale_warnings: true,
-		show_missing_locale_warnings: true,
-		show_skipped_updates: true,
+		show_duplicate_locale_warnings: false,
+		show_missing_locale_warnings: false,
+		show_skipped_updates: false,
 
 		character_based_locales: ['ja', 'ja_jp', 'ja-jp'],
 		google_credentials_filename: null
@@ -67,7 +66,6 @@ const optionsDefaults = {
 };
 
 let exitCode = 0;
-
 
 module.exports = {
 	/**
@@ -151,6 +149,10 @@ module.exports = {
 
 		options.rosey.source_version = flags.version || options.rosey.source_version;
 
+		options.rosey.show_duplicate_locale_warnings = flags.verbose;
+		options.rosey.show_missing_locale_warnings = flags.verbose;
+		options.rosey.show_skipped_updates = flags.verbose;
+
 		// flags
 		options.flags.yes = flags.yes;
 		options.flags.partialLanguages = flags.languages ? flags.languages.toUpperCase().split(',') : null;
@@ -170,7 +172,6 @@ module.exports = {
      * */
 	run: async function (cli) {
 		exitCode = 0;
-
 
 		const options = this.setOptions(cli);
 

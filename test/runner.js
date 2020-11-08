@@ -12,7 +12,6 @@ const wordwrap = require('../lib/plugins/wordwrap-json');
 const runner = require('../lib/runner.js');
 const cli = require('../cli.js');
 
-
 chai.use(spies);
 
 const { expect } = chai;
@@ -48,7 +47,6 @@ options.rosey.credentials = '/credentials.json';
 
 let modifiedOptions = {};
 modifiedOptions = defaults(modifiedOptions, options);
-
 
 const localeBR = {
 	'homepage-title': 'Criamos websites para você',
@@ -435,7 +433,6 @@ function createTestingStructure() {
         </html>
         `;
 
-
 	// Creat Source Files
 	fs.mkdirSync(options.rosey.source);
 	fs.mkdirSync(`${options.rosey.source}/assets`);
@@ -454,7 +451,7 @@ function createTestingStructure() {
 
 function createLocales() {
 	// Create Locales
-	fs.mkdirSync(options.rosey.generated_locale_dest);
+	fs.mkdirSync(options.rosey.generated_locale_dest_path);
 	fs.mkdirSync(options.rosey.locale_source);
 
 	fs.writeJsonSync(`${options.rosey.locale_source}/pt-BR.json`, localeBR);
@@ -474,9 +471,67 @@ function createLocales() {
 	// fs.writeJsonSync(path.join(options.rosey.locale_source, "../wrapped")+"/ja.json",localeJA);
 }
 
+function createJsonToTranslate() {
+	const ambassadors = `
+    {
+		"ambassadors": [
+			{
+				"name": "John",
+				"details": {
+					"description": "Ambassador description",
+					"info_markdown": "#Some markdown"
+				},
+				"tags": [
+					"cool",
+					"blue",
+					"round"
+				],
+				"surname":"Mark",
+				"likes": "rum and coca-cola"
+			},
+			{
+				"name": "Samson",
+				"details": {
+					"description": "Big boi",
+					"info_markdown": "- one- two"
+				},
+				"tags": [
+					"green",
+					"yellow",
+					"red"
+				]
+			}
+		]
+	}`;
+
+	const schema = `
+    {
+		"ambassadors": [
+			{
+				"name": "rosey-ns|rosey:name",
+				"details": {
+					"description": "rosey:details.description",
+					"info_markdown": "rosey:details.info_markdown"
+				},
+				"tags": [ "rosey-array-ns|rosey:value" ],
+	
+				"surname":"rosey:surname",
+				"likes": "rosey:likes"
+			}
+		]
+	}`;
+
+	// Creat Source Files
+	fs.mkdirSync(options.rosey.source);
+	fs.writeFileSync(`${options.rosey.source}/ambassadors.json`, ambassadors);
+	fs.writeFileSync(`${options.rosey.source}/ambassadors.rosey.json`, schema);
+	fs.writeFileSync(`${options.rosey.source}/ambassadorsSchemaLess.json`, ambassadors);
+}
+
 async function cleanUpFilesAfterTest() {
-	await fs.remove(options.rosey.generated_locale_dest);
+	await fs.remove(options.rosey.generated_locale_dest_path);
 	await fs.remove(options.rosey.locale_source);
+	// await fs.remove(path.join(options.rosey.generated_locale_dest, '../wrapped'));
 	await fs.remove(options.rosey.source);
 	await fs.remove(options.rosey.dest);
 }
@@ -541,7 +596,6 @@ describe('clean', () => {
 		});
 	});
 
-
 	context('invalid directory name', () => {
 		it('should return an empty array', async () => {
 			modifiedOptions.rosey.dest = 'thisdoesntexist';
@@ -551,14 +605,12 @@ describe('clean', () => {
 		});
 	});
 
-
 	after(async () => {
 		fs.removeSync(options.rosey.dest, { recursive: true });// TODO: move to options variable
 	});
 });
 
-
-describe('generate', () => {
+describe('generateFromHTML', () => {
 	before(async () => {
 		createTestingStructure();
 	});
@@ -576,7 +628,6 @@ describe('generate', () => {
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 	});
-
 
 	context('Generate version 1 document', () => {
 		it('rosey generated locale path file should not exist', async () => {
@@ -596,6 +647,32 @@ describe('generate', () => {
 		fs.removeSync(options.rosey.full_generated_locale_dest);
 	});
 
+	after(async () => {
+		await cleanUpFilesAfterTest();
+	});
+});
+
+describe('generateFromJSON', () => {
+	before(async () => {
+		createJsonToTranslate();
+	});
+
+	context('Generate version 2 document', () => {
+		it('rosey generated locale path file should not exist', async () => {
+			expect(fs.existsSync(options.rosey.full_generated_locale_dest)).to.equal(false);
+		});
+
+		it('should create the source.json file', async () => {
+			console.log('path expected');
+			console.log(options.rosey.full_generated_locale_dest);
+			const res = runner.generate(options);
+			await res;
+			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
+		});
+	});
+	afterEach(async () => {
+		fs.removeSync(options.rosey.full_generated_locale_dest);
+	});
 
 	after(async () => {
 		await cleanUpFilesAfterTest();
@@ -607,7 +684,6 @@ describe('check', () => {
 		createTestingStructure();
 		createLocales();
 	});
-
 
 	context('Check on wrong locales folder', () => {
 		it('should reject the promise ', async () => {
@@ -678,7 +754,6 @@ describe('check', () => {
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 
-
 		it('should create the checks.json file', async () => {
 			let isResolved = null;
 			const expectedResult = true;
@@ -705,7 +780,6 @@ describe('check', () => {
 			expect(checks.ga.states.unused).to.equal(1);
 		});
 	});
-
 
 	context('Check against version 1 document', () => {
 		it('generated locale path file should not exist', async () => {
@@ -771,7 +845,6 @@ describe('check', () => {
 		});
 	});
 
-
 	after(async () => {
 		await cleanUpFilesAfterTest();
 	});
@@ -782,7 +855,6 @@ describe('convert', () => {
 		createTestingStructure();
 		createLocales();
 	});
-
 
 	context('Convert with missing source.json file', () => {
 		it('rosey generated locale path file should not exist', async () => {
@@ -850,7 +922,6 @@ describe('convert', () => {
 		});
 	});
 
-
 	context('Check against version 2 document', () => {
 		it('rosey generated locale path file should not exist', async () => {
 			// Remove before starting
@@ -878,7 +949,6 @@ describe('convert', () => {
 
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
-
 
 		it('should create the converted.json files', async () => {
 			let isResolved = null;
@@ -912,7 +982,6 @@ describe('convert', () => {
 			expect(fs.existsSync(`${options.rosey.full_locale_source}/v2/rs.json`)).to.equal(false);
 		});
 	});
-
 
 	context('Check against version 1 document', () => {
 		it('generated locale path file should not exist', async () => {
@@ -969,7 +1038,6 @@ describe('convert', () => {
 			modifiedOptions.rosey.source_version = options.rosey.source_version;
 		});
 	});
-
 
 	after(async () => {
 		await cleanUpFilesAfterTest();
@@ -1166,7 +1234,6 @@ describe('build', () => {
 
 			expect(res).to.equal(0);
 		});
-
 
 		it('should have the assets copied to dest', async () => {
 			expect(fs.existsSync(`${options.rosey.full_dest}/assets/image2.jpg`)).to.equal(true);
