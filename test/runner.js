@@ -1382,7 +1382,7 @@ describe('translate', () => {
 		});
 		it('should have the pre localized files copied to dest', async () => {
 			expect(fs.existsSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
-			
+
 			const preLocalized = fs.readFileSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`).toString('utf-8');
 
 			expect(preLocalized.indexOf(preLocalizedMarker)).to.be.greaterThan(0);

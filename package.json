@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/CloudCannon/rosey#readme",
   "dependencies": {
-    "@google-cloud/language": "^3.8.0",
+    "@google-cloud/language": "^4.2.1",
     "ansi-colors": "^4.1.1",
     "async": "^3.2.0",
     "browser-sync": "^2.26.12",
