@@ -209,6 +209,8 @@ const localeJA = {
 	'about:meta:title': 'ページについて'
 };
 
+const preLocalizedMarker = '<title>I AM PRELOCALISED</title>';
+
 function createTestingStructure() {
 	const html = `
     <!doctype html>
@@ -397,7 +399,8 @@ function createTestingStructure() {
 	const preLocalized = `
     <!doctype html>
         <html lang="en">
-            <head>
+			<head>
+				${preLocalizedMarker}
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
             </head>
@@ -408,7 +411,7 @@ function createTestingStructure() {
                         <nav>
                             <a class="nav-toggle" id="open-nav" href="#">&#9776;</a>
                             <ul>
-                                <li><a href="/pt-PT/portfolio/" class="" >Clientes</a></li>
+                                <li><a href="/pt-BR/portfolio/" class="" >Clientes</a></li>
                                 <li><a href="/pt-BR/blog/" class="" >Blog</a></li>
                                 <li><a href="/about/" class="" >Sobre Nos</a></li>
                                 <li><a href="/contact/" class="" >Contatos</a></li>
@@ -1379,6 +1382,11 @@ describe('translate', () => {
 		});
 		it('should have the pre localized files copied to dest', async () => {
 			expect(fs.existsSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
+			
+			const preLocalized = fs.readFileSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`).toString('utf-8');
+
+			expect(preLocalized.indexOf(preLocalizedMarker)).to.be.greaterThan(0);
+			console.log(preLocalized);
 		});
 
 		it('should NOT have a the folders not part of the specified languages', async () => {
