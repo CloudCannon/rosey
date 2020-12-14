@@ -544,9 +544,6 @@ function createLocales() {
 	// fs.writeJsonSync(path.join(options.rosey.locale_source, "../wrapped")+"/ja.json",localeJA);
 }
 
-function createJsonToTranslate() {
-}
-
 async function cleanUpFilesAfterTest() {
 	await fs.remove(options.rosey.generated_locale_dest_path);
 	await fs.remove(options.rosey.locale_source);
