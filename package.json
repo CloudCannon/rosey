@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "nyc mocha --bail --check-leaks",
-    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov --disable=gcov",
     "lint-autofix": "eslint --fix lib/** test/** index.js cli.js",
     "lint-code": "eslint  lib/** test/** index.js cli.js",
     "lint": "npm run lint-autofix && npm run lint-code"
@@ -64,7 +64,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-spies": "^1.0.0",
-    "codecov": "^3.8.1",
+    "codecov": "^3.8.0",
     "eslint": "^6.8.0",
     "eslint-config-cloudcannon": "^1.0.0-rc5",
     "eslint-plugin-import": "^2.22.1",
