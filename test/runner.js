@@ -2,10 +2,10 @@
 const chai = require('chai');
 const cheerio = require('cheerio');
 const defaults = require('defaults');
+const jsonPointer = require('json-pointer');
 const fs = require('fs-extra');
 const log = require('fancy-log');
 const path = require('path');
-// const { promisify } = require('util');
 const spies = require('chai-spies');
 
 const wordwrap = require('../lib/plugins/wordwrap-json');
@@ -18,7 +18,7 @@ const { expect } = chai;
 // const readFile = promisify(fs.readFile);
 
 // Load default settings
-const flags = { yes: true };
+const flags = { yes: true, verbose: true };
 const options = cli.setOptions({ flags: flags });
 
 // Modify paths for test purpose
@@ -148,6 +148,10 @@ const localeRS = {
 	'view-portfolio': {
 		original: '<a href="/portfolio/">View Full Portfolio &rarr;</a>',
 		value: ''
+	},
+	'john.details.description': {
+		original: 'Ambassador description',
+		value: 'Translated text for description'
 	}
 };
 const localeGA = {
@@ -436,6 +440,67 @@ function createTestingStructure() {
         </html>
         `;
 
+	const ambassadors = `
+		{
+			"ambassadors": [
+				{
+					"name": "John",
+					"details": {
+						"description": "Ambassador description",
+						"info_markdown": "#Some markdown"
+					},
+					"tags": [
+						"cool",
+						"blue",
+						"round"
+					],
+					"surname":"Mark",
+					"likes": "rum and coca-cola"
+				},
+				{
+					"name": "Samson",
+					"details": {
+						"description": "Big boi",
+						"info_markdown": "- one- two"
+					},
+					"tags": [
+						"green",
+						"yellow",
+						"red"
+					]
+				},
+				{
+					"name": "Samson",
+					"details": {
+						"description": "Big boi Duplicated",
+						"info_markdown": "- one- two"
+					},
+					"tags": [
+						"green",
+						"yellow",
+						"red"
+					]
+				}
+			]
+		}`;
+
+	const schema = `
+		{
+			"ambassadors": [
+				{
+					"name": "rosey-ns|rosey:name",
+					"details": {
+						"description": "rosey:details.description",
+						"info_markdown": "rosey:details.info_markdown"
+					},
+					"tags": [ "rosey-array-ns|rosey:value" ],
+		
+					"surname":"rosey:surname",
+					"likes": "rosey|:likes"
+				}
+			]
+		}`;
+
 	// Creat Source Files
 	fs.mkdirSync(options.rosey.source);
 	fs.mkdirSync(`${options.rosey.source}/assets`);
@@ -450,6 +515,11 @@ function createTestingStructure() {
 	fs.writeFileSync(`${options.rosey.source}/htmlAttrs.html`, htmlAttrs);
 	fs.writeFileSync(`${options.rosey.source}/html/index2.html`, html2);
 	fs.writeFileSync(`${options.rosey.source}/pt-BR/preLocalized.html`, preLocalized);
+
+	// Creat Source Files
+	fs.writeFileSync(`${options.rosey.source}/ambassadors.json`, ambassadors);
+	fs.writeFileSync(`${options.rosey.source}/ambassadors.rosey.json`, schema);
+	fs.writeFileSync(`${options.rosey.source}/ambassadorsSchemaLess.json`, ambassadors);
 }
 
 function createLocales() {
@@ -475,60 +545,6 @@ function createLocales() {
 }
 
 function createJsonToTranslate() {
-	const ambassadors = `
-    {
-		"ambassadors": [
-			{
-				"name": "John",
-				"details": {
-					"description": "Ambassador description",
-					"info_markdown": "#Some markdown"
-				},
-				"tags": [
-					"cool",
-					"blue",
-					"round"
-				],
-				"surname":"Mark",
-				"likes": "rum and coca-cola"
-			},
-			{
-				"name": "Samson",
-				"details": {
-					"description": "Big boi",
-					"info_markdown": "- one- two"
-				},
-				"tags": [
-					"green",
-					"yellow",
-					"red"
-				]
-			}
-		]
-	}`;
-
-	const schema = `
-    {
-		"ambassadors": [
-			{
-				"name": "rosey-ns|rosey:name",
-				"details": {
-					"description": "rosey:details.description",
-					"info_markdown": "rosey:details.info_markdown"
-				},
-				"tags": [ "rosey-array-ns|rosey:value" ],
-	
-				"surname":"rosey:surname",
-				"likes": "rosey:likes"
-			}
-		]
-	}`;
-
-	// Creat Source Files
-	fs.mkdirSync(options.rosey.source);
-	fs.writeFileSync(`${options.rosey.source}/ambassadors.json`, ambassadors);
-	fs.writeFileSync(`${options.rosey.source}/ambassadors.rosey.json`, schema);
-	fs.writeFileSync(`${options.rosey.source}/ambassadorsSchemaLess.json`, ambassadors);
 }
 
 async function cleanUpFilesAfterTest() {
@@ -567,6 +583,16 @@ async function checkElement(file, selector, expectedValue) {
 	// log('found:', $el.html());
 	// log('expected:', expectedValue);
 	return expect($el.html()).to.equal(expectedValue);
+}
+
+async function checkJsonElement(file, selector, expectedValue) {
+	const fileContent = await fs.readFile(file, 'utf-8');
+
+	const jsonContent = JSON.parse(fileContent);
+
+	const elementContent = jsonPointer.get(jsonContent, selector);
+
+	return expect(elementContent).to.equal(expectedValue);
 }
 
 describe('askYesNo', () => {
@@ -657,7 +683,7 @@ describe('generateFromHTML', () => {
 
 describe('generateFromJSON', () => {
 	before(async () => {
-		createJsonToTranslate();
+		createTestingStructure();
 	});
 
 	context('Generate version 2 document', () => {
@@ -777,7 +803,7 @@ describe('check', () => {
 
 		it('should match the results on the checks.json file', async () => {
 			const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest_path, '/checks.json'));
-			expect(checks.ga.states.missing).to.equal(7);
+			expect(checks.ga.states.missing).to.equal(21);
 			expect(checks.ga.states.current).to.equal(10);
 			expect(checks.ga.states.outdated).to.equal(2);
 			expect(checks.ga.states.unused).to.equal(1);
@@ -841,8 +867,8 @@ describe('check', () => {
 
 		it('should match the results on the checks.json file', async () => {
 			const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest_path, '/checks.json'));
-			expect(checks.rs.states.missing).to.equal(0);
-			expect(checks.rs.states.current).to.equal(19);
+			expect(checks.rs.states.missing).to.equal(13);
+			expect(checks.rs.states.current).to.equal(20);
 			expect(checks.rs.states.outdated).to.equal(0);
 			expect(checks.rs.states.unused).to.equal(0);
 		});
@@ -1049,7 +1075,6 @@ describe('convert', () => {
 describe('build', () => {
 	before(async () => {
 		createTestingStructure();
-
 		createLocales();
 	});
 
@@ -1297,6 +1322,13 @@ describe('build', () => {
 			const translation = localeRS['notNested:branding'].value;
 
 			await checkElement(path.join(options.rosey.dest, 'rs/htmlAttrs.html'), selector, translation);
+		});
+
+		it('should have the correct translation for a JSON translation', async () => {
+			const selector = '/ambassadors/0/details/description';
+			const translation = localeRS['john.details.description'].value;
+
+			await checkJsonElement(path.join(options.rosey.dest, 'rs/ambassadors.json'), selector, translation);
 		});
 
 		it('should have an en folder on the dest', async () => {
