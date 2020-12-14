@@ -233,8 +233,149 @@ The output translation keys generated are:
 }
 ```
 
+## JSON Schema
+Rosey supports translation of JSON file using a schema file to determine the attributes to be translated.
+
+The schema file will live on the same folder of the original JSON file and should be name as `*originalFileName*.rosey.json`
+
+Eg.: To translate a file called `titles.json`, the schema should be named as `titles.rosey.json`.
+
+### `rosey:tagName`
+
+Defines that the element will be added as a tag to be translated. The string after the collumn will be used as the tag name.
+
+With given example
+
+```
+{
+	"myCollection" : {
+			"name": "Home Page",
+      "title: "Home page title"
+		}
+}
+```
+
+We can have the following schema file:
+```
+{
+	"myCollection": {
+			"name": "rosey:myCollection.name",
+			"title": "rosey:myCollection.title"
+		}
+}
+```
+
+The output translation keys generated are:
+```
+{
+  "myCollection.name":…,
+  "myCollection.title":…
+}
+```
+
+### `rosey-ns`
+`rosey-ns` is used to define nested namespaces to be included as part of the key for the translations. The value of the element defined as `rose-ns` will be used as part of the tag name.
+All the parents from the element with a `rosey-ns` tag will be used as the namespaces concatenated with a dot.
+
+With given example
+
+```
+{
+	"myCollection": [
+		{
+			"name": "John",
+			"details": {
+				"description": "This is a cool description"
+			}
+		},
+		{
+			"name": "Mark",
+			"details": {
+				"description": "Big description"
+			}
+		}
+	]
+}
+```
+
+We can have the following schema file:
+```
+{
+	"myCollection": [
+		{
+			"name": "rosey-ns|rosey:name",
+			"details": {
+				"description": "rosey:details.description"
+			}
+		}
+	]
+}
+```
+
+The output translation keys generated are:
+```
+{
+  "john.name":…,
+  "john.details.description":…,
+  "mark.name":…,
+  "mark.details.description":…
+}
+```
 
 
+### `rosey-array-ns`
+`rosey-array-ns` is used when you have an array where the value needs to be translated. The value of the element defined as `rose-array-ns` will be used as part of the tag name.
+
+With given example
+
+```
+{
+	"myCollection": [
+		{
+			"name": "John",
+			"tags": [
+				"cool",
+				"blue",
+				"round"
+			]
+		},
+		{
+			"name": "Mark",
+			"tags": [
+				"green",
+				"square",
+				"top"
+			]
+		}
+	]
+}
+```
+
+We can have the following schema file:
+```
+{
+	"myCollection": [
+		{
+			"name": "rosey-ns|rosey:name",
+			"tags": [ "rosey-array-ns|rosey:value" ],
+		}
+	]
+}
+```
+
+The output translation keys generated are:
+```
+{
+  "john.name":…,
+  "john.blue.value":…,
+  "john.cool.value":…,
+  "john.round.value":…,
+  "mark.name":…,
+  "mark.green.value":…,
+  "mark.square.value":…,
+  "mark.top.value":…,
+}
+```
 ## Synopsis
 
 ```
