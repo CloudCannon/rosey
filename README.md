@@ -1,5 +1,6 @@
-# rosey
-The CLI for the CloudCannon rosey package.
+# Rosey
+
+The CLI for the CloudCannon rosey package, an open-source tool for managing translations on static websites. 
 
 Requires node >=10.0.0
 
@@ -7,95 +8,76 @@ Requires node >=10.0.0
 [![codecov](https://codecov.io/gh/CloudCannon/rosey/branch/master/graph/badge.svg?token=SLXCH04SAM)](https://codecov.io/gh/CloudCannon/rosey)
 
 
-
-## Contents
-<ul>
-    <li> <a href="#installation">Installation</a>
-    <li> <a href="#html-tags">HTML tags</a>
-    <li> <a href="#help">Help</a>
-    <li> <a href="#generate">Generate</a>
-    <li> <a href="#check">Check</a>
-    <li> <a href="#convert">Convert</a>
-    <li> <a href="#rosey">Rosey</a>
-    <li> <a href="#build">Build</a>
-    <li> <a href="#serve">Serve</a>
-    <li> <a href="#watch">Watch</a>
-    <li> <a href="#clean">Clean</a>
-    <li> <a href="#base">Base</a>
-    <li> <a href="#translate">Translate</a>
-</ul>
-
 ## Installation
 
-### Using NPX
-You can use the rosey package without installing it.
-For that, you will need to run `npx` which will download and cache a version of the package
+Using NPM:
 
 ```
-$ npx rosey rosey <command> [args]
-```
-### Installing globally
-You can install it globally
-```
-$ npm install rosey -g
+$ npm i -g rosey
 ```
 
-And then just run the commands from any project
-```
-$ rosey <command> [args]
-```
-### Using package.json
-You can also install rosey on a specific project only
-```
-$ npm install rosey --save-dev
-```
-#### Running with npx
-To run from the local package, use `npx`. It will look for the locally installed or globally installed package before downloading and caching the latest version.
+## Quick Start
 
+1\. Mark up elements in HTML for translation with `data-rosey` attributes:
+```html
+ # test/src/index.html
+ <h1 data-rosey="title">Welcome!</h1>
+ ```
+2\. Create `rosey/locales` folder and add `<language code>.json` files with corresponding keys and translations:
+```json
+# test/rosey/locales/es.json
+{
+  "title": "Bienvenido!"
+}
 ```
-$ npx rosey <command> [args]
-```
+3\. From project directory, run `rosey build -s path/to/src` (assuming Rosey installed globally).  
+4\. View the site with available languages at `dist/translated_site`.
 
-#### Running with scripts
-Alternatively, you can call it using the `packages.json` scripts.
-You will need to add the following on your `packages.json` file
-```
-  "scripts": {
-    "rosey": "rosey"
-  },
-```
-And then run
-```
-$ npm run rosey <commands> [args]
-```
+## Contents
+-  [Tagging HTML](#tagging-html)
+	- [Translating elements](#translating-elements)
+	- [Translating attributes](#translating-attributes)
+	- [Naming attributes explicitly](#Naming-attributes-explicitly)
+	- [Namespace](#namespace)
+-  [JSON Schema](#json-schema)
+    - [rosey:tagName](#roseytagname)
+    - [rosey-ns](#rosey-ns)
+    - [rosey-array-ns](#rosey-array-ns)
+-  [CLI usage](#cli-usage)
+	-  [help](#help)
+	-  [generate](#generate)
+	-  [check](#check)
+	-  [convert](#convert)
+	-  [rosey](#rosey)
+	-  [build](#build)
+	-  [serve](#serve)
+	-  [watch](#watch)
+	-  [clean](#clean)
+	-  [base](#base)
+	-  [translate](#translate)
+	-  [Japanese translations](#japanese-translations)
+	-  [Required flags](#required-flags)
 
-#### Running with index.js
-Another option is calling directly the index.js file installed on the `node_modules` folder.
-```
-$ node_modules/rosey/index.js <command> [args]
-```
+## Tagging HTML
 
-## HTML tags
-Rosey works looking into certain html tags added into the HTML to determine which contents require transalations.
+Rosey works by looking into certain attributes added onto HTML tags to determine which contents require translations.
 
-### Element
-#### `data-rosey`
+### Translating elements  
 
-`data-rosey` will be included on all the elements that require translation. 
-On translation, the whole HTML content between the element will be replaced with the appropriate translation.
+#### `data-rosey`  
+All elements that require translation need the `data-rosey` attribute. On translation, the text content of the HTML element will be replaced with the appropriate translation.
 
-With the given example
-```
+Example: 
+```html
 <!DOCTYPE html>
 <html>
-  <body>
-    <h1 data-rosey=”title”>Home page title</h1>
-    <h2 data-rosey=”sub-title”>Home page sub title</h1>
-  </body>
+    <body>
+        <h1 data-rosey=”title”>Home page title</h1>
+        <h2 data-rosey=”sub-title”>Home page subtitle</h1>
+    </body>
 </html>
-
 ```
-The output translation keys generate are:
+Output translation keys:
 ```
 {
   "sub-title":"",
@@ -103,19 +85,23 @@ The output translation keys generate are:
 }
 ```
 
-### Attributes
-### `data-rosey-attrs`
-```
+### Translating attributes
+
+#### `data-rosey-attrs`  
+With `data-rosey-attrs` you can translate multiple HTML attributes.
+
+Example:
+```html
 <!DOCTYPE html>
 <html>
-  <body>
-    <h1 data-rosey=”title” data-rosey-attrs="content,alt" content="Content attribute" alt="alt attribute">Home page title</h1>
-    <h2 data-rosey=”sub-title”>Home page sub title</h1>
-  </body>
+    <body>
+        <h1 data-rosey=”title” data-rosey-attrs="content,alt" content="Content attribute" 
+        alt="alt attribute">Home page title</h1>
+        <h2 data-rosey=”sub-title”>Home page subtitle</h1>
+    </body>
 </html>
-
 ```
-The output translation keys generate are:
+Output translation keys:
 ```
 {
   "sub-title":"",
@@ -125,23 +111,23 @@ The output translation keys generate are:
 }
 ```
 
+### Naming attributes explicitly
 
-### Attributes explicit tags
-### `data-rosey-attrs-explicit`
-Using `data-rosey-attrs-explicit` you are able to explicitly define the name of the key to be used on the translation files.
+#### `data-rosey-attrs-explicit`
+With `data-rosey-attrs-explicit` you can explicitly define the name of the key to be used on the translation files.
 If the key name is shared with other attributes or elements, they all will have the same translation.
 
-```
+Example:
+```html
 <!DOCTYPE html>
 <html>
-  <body>
-    <h1 data-rosey=”title” data-rosey-attrs-explicit='{"content":"title","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Home page title</h1>
-    <h2 data-rosey=”sub-title”>Home page sub title</h1>
-  </body>
+    <body>
+        <h1 data-rosey=”title” data-rosey-attrs-explicit='{"content":"title","alt":"alt-tag"}'         content="Content attribute" alt="alt attribute">Home page title</h1>
+        <h2 data-rosey=”sub-title”>Home page subtitle</h1>
+    </body>
 </html>
-
 ```
-The output translation keys generate are:
+Output translation keys:
 ```
 {
   "alt-tag":"",
@@ -150,16 +136,15 @@ The output translation keys generate are:
 }
 ```
 
-
 ### Namespace
+
 #### `data-rosey-root`
-`data-rosey-root` is used to define a SINGLE namespace to be included as part of the key for the translations.
-The closest parent with `data-rosey-root` tag will be used as the namespace. When an empty string `data-rosey-root` tag is included, no namespace is used for the child `data-rosey` and `data-rosey-attrs` tags.
-Any `data-rosey-root` tag found will take priority over the `data-rosey-ns` tags.
+You can use `data-rosey-root` to define a SINGLE namespace to be included as part of the key for the translations.
+The closest parent with `data-rosey-root` attribute will be used as the namespace. When an empty-string `data-rosey-root` attribute is included, no namespace is used for the child `data-rosey` and `data-rosey-attrs` attributes.
+Any `data-rosey-root` attribute found will take priority over the `data-rosey-ns` attributes.
 
-
-With given example
-```
+Example:
+```html
 <!DOCTYPE html>
 <html>
   <head data-rosey-root='home:meta'>
@@ -174,22 +159,20 @@ With given example
 </html>
 ```
 
-The output translation keys generated are:
+Output translation keys:
 ```
 {
-  “contact-us”: ...
+  "contact-us": ...
   "home:meta:title": …,
   "home:content:title": …
 }
 ```
 
 #### `data-rosey-ns`
-`data-rosey-ns` is used to define nested namespaces to be included as part of the key for the translations.
-All the parents from the element with a `data-rosey-ns` tag will be used as the namespaces concatenated with a colon.
+Use `data-rosey-ns` to define nested namespaces to be included as part of the key for the translations. All parents of an element with a `data-rosey-ns` attribute will be used as the namespaces, concatenated with a colon.
 
-
-With given example
-```
+Example:
+```html
 <!DOCTYPE html>
 <html>
   <body>
@@ -223,7 +206,7 @@ With given example
 </html>
 ```
 
-The output translation keys generated are:
+Output translation keys:
 ```
 {
   "about:benefits:row-0:col-0:title":…,
@@ -233,18 +216,19 @@ The output translation keys generated are:
 }
 ```
 
+
 ## JSON Schema
-Rosey supports translation of JSON file using a schema file to determine the attributes to be translated.
+Rosey supports translation of JSON files using a schema file to determine the attributes to be translated.
 
-The schema file will live on the same folder of the original JSON file and should be name as `*originalFileName*.rosey.json`
+The schema file must live in the same folder as the original JSON file and should follow naming conventions of `*originalFileName*.rosey.json`
 
-Eg.: To translate a file called `titles.json`, the schema should be named as `titles.rosey.json`.
+For example, to translate a file called `titles.json`, the schema should be named `titles.rosey.json`.
 
 ### `rosey:tagName`
 
-Defines that the element will be added as a tag to be translated. The string after the collumn will be used as the tag name.
+Defines that the element will be added as a tag to be translated. The string after the column will be used as the tag name.
 
-With given example
+Example `titles.json`:
 
 ```
 {
@@ -255,7 +239,7 @@ With given example
 }
 ```
 
-We can have the following schema file:
+Corresponding `title.rosey.json` schema file:
 ```
 {
 	"myCollection": {
@@ -265,7 +249,7 @@ We can have the following schema file:
 }
 ```
 
-The output translation keys generated are:
+Output translation keys generated:
 ```
 {
   "myCollection.name":…,
@@ -274,10 +258,10 @@ The output translation keys generated are:
 ```
 
 ### `rosey-ns`
-`rosey-ns` is used to define nested namespaces to be included as part of the key for the translations. The value of the element defined as `rose-ns` will be used as part of the tag name.
+`rosey-ns` is used to define nested namespaces to be included as part of the key for the translations. The value of the element defined as `rosey-ns` will be used as part of the tag name.
 All the parents from the element with a `rosey-ns` tag will be used as the namespaces concatenated with a dot.
 
-With given example
+Example JSON file:
 
 ```
 {
@@ -298,7 +282,7 @@ With given example
 }
 ```
 
-We can have the following schema file:
+Corresponding schema file:
 ```
 {
 	"myCollection": [
@@ -312,7 +296,7 @@ We can have the following schema file:
 }
 ```
 
-The output translation keys generated are:
+Output translation keys generated:
 ```
 {
   "john.name":…,
@@ -322,12 +306,10 @@ The output translation keys generated are:
 }
 ```
 
-
 ### `rosey-array-ns`
-`rosey-array-ns` is used when you have an array where the value needs to be translated. The value of the element defined as `rose-array-ns` will be used as part of the tag name.
+`rosey-array-ns` is used when you have an array where the values need to be translated. The value of the element defined as `rose-array-ns` will be used as part of the tag name.
 
-With given example
-
+Example JSON file:
 ```
 {
 	"myCollection": [
@@ -351,7 +333,7 @@ With given example
 }
 ```
 
-We can have the following schema file:
+Corresponding schema file:
 ```
 {
 	"myCollection": [
@@ -363,7 +345,7 @@ We can have the following schema file:
 }
 ```
 
-The output translation keys generated are:
+Output translation keys generated:
 ```
 {
   "john.name":…,
@@ -376,18 +358,14 @@ The output translation keys generated are:
   "mark.top.value":…,
 }
 ```
-## Synopsis
+
+## CLI usage
 
 ```
 $ rosey <command> [args]
 ```
 
-
-## Usage
-
-
-### Help
-##### ```help```
+### `help`
 Present the list of available commands
 
 #### Example:
@@ -396,8 +374,7 @@ Present the list of available commands
 $ rosey help
 ```
 
-### Generate
-##### ```generate```
+### `generate`
 Generates a lookup table, called a “locale”, for these keys. The locale determines the content to be shown for each `data-rosey` key.
 The generated locale source is saved by default at `rosey/source.json`.
 
@@ -407,8 +384,7 @@ The generated locale source is saved by default at `rosey/source.json`.
 $ rosey generate [<source>|<version>|<tag>|<locale-dest>|<source-delimiter>]
 ```
 
-### Check
-##### ```check```
+### `check`
 Generates a comparison of `rosey/source.json` and `rosey/locales/*.json` at `rosey/checks.json`. This is not run as part of the `rosey` command.
 
 #### Example:
@@ -417,8 +393,7 @@ Generates a comparison of `rosey/source.json` and `rosey/locales/*.json` at `ros
 $ rosey check [<version>|<locale-source>|<locale-dest>]
 ```
 
-### Convert
-##### ```convert```
+### `convert`
 If you still have `locales` files using version 1, you can use the `convert` command to migrate the current translations to version 2.
 It will need an existing `source.json` file on with version 2 file as the base for the new locales files. 
 It is recommended to run `rosey generate --version 2` before using the `convert` command.
@@ -429,8 +404,7 @@ It is recommended to run `rosey generate --version 2` before using the `convert`
 $ rosey convert [<locale-source>|<locale-dest>]
 ```
 
-### Rosey
-##### ```rosey```
+### `rosey`
 Create translated version of your website for each "locale" file on the `rosey/locales/` folder. 
 Serves the translated version on a local browser and watches for changes.
 
@@ -440,8 +414,7 @@ Serves the translated version on a local browser and watches for changes.
 $ rosey [<source>|<dest>|<credentials>|<yes>|<version>|<port>|<tag>|<locale-source>|<locale-dest>|<default-language>|<source-delimiter>]
 ```
 
-### Build
-##### ```build```
+### `build`
 Builds the translated sites to the `dest` folder.
 
 #### Example:
@@ -450,10 +423,61 @@ Builds the translated sites to the `dest` folder.
 $ rosey build [<source>|<dest>|<credentials>|<yes>|<tag>|<locale-source>|<default-language>]
 ```
 
-##### Japanese translations
-When translating for a Japanese website the translated content from the locales folder will have span tags added to wordwrap characters more appropriately. 
+### `serve`
+Runs a local webserver on the `dest` folder.
+
+#### Example:
+
+```
+$ rosey serve [<dest>|<port>]
+```
+
+### `watch`
+Watches the `source` and `locale_source` folders.
+A ``build`` is triggered when the `source` files are modified.
+A ``generate`` is triggered when the `locale_source` files are modified.
+
+#### Example:
+
+```
+$ rosey watch [<source>|<credentials>|<yes>|<version>|<tag>|<locale-source>|<locale-dest>|<default-language>|<source-delimiter>]
+```
+
+### `clean`
+
+Deletes the contents of the `dest` folder.
+
+#### Example:
+
+```
+$ rosey clean [<dest>|<yes>]
+```
+
+### `base`
+
+Copies assets and creates the redirect page into the `dest` folder. Use `translate` to generate the translated websites.
+
+#### Example:
+
+```
+$ rosey base [<source>|<dest>|<tag>|<locale-source>|<default-language>]
+```
+
+
+### `translate`
+
+Generates a translated version of the websites on `dest` for the specified languages only.
+
+#### Example:
+
+```
+$ rosey translate [<source>|<dest>|<languages>|<credentials>|<tag>|<locale-source>]
+```
+
+### Japanese translations
+When translating for Japanese websites, the translated content from the `locales` folder will have `span` tags added to wordwrap characters more appropriately. 
 This requires a [Google Cloud Natural Language API key](https://cloud.google.com/natural-language/docs/quickstart) to be set.
-You can either use a argument when calling the CLI command, or set the specific environment variable.
+You can either use an argument when calling the CLI command, or set the specific environment variable.
 
 #### Example:
 
@@ -465,62 +489,5 @@ or
 $ export GOOGLE_APPLICATION_CREDENTIALS='/PATH/TO/CREDENTIALS/credentials.json'
 ```
 
-### Serve
-##### ```serve```
-Runs a local webserver on the `dest` folder.
-
-#### Example:
-
-```
-$ rosey serve [<dest>|<port>]
-```
-
-### Watch
-##### ```watch```
-Watches the `source` and `locale_source` folders.
-A ``build`` is triggered when the `source` files are modified.
-A ``generate`` is triggered when the `locale_source` files are modified.
-
-#### Example:
-
-```
-$ rosey watch [<source>|<credentials>|<yes>|<version>|<tag>|<locale-source>|<locale-dest>|<default-language>|<source-delimiter>]
-```
-
-
-### Clean
-##### ```clean```
-
-Deletes the contents of the `dest` folder.
-
-#### Example:
-
-```
-$ rosey clean [<dest>|<yes>]
-```
-
-### Base
-##### ```base```
-
-Copy assets and creates the redirect page into the `dest` folder. Use `translate` to generate the translated websites.
-
-#### Example:
-
-```
-$ rosey base [<source>|<dest>|<tag>|<locale-source>|<default-language>]
-```
-
-
-### Translate
-##### ```translate```
-
-Generates a translated version of the websites on `dest` for the specified languages only.
-
-#### Example:
-
-```
-$ rosey translate [<source>|<dest>|<languages>|<credentials>|<tag>|<locale-source>]
-```
-
-#### Required flags:
+### Required flags:
 [-l | --languages ]
