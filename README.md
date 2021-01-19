@@ -72,8 +72,8 @@ Example:
 <!DOCTYPE html>
 <html>
     <body>
-        <h1 data-rosey=”title”>Home page title</h1>
-        <h2 data-rosey=”sub-title”>Home page subtitle</h1>
+        <h1 data-rosey="title">Home page title</h1>
+        <h2 data-rosey="sub-title">Home page subtitle</h2>
     </body>
 </html>
 ```
@@ -95,9 +95,9 @@ Example:
 <!DOCTYPE html>
 <html>
     <body>
-        <h1 data-rosey=”title” data-rosey-attrs="content,alt" content="Content attribute" 
+        <h1 data-rosey="title" data-rosey-attrs="content,alt" content="Content attribute" 
         alt="alt attribute">Home page title</h1>
-        <h2 data-rosey=”sub-title”>Home page subtitle</h1>
+        <h2 data-rosey="sub-title">Home page subtitle</h2>
     </body>
 </html>
 ```
@@ -122,8 +122,8 @@ Example:
 <!DOCTYPE html>
 <html>
     <body>
-        <h1 data-rosey=”title” data-rosey-attrs-explicit='{"content":"title","alt":"alt-tag"}'         content="Content attribute" alt="alt attribute">Home page title</h1>
-        <h2 data-rosey=”sub-title”>Home page subtitle</h1>
+        <h1 data-rosey="title" data-rosey-attrs-explicit='{"content":"title","alt":"alt-tag"}'         content="Content attribute" alt="alt attribute">Home page title</h1>
+        <h2 data-rosey="sub-title">Home page subtitle</h2>
     </body>
 </html>
 ```
@@ -151,9 +151,9 @@ Example:
     <title data-rosey='title'>Home title</title>
   </head>
   <body data-rosey-root='home:content'>
-    <h1 data-rosey=”title”>Home page title</h1>
-    <div data-rosey-root=””>
-      <p data-rosey=”contact-us”>...</p>
+    <h1 data-rosey="title">Home page title</h1>
+    <div data-rosey-root="">
+      <p data-rosey="contact-us">...</p>
     </div>
   </body>
 </html>
