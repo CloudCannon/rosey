@@ -61,14 +61,14 @@ $ npm i -g rosey
 
 ## Locales
 
-A _locale_ is a file that needs to be created so that Rosey can manage a site's translations.  
+A _locale_ is a file that needs to be created so that Rosey can manage a site's translations. Use 
 During a build, Rosey will search through any existing locale files and consume their content. This content will then be used to create a translated version of the website under the locale file's name.  
-For example, with `locales/es.json` and `locales/en_US.json`, Rosey will create Spanish and US English localizations viewable at, for example, `example.com/es` and `example.com/en_US`.
+For example, with `rosey/locales/es.json` and `rosey/locales/en_US.json`, Rosey will create Spanish and US English localizations viewable at, for example, `example.com/es` and `example.com/en_US`.
 
 ### Usage notes
-- A `locales` folder must be created in the root of your project to store individual locales.
+- A `locales` folder needs to be created in your project to store individual locales (default is `rosey/locales`). Use the `--locale-source` flag if specifying a different locales location.
 - The contents of locale files should contain the _actual translations_ for corresponding `rosey` tags in your site's content.  
-  For example, `data-rosey="title"` in `src/index.html` should have a corresponding key with `"title": "My translation"` in `locales/<language code>.json`.  
+  For example, `data-rosey="title"` in `src/index.html` should have a corresponding key with `"title": "My translation"` in `rosey/locales/<language code>.json`.  
   
 
 ## Tagging HTML
