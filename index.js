@@ -83,7 +83,7 @@ const inputs = meow(
 			},
 			tag: {
 				type: 'string',
-				alias: null
+				alias: 't'
 			},
 			port: {
 				type: 'string',
