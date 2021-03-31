@@ -649,8 +649,6 @@ describe('generateFromHTML', () => {
 		it('should create the source.json file', async () => {
 			const res = runner.generate(options);
 			await res;
-			console.log('path expected');
-			console.log(options.rosey.full_generated_locale_dest);
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 	});
@@ -689,8 +687,6 @@ describe('generateFromJSON', () => {
 		});
 
 		it('should create the source.json file', async () => {
-			console.log('path expected');
-			console.log(options.rosey.full_generated_locale_dest);
 			const res = runner.generate(options);
 			await res;
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
@@ -1415,7 +1411,7 @@ describe('translate', () => {
 			const preLocalized = fs.readFileSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`).toString('utf-8');
 
 			expect(preLocalized.indexOf(preLocalizedMarker)).to.be.greaterThan(0);
-			console.log(preLocalized);
+			// console.log(preLocalized);
 		});
 
 		it('should NOT have a the folders not part of the specified languages', async () => {
