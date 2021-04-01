@@ -323,7 +323,7 @@ function createTestingStructure() {
                         </div>
                         <div>
                             <ul class="image-grid">
-                                    <li><a href="/clients/cause/"><img src="/images/clients/cause.jpg"></a></li>
+                                    <li><a href="/clients/cause/"><img class="updated-src-path" src="/images/clients/cause.jpg"></a></li>
                                     <li><a href="/clients/edition/"><img src="/images/clients/edition.png"></a></li>
                                     <li><a href="/clients/frisco/"><img src="/images/clients/frisco.jpg"></a></li>
                                     <li><a href="/clients/hydra/"><img src="/images/clients/hydra.png"></a></li>
@@ -503,12 +503,16 @@ function createTestingStructure() {
 
 	// Creat Source Files
 	fs.mkdirSync(options.rosey.source);
+	fs.mkdirSync(`${options.rosey.source}/images`);
+	fs.mkdirSync(`${options.rosey.source}/images/clients`);
 	fs.mkdirSync(`${options.rosey.source}/assets`);
 	fs.mkdirSync(`${options.rosey.source}/css`);
 	fs.mkdirSync(`${options.rosey.source}/html`);
 	fs.mkdirSync(`${options.rosey.source}/pt-BR/`);
 	fs.writeFileSync(`${options.rosey.source}/image.jpg`, 'image');
 	fs.writeFileSync(`${options.rosey.source}/assets/image2.jpg`, 'image');
+	fs.writeFileSync(`${options.rosey.source}/images/clients/cause.jpg`, 'image');
+	fs.writeFileSync(`${options.rosey.source}/images/clients/cause.rs.jpg`, 'image');
 	fs.writeFileSync(`${options.rosey.source}/style.css`, 'css');
 	fs.writeFileSync(`${options.rosey.source}/css/style2.css`, 'css');
 	fs.writeFileSync(`${options.rosey.source}/index.html`, html);
@@ -649,8 +653,6 @@ describe('generateFromHTML', () => {
 		it('should create the source.json file', async () => {
 			const res = runner.generate(options);
 			await res;
-			console.log('path expected');
-			console.log(options.rosey.full_generated_locale_dest);
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
 		});
 	});
@@ -689,8 +691,6 @@ describe('generateFromJSON', () => {
 		});
 
 		it('should create the source.json file', async () => {
-			console.log('path expected');
-			console.log(options.rosey.full_generated_locale_dest);
 			const res = runner.generate(options);
 			await res;
 			expect(fs.existsSync(`${options.rosey.full_generated_locale_dest}`)).to.equal(true);
@@ -1339,6 +1339,17 @@ describe('build', () => {
 		it('should have the pre localized files copied to dest', async () => {
 			expect(fs.existsSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`)).to.equal(true);
 		});
+		it('should have the correct path for an image that have a locale translated version', async () => {
+			const selector = '.updated-src-path';
+			const translation = '/images/clients/cause.rs.jpg';
+			await checkAttribute(path.join(options.rosey.dest, 'rs/html/index2.html'), selector, 'src', translation);
+		});
+
+		it('should have the correct path for an image that DOES NOT have a locale translated version', async () => {
+			const selector = '.updated-src-path';
+			const translation = '/images/clients/cause.jpg';
+			await checkAttribute(path.join(options.rosey.dest, 'fr/html/index2.html'), selector, 'src', translation);
+		});
 
 		it('should have a redirect index.html file on the root of the dest', async () => {
 			expect(fs.existsSync(`${options.rosey.full_dest}/index.html`)).to.equal(true);
@@ -1415,7 +1426,7 @@ describe('translate', () => {
 			const preLocalized = fs.readFileSync(`${options.rosey.full_dest}/pt-BR/preLocalized.html`).toString('utf-8');
 
 			expect(preLocalized.indexOf(preLocalizedMarker)).to.be.greaterThan(0);
-			console.log(preLocalized);
+			// console.log(preLocalized);
 		});
 
 		it('should NOT have a the folders not part of the specified languages', async () => {

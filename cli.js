@@ -47,6 +47,7 @@ const optionsDefaults = {
 		generated_locale_dest: 'rosey/source.json',
 		source_version: 2,
 		source_delimeter: '\t',
+		redirect_page: `${__dirname}/lib/plugins/redirect-page.html`,
 		data_tag: 'data-rosey',
 
 		show_duplicate_locale_warnings: false,
@@ -146,6 +147,7 @@ module.exports = {
 		options.rosey.data_tag = flags.tag || options.rosey.data_tag;
 		options.rosey.default_language = flags.defaultLanguage || options.rosey.default_language;
 		options.rosey.source_delimeter = flags.sourceDelimeter || options.rosey.source_delimeter;
+		options.rosey.redirect_page = flags.redirectPage || options.rosey.redirect_page;
 
 		options.rosey.source_version = flags.version || options.rosey.source_version;
 

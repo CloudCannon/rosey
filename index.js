@@ -18,8 +18,9 @@ Args:
     --locale-source     The source folder to read the translated json files. Defaults to 'rosey/locales'.
     --locale-dest       The destination folder to output the generated 'source.json' file. Defaults to 'rosey'.
     --default-language  The default language for the site (i.e. the language of 'source.json'). Defaults to 'en'.
-	--source-delimiter  The character that should be used to format the 'source.json' file. Defaults to '\\t'.
-	--verbose           Show warnings on console output. 
+    --source-delimiter  The character that should be used to format the 'source.json' file. Defaults to '\\t'.
+    --redirect-page     The path to the redirect page to be used. Defaults to an internally stored file.
+    --verbose           Show warnings on console output. 
 
 Commands:
     --Command--                                                         --Reqd flags--
@@ -77,13 +78,17 @@ const inputs = meow(
 				type: 'string',
 				alias: null
 			},
+			'redirect-page': {
+				type: 'string',
+				alias: null
+			},
 			credentials: {
 				type: 'string',
 				alias: 'c'
 			},
 			tag: {
 				type: 'string',
-				alias: null
+				alias: 't'
 			},
 			port: {
 				type: 'string',
