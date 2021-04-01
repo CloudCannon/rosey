@@ -20,12 +20,12 @@ $ npm i -g rosey
 
 1\. Mark up elements in HTML for translation with `data-rosey` attributes:
 ```html
- # test/src/index.html
+ # example/src/index.html
  <h1 data-rosey="title">Welcome!</h1>
  ```
-2\. Create `rosey/locales` folder and add `<language code>.json` files with corresponding keys and translations:
+2\. Create `rosey/locales` (see info on [locales](#locales) below) folder and add `<language code>.json` files with corresponding keys and translations:
 ```json
-# test/rosey/locales/es.json
+# example/rosey/locales/es.json
 {
   "title": "Bienvenido!"
 }
@@ -34,6 +34,7 @@ $ npm i -g rosey
 4\. View the site with available languages at `dist/translated_site`.
 
 ## Contents
+-  [Locales](#locales)
 -  [Tagging HTML](#tagging-html)
 	- [Translating elements](#translating-elements)
 	- [Translating attributes](#translating-attributes)
@@ -57,6 +58,18 @@ $ npm i -g rosey
 	-  [translate](#translate)
 	-  [Japanese translations](#japanese-translations)
 	-  [Required flags](#required-flags)
+
+## Locales
+
+A _locale_ is a file that needs to be created so that Rosey can manage a site's translations. Use 
+During a build, Rosey will search through any existing locale files and consume their content. This content will then be used to create a translated version of the website under the locale file's name.  
+For example, with `rosey/locales/es.json` and `rosey/locales/en_US.json`, Rosey will create Spanish and US English localizations viewable at, for example, `example.com/es` and `example.com/en_US`.
+
+### Usage notes
+- A `locales` folder needs to be created in your project to store individual locales (default is `rosey/locales`). Use the `--locale-source` flag if specifying a different locales location.
+- The contents of locale files should contain the _actual translations_ for corresponding `rosey` tags in your site's content.  
+  For example, `data-rosey="title"` in `src/index.html` should have a corresponding key with `"title": "My translation"` in `rosey/locales/<language code>.json`.  
+  
 
 ## Tagging HTML
 
