@@ -135,7 +135,7 @@ Example:
 <!DOCTYPE html>
 <html>
     <body>
-        <h1 data-rosey="title" data-rosey-attrs-explicit='{"content":"title","alt":"alt-tag"}'         content="Content attribute" alt="alt attribute">Home page title</h1>
+        <h1 data-rosey="title" data-rosey-attrs-explicit='{"content":"title","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Home page title</h1>
         <h2 data-rosey="sub-title">Home page subtitle</h2>
     </body>
 </html>
@@ -245,20 +245,20 @@ Example `titles.json`:
 
 ```
 {
-	"myCollection" : {
-			"name": "Home Page",
-      "title: "Home page title"
-		}
+  "myCollection" : {
+    "name": "Home Page",
+    "title: "Home page title"
+  }
 }
 ```
 
 Corresponding `title.rosey.json` schema file:
 ```
 {
-	"myCollection": {
-			"name": "rosey:myCollection.name",
-			"title": "rosey:myCollection.title"
-		}
+  "myCollection": {
+    "name": "rosey:myCollection.name",
+    "title": "rosey:myCollection.title"
+  }
 }
 ```
 
@@ -278,44 +278,44 @@ Example JSON file:
 
 ```
 {
-	"myCollection": [
-		{
-			"name": "John",
-			"details": {
-				"description": "This is a cool description"
-			}
-		},
-		{
-			"name": "Mark",
-			"details": {
-				"description": "Big description"
-			}
-		}
-	]
+    "myCollection": [
+        {
+            "name": "John",
+            "details": {
+                "description": "This is a cool description"
+            }
+        },
+        {
+            "name": "Mark",
+            "details": {
+                "description": "Big description"
+            }
+        }
+    ]
 }
 ```
 
 Corresponding schema file:
 ```
 {
-	"myCollection": [
-		{
-			"name": "rosey-ns|rosey:name",
-			"details": {
-				"description": "rosey:details.description"
-			}
-		}
-	]
+    "myCollection": [
+        {
+            "name": "rosey-ns|rosey:name",
+            "details": {
+                "description": "rosey:details.description"
+            }
+        }
+    ]
 }
 ```
 
 Output translation keys generated:
 ```
 {
-  "john.name":…,
-  "john.details.description":…,
-  "mark.name":…,
-  "mark.details.description":…
+    "john.name":…,
+    "john.details.description":…,
+    "mark.name":…,
+    "mark.details.description":…
 }
 ```
 
@@ -325,50 +325,50 @@ Output translation keys generated:
 Example JSON file:
 ```
 {
-	"myCollection": [
-		{
-			"name": "John",
-			"tags": [
-				"cool",
-				"blue",
-				"round"
-			]
-		},
-		{
-			"name": "Mark",
-			"tags": [
-				"green",
-				"square",
-				"top"
-			]
-		}
-	]
+    "myCollection": [
+        {
+            "name": "John",
+            "tags": [
+                "cool",
+                "blue",
+                "round"
+            ]
+        },
+        {
+            "name": "Mark",
+            "tags": [
+                "green",
+                "square",
+                "top"
+            ]
+        }
+    ]
 }
 ```
 
 Corresponding schema file:
 ```
 {
-	"myCollection": [
-		{
-			"name": "rosey-ns|rosey:name",
-			"tags": [ "rosey-array-ns|rosey:value" ],
-		}
-	]
+    "myCollection": [
+        {
+            "name": "rosey-ns|rosey:name",
+            "tags": [ "rosey-array-ns|rosey:value" ],
+        }
+    ]
 }
 ```
 
 Output translation keys generated:
 ```
 {
-  "john.name":…,
-  "john.blue.value":…,
-  "john.cool.value":…,
-  "john.round.value":…,
-  "mark.name":…,
-  "mark.green.value":…,
-  "mark.square.value":…,
-  "mark.top.value":…,
+    "john.name":…,
+    "john.blue.value":…,
+    "john.cool.value":…,
+    "john.round.value":…,
+    "mark.name":…,
+    "mark.green.value":…,
+    "mark.square.value":…,
+    "mark.top.value":…,
 }
 ```
 
