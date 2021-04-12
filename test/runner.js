@@ -155,18 +155,6 @@ const localeRS = {
 	}
 };
 const localeGA = {
-	'0Pm75CuMAuL17aHK7NygQ+K+2RcLVXa+uX7LdnO2TkQ': {
-		original: '\n                            <a href="cloudcannon:collections/_data/footer.yml" class="btn">\n                                <strong>&#9998;</strong> Update Footer Sections</a>\n                        ',
-		value: ''
-	},
-	'KON8fKUYnhjh549v0V7gTOiufsF1eYznwJNJbWG2rgY': {
-		original: 'Home',
-		value: ''
-	},
-	'LZWt/W8QjSfGY8qG29ixQyxwihJBCmn6Apz8h68EVwg': {
-		original: '<a href="/portfolio/">Missing key?</a>',
-		value: ''
-	},
 	'contact-us': {
 		original: 'Contact Us',
 		value: ''
@@ -185,14 +173,6 @@ const localeGA = {
 	},
 	'unused': {
 		original: 'Portfolio',
-		value: ''
-	},
-	'qt8GcQ6z7SHjYxmdhirp4cddL+YA/hx6Oyfa3x4CH9Y': {
-		original: 'Blog',
-		value: ''
-	},
-	'rU81YcMaFGiZdU/ld17APEHxfVesQJ+cqofF5H2fGLQ': {
-		original: 'About',
 		value: ''
 	},
 	'some-of-our-work': {
@@ -560,7 +540,6 @@ async function checkAttribute(file, selector, attribute, expectedValue) {
 	const html = await fs.readFile(file, 'utf-8');
 	const $ = cheerio.load(html,
 		{
-			_useHtmlParser2: true,
 			lowerCaseAttributeNames: false,
 			decodeEntities: false
 		});
@@ -800,9 +779,9 @@ describe('check', () => {
 
 		it('should match the results on the checks.json file', async () => {
 			const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest_path, '/checks.json'));
-			expect(checks.ga.states.missing).to.equal(21);
-			expect(checks.ga.states.current).to.equal(10);
-			expect(checks.ga.states.outdated).to.equal(2);
+			expect(checks.ga.states.missing).to.equal(26);
+			expect(checks.ga.states.current).to.equal(4);
+			expect(checks.ga.states.outdated).to.equal(3);
 			expect(checks.ga.states.unused).to.equal(1);
 		});
 	});
@@ -864,10 +843,10 @@ describe('check', () => {
 
 		it('should match the results on the checks.json file', async () => {
 			const checks = await fs.readJson(path.join(options.rosey.full_generated_locale_dest_path, '/checks.json'));
-			expect(checks.rs.states.missing).to.equal(13);
-			expect(checks.rs.states.current).to.equal(20);
+			expect(checks.rs.states.missing).to.equal(18);
+			expect(checks.rs.states.current).to.equal(15);
 			expect(checks.rs.states.outdated).to.equal(0);
-			expect(checks.rs.states.unused).to.equal(0);
+			expect(checks.rs.states.unused).to.equal(5);
 		});
 	});
 
