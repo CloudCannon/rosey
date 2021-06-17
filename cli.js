@@ -125,6 +125,7 @@ module.exports = {
 		const source = flags.source || options.rosey.source;
 		const localeSource = flags.localeSource || options.rosey.locale_source;
 		const localeDest = flags.localeDest || options.rosey.generated_locale_dest;
+		const imagesSource = flags.imagesSource || source;
 
 		options.cwd = cwd;
 		options.help = help;
@@ -136,6 +137,7 @@ module.exports = {
 		options.rosey.generated_locale_dest = localeDest;
 		options.rosey.generated_locale_dest_path = path.dirname(localeDest);
 		options.rosey.generated_locale_dest_file = path.basename(localeDest);
+		options.rosey.images_source = imagesSource;
 
 		options.rosey.full_dest = path.resolve(cwd, dest);
 		options.rosey.full_source = path.resolve(cwd, source);
@@ -143,6 +145,7 @@ module.exports = {
 		options.rosey.full_generated_locale_dest = path.resolve(cwd, localeDest);
 		// eslint-disable-next-line max-len
 		options.rosey.full_generated_locale_dest_path = path.resolve(cwd, options.rosey.generated_locale_dest_path);
+		options.rosey.full_images_source = path.resolve(cwd, imagesSource);
 
 		options.rosey.credentials = flags.credentials;
 		options.rosey.data_tag = flags.tag || options.rosey.data_tag;
