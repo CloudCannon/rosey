@@ -15,10 +15,10 @@ Args:
     -v | --version      The version number of the locale file. Defaults to '2'.
     -p | --port         The port number to serve the site on. Defaults to '8000'.
     -t | --tag          Name for the rosey tag used on the HTML. Defaults to 'data-rosey'.
-    --exclusions        A regular expresion used to determine which files not to copy as assets. Defaults to '\\.(html?|json)'.
+    --exclusions        A regular expression used to determine which files not to copy as assets. Defaults to '\\.(html?|json)'.
     --locale-source     The source folder to read the translated json files. Defaults to 'rosey/locales'.
     --locale-dest       The destination folder to output the generated 'source.json' file. Defaults to 'rosey'.
-    --images-source     The source folder to lookup for translated images. Defaults to the same path as '--source'.
+    --images-source     The source folder to look up for translated images. Defaults to the same path as '--source'.
     --default-language  The default language for the site (i.e. the language of 'source.json'). Defaults to 'en'.
     --source-delimiter  The character that should be used to format the 'source.json' file. Defaults to '\\t'.
     --redirect-page     The path to the redirect page to be used. Defaults to an internally stored file.
