@@ -51,10 +51,6 @@ describe('setOptions()', () => {
 });
 
 describe('run()', () => {
-	// before(function(){
-	//     fs.mkdirSync("test/forTesting");
-	//     fs.writeFileSync("test/forTesting/image.jpg", "image");
-	// })
 	context('User enters invalid command', () => {
 		const inputs = { flags: {}, input: ['invalidcommand'] };
 		it('Should exit with code 1', async () => {
@@ -70,24 +66,4 @@ describe('run()', () => {
 			expect(exitCode).to.equal(0);
 		});
 	});
-
-	// context ("Command runs but fails", function() {
-	//     let inputs = {flags: {"source": "test/invalidplace"}, input: ["clone-assets"]}
-	//     it("Should exit with code (1)", async function() {
-	//         let exitCode = await cli.run( inputs );
-	//         expect(exitCode).to.equal(1);
-	//     })
-	// })
-
-	// context ("User misses required flag", function() {
-	//     let inputs = {flags: {}, input: ["build"]}
-	//     it ("Should exit with code 1", async function() {
-	//         let exitCode = await cli.run( inputs );
-	//         expect(exitCode).to.equal(1);
-	//     })
-	// })
-
-	// after(function(){
-	//     fs.removeSync("test/forTesting")
-	// })
 });

@@ -15,6 +15,7 @@ Args:
     -v | --version      The version number of the locale file. Defaults to '2'.
     -p | --port         The port number to serve the site on. Defaults to '8000'.
     -t | --tag          Name for the rosey tag used on the HTML. Defaults to 'data-rosey'.
+    --exclusions        A regular expresion used to determine which files not to copy as assets. Defaults to '\\.(html?|json)'.
     --locale-source     The source folder to read the translated json files. Defaults to 'rosey/locales'.
     --locale-dest       The destination folder to output the generated 'source.json' file. Defaults to 'rosey'.
     --default-language  The default language for the site (i.e. the language of 'source.json'). Defaults to 'en'.
@@ -89,6 +90,10 @@ const inputs = meow(
 			tag: {
 				type: 'string',
 				alias: 't'
+			},
+			exclusions: {
+				type: 'string',
+				alias: null
 			},
 			port: {
 				type: 'string',
