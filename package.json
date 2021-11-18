@@ -24,7 +24,7 @@
     "localisation"
   ],
   "author": "Jonatah Benatti",
-  "license": "ISC",
+  "license": "MIT",
   "bin": {
     "rosey": "./index.js"
   },
