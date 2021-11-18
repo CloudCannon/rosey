@@ -2,9 +2,11 @@ use std::cell::RefCell;
 
 use cucumber::gherkin::Step;
 use cucumber::{given, then, when};
+use json_dotpath::DotPaths;
 use kuchiki::iter::{Descendants, Elements, Select};
 use kuchiki::traits::TendrilSink;
 use kuchiki::{Attributes, ElementData, NodeDataRef, NodeRef};
+use serde_json::Value;
 
 use crate::{RoseyOptions, RoseyWorld};
 
@@ -37,18 +39,18 @@ fn new_templated_file(world: &mut RoseyWorld, step: &Step, filename: String) {
 
 // WHENS
 
-#[when("I run Rosey")]
-fn run_rosey(world: &mut RoseyWorld) {
+#[when(regex = "I run Rosey ([a-z]+)")]
+fn run_rosey(world: &mut RoseyWorld, command: String) {
     let options = RoseyOptions::default();
-    world.run_rosey(options);
+    world.run_rosey(command, options);
 }
 
-#[when("I run Rosey with options:")]
-fn run_rosey_with_options(world: &mut RoseyWorld, step: &Step) {
+#[when(regex = "I run Rosey ([a-z]+) with options:")]
+fn run_rosey_with_options(world: &mut RoseyWorld, step: &Step, command: String) {
     match &step.table {
         Some(table) => {
             let options = RoseyOptions::from(table);
-            world.run_rosey(options);
+            world.run_rosey(command, options);
         }
         None => panic!("`{}` step expected a docstring", step.value),
     }
@@ -59,6 +61,7 @@ fn run_rosey_with_options(world: &mut RoseyWorld, step: &Step) {
 #[then(regex = "^I should see (?:\"|')(.*)(?:\"|') in (?:\"|')(.*)(?:\"|')$")]
 fn file_does_contain(world: &mut RoseyWorld, expected: String, filename: String) {
     assert!(world.check_file_exists(&filename));
+    println!("{:?}", world.read_file(&filename));
     assert!(world.read_file(&filename).contains(&expected));
 }
 
@@ -81,7 +84,7 @@ fn file_does_not_exist(world: &mut RoseyWorld, filename: String) {
 #[then(regex = "^I should see a selector (?:\"|')(.*)(?:\"|') in (?:\"|')(\\S*)(?:\"|')$")]
 fn selector_exists(world: &mut RoseyWorld, selector: String, filename: String) {
     assert!(world.check_file_exists(&filename));
-    let parsed_file = parse_file(&world.read_file(&filename));
+    let parsed_file = parse_html_file(&world.read_file(&filename));
     assert!(select_nodes(&parsed_file, &selector).next().is_some());
 }
 
@@ -90,7 +93,7 @@ fn selector_exists(world: &mut RoseyWorld, selector: String, filename: String) {
 )]
 fn selector_attributes(world: &mut RoseyWorld, step: &Step, selector: String, filename: String) {
     assert!(world.check_file_exists(&filename));
-    let parsed_file = parse_file(&world.read_file(&filename));
+    let parsed_file = parse_html_file(&world.read_file(&filename));
 
     'nodes: for node in select_nodes(&parsed_file, &selector) {
         let atts = node_attributes(&node);
@@ -130,9 +133,39 @@ fn selector_attributes(world: &mut RoseyWorld, step: &Step, selector: String, fi
     panic!("No nodes found that exactly match all provided attributes");
 }
 
+#[then(
+    regex = "^I should see the path (?:\"|')(.*)(?:\"|') containing (?:\"|')(.*)(?:\"|') in (?:\"|')(\\S+\\.json)(?:\"|')$"
+)]
+fn json_path_contains(world: &mut RoseyWorld, path: String, expected: String, filename: String) {
+    assert!(world.check_file_exists(&filename));
+    let parsed_json = parse_json_file(&world.read_file(&filename));
+    let value: String = parsed_json
+        .dot_get(&path)
+        .expect("JSON path lookup failed")
+        .expect("JSON path yielded none");
+    assert_eq!(value, expected);
+}
+
+#[then(
+    regex = "^I should see the path (?:\"|')(.*)(?:\"|') containing (\\d+) in (?:\"|')(\\S+\\.json)(?:\"|')$"
+)]
+fn json_path_contains_int(world: &mut RoseyWorld, path: String, expected: i64, filename: String) {
+    assert!(world.check_file_exists(&filename));
+    let parsed_json = parse_json_file(&world.read_file(&filename));
+    let value: i64 = parsed_json
+        .dot_get(&path)
+        .expect("JSON path lookup failed")
+        .expect("JSON path yielded none");
+    assert_eq!(value, expected);
+}
+
 // HELPERS
 
-fn parse_file(html: &str) -> NodeRef {
+fn parse_json_file(json: &str) -> Value {
+    serde_json::from_str(json).expect("File contained invalid JSON")
+}
+
+fn parse_html_file(html: &str) -> NodeRef {
     kuchiki::parse_html().one(html)
 }
 

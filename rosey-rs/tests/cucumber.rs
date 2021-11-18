@@ -79,17 +79,17 @@ impl RoseyWorld {
         self.tmp_file_path(filename).exists()
     }
 
-    fn run_rosey(&mut self, options: RoseyOptions) {
+    fn run_rosey(&mut self, command: String, options: RoseyOptions) {
         match std::env::var("ROSEY_IMPL").as_deref() {
             Ok("js") => {
                 let cwd = std::env::current_dir().unwrap();
                 let rosey_js = cwd.join(PathBuf::from("../index.js"));
                 let rosey_js = rosey_js.to_str().unwrap();
-                let command = format!("{} build -s {:?} -d {:?}", rosey_js, options.source, options.dest);
+                let js_cli = format!("{} {} -s {:?} -d {:?}", rosey_js, &command, options.source, options.dest);
                 let output = Command::new("sh")
                     .arg("-c")
                     .current_dir(self.tmp_dir())
-                    .arg(command)
+                    .arg(js_cli)
                     .output()
                     .expect("failed to execute rosey js");
                 assert!(output.stderr.is_empty());
@@ -97,6 +97,7 @@ impl RoseyWorld {
             Ok("rs") => {
                 let mut runner = RoseyRunner {
                     working_directory: self.tmp_dir(),
+                    command,
                     source: PathBuf::from(options.source),
                     dest: PathBuf::from(options.dest),
                 };

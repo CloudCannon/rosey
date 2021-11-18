@@ -32,6 +32,7 @@ fn main() {
         working_directory: env::current_dir().unwrap(),
         source: PathBuf::from(matches.value_of("source").unwrap_or(".")),
         dest: PathBuf::from(matches.value_of("dest").unwrap()),
+        command: "build".to_string(),
     };
 
     runner.run();

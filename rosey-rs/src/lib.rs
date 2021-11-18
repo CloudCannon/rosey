@@ -4,6 +4,7 @@ pub struct RoseyRunner {
     pub working_directory: PathBuf,
     pub source: PathBuf,
     pub dest: PathBuf,
+    pub command: String,
 }
 
 impl RoseyRunner {
