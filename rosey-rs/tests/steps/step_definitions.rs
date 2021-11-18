@@ -10,6 +10,11 @@ use crate::{RoseyOptions, RoseyWorld};
 
 // GIVENS
 
+#[given(regex = "^I have an? (?:\"|')(.*)(?:\"|') file$")]
+fn new_empty_file(world: &mut RoseyWorld, filename: String) {
+    world.write_file(&filename, "");
+}
+
 #[given(regex = "^I have an? (?:\"|')(.*)(?:\"|') file with the content:$")]
 fn new_file(world: &mut RoseyWorld, step: &Step, filename: String) {
     match &step.docstring {
