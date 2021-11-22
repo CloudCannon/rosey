@@ -124,7 +124,7 @@ fn selector_attributes(
             .expect("This step requires a table")
             .rows;
         for row in rows {
-            let attribute_key = unescape_pipes(&row[0]);
+            let attribute_key = normalize_table_cell(&row[0]);
             let value = match attribute_key.as_ref() {
                 "innerText" => node.text_contents(),
                 _ => {
@@ -135,7 +135,7 @@ fn selector_attributes(
                     }
                 }
             };
-            if value != unescape_pipes(&row[1]) {
+            if value != normalize_table_cell(&row[1]) {
                 continue 'nodes;
             }
         }
@@ -167,7 +167,8 @@ fn json_contains_values(world: &mut RoseyWorld, debug: StepDebug, step: &Step, f
         .expect("This step requires a table")
         .rows
     {
-        if let Some(expected_int) = int_re.captures(&row[1]) {
+        let expected_value = normalize_table_cell(&row[1]);
+        if let Some(expected_int) = int_re.captures(&expected_value) {
             let value: i64 = parsed_json
                 .dot_get(&row[0])
                 .expect("JSON path lookup failed")
@@ -184,7 +185,7 @@ fn json_contains_values(world: &mut RoseyWorld, debug: StepDebug, step: &Step, f
                 .dot_get(&row[0])
                 .expect("JSON path lookup failed")
                 .expect("JSON path yielded none");
-            assert_eq!(value, row[1]);
+            assert_eq!(value, expected_value);
         }
     }
 }
@@ -213,8 +214,8 @@ fn node_attributes(node: &NodeDataRef<ElementData>) -> RefCell<Attributes> {
         .clone()
 }
 
-fn unescape_pipes(table_value: &str) -> String {
-    table_value.replace("\\PIPE", "|")
+fn normalize_table_cell(table_value: &str) -> String {
+    table_value.replace("\\PIPE", "|").replace("\\n", "\n")
 }
 
 fn template_file(body_contents: &str) -> String {

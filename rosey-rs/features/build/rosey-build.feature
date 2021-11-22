@@ -1,4 +1,4 @@
-# Feature: Rosey Build v2
+Feature: Rosey Build v2
 
 #   Scenario: Rosey builds an output site from locales
 #   Scenario: Rosey builds an output site from locales with attrs
