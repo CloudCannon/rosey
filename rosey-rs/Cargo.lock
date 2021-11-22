@@ -982,6 +982,7 @@ dependencies = [
  "cucumber",
  "json_dotpath",
  "kuchiki",
+ "regex",
  "serde_json",
  "tempfile",
  "tokio",

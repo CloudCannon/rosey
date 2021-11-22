@@ -3,6 +3,7 @@ use rosey::RoseyRunner;
 use std::convert::Infallible;
 use std::io::{Read, Write};
 use std::process::Command;
+use std::str::from_utf8;
 use std::{fs, path::PathBuf};
 use tempfile::tempdir;
 
@@ -10,15 +11,23 @@ use async_trait::async_trait;
 use cucumber::{World, WorldInit};
 
 struct RoseyOptions {
-    source: String,
-    dest: String,
+    source: Option<String>,
+    dest: Option<String>,
+    version: Option<u8>,
+    tag: Option<String>,
+    separator: Option<String>,
+    locale_dest: Option<String>,
 }
 
 impl Default for RoseyOptions {
     fn default() -> Self {
         Self {
-            source: "source".to_string(),
-            dest: "dest".to_string(),
+            source: Some("source".to_string()),
+            dest: Some("dest".to_string()),
+            version: None,
+            tag: None,
+            separator: None,
+            locale_dest: None,
         }
     }
 }
@@ -28,9 +37,15 @@ impl From<&Table> for RoseyOptions {
         let mut options = RoseyOptions::default();
         for row in &step_table.rows {
             match row[0].as_ref() {
-                "source" => options.source = row[1].clone(),
-                "dest" => options.dest = row[1].clone(),
-                _ => panic!("Unknown Rosey option {}", row[1]),
+                "source" => options.source = Some(row[1].clone()),
+                "dest" => options.dest = Some(row[1].clone()),
+                "version" => {
+                    options.version = Some(row[1].parse().expect("Version needs to be an integer"))
+                }
+                "tag" => options.tag = Some(row[1].clone()),
+                "separator" => options.separator = Some(row[1].clone()),
+                "locale-dest" => options.locale_dest = Some(row[1].clone()),
+                _ => panic!("Unknown Rosey option {}", row[0]),
             }
         }
         options
@@ -82,24 +97,24 @@ impl RoseyWorld {
     fn run_rosey(&mut self, command: String, options: RoseyOptions) {
         match std::env::var("ROSEY_IMPL").as_deref() {
             Ok("js") => {
-                let cwd = std::env::current_dir().unwrap();
-                let rosey_js = cwd.join(PathBuf::from("../index.js"));
-                let rosey_js = rosey_js.to_str().unwrap();
-                let js_cli = format!("{} {} -s {:?} -d {:?}", rosey_js, &command, options.source, options.dest);
+                let js_cli = build_js_rosey_command(&command, options);
                 let output = Command::new("sh")
                     .arg("-c")
                     .current_dir(self.tmp_dir())
-                    .arg(js_cli)
+                    .arg(&js_cli)
                     .output()
                     .expect("failed to execute rosey js");
-                assert!(output.stderr.is_empty());
+                if !output.stderr.is_empty() {
+                    panic!("Ran \"{}\" and stderr was not empty. Was:\n{}", &js_cli, from_utf8(&output.stderr).unwrap_or("failed utf8"));
+                }
             },
             Ok("rs") => {
                 let mut runner = RoseyRunner {
                     working_directory: self.tmp_dir(),
                     command,
-                    source: PathBuf::from(options.source),
-                    dest: PathBuf::from(options.dest),
+                    source: options.source.map(PathBuf::from),
+                    dest: options.dest.map(PathBuf::from),
+                    version: options.version,
                 };
                 runner.run();
             },
@@ -126,4 +141,37 @@ mod steps;
 #[tokio::main]
 async fn main() {
     RoseyWorld::run("features").await;
+}
+
+struct RoseyJsCommand(String);
+
+impl RoseyJsCommand {
+    fn try_add<F: Fn(String) -> String>(&mut self, field: Option<String>, formatter: F) {
+        if let Some(field) = field {
+            self.0 = format!("{} {}", self.0, formatter(field));
+        }
+    }
+
+    fn consume(self) -> String {
+        self.0
+    }
+}
+
+// Some helpers
+fn build_js_rosey_command(command: &str, options: RoseyOptions) -> String {
+    let cwd = std::env::current_dir().unwrap();
+    let rosey_path = cwd.join(PathBuf::from("../index.js"));
+    let rosey_path = rosey_path.to_str().unwrap();
+
+    let mut command = RoseyJsCommand(format!("{} {}", rosey_path, command));
+    command.try_add(options.source, |s| format!("-s {}", s));
+    command.try_add(options.dest, |s| format!("-d {}", s));
+    command.try_add(options.version.map(|v| v.to_string()), |s| {
+        format!("-v {}", s)
+    });
+    command.try_add(options.tag, |s| format!("-t \"{}\"", s));
+    command.try_add(options.separator, |s| format!("--separator \"{}\"", s));
+    command.try_add(options.locale_dest, |s| format!("--locale-dest {}", s));
+
+    command.consume()
 }

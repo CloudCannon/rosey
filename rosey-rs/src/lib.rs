@@ -2,9 +2,10 @@ use std::path::PathBuf;
 
 pub struct RoseyRunner {
     pub working_directory: PathBuf,
-    pub source: PathBuf,
-    pub dest: PathBuf,
+    pub source: Option<PathBuf>,
+    pub dest: Option<PathBuf>,
     pub command: String,
+    pub version: Option<u8>,
 }
 
 impl RoseyRunner {

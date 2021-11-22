@@ -30,9 +30,10 @@ fn main() {
 
     let mut runner = RoseyRunner {
         working_directory: env::current_dir().unwrap(),
-        source: PathBuf::from(matches.value_of("source").unwrap_or(".")),
-        dest: PathBuf::from(matches.value_of("dest").unwrap()),
+        source: Some(PathBuf::from(matches.value_of("source").unwrap_or("."))),
+        dest: Some(PathBuf::from(matches.value_of("dest").unwrap())),
         command: "build".to_string(),
+        version: Some(2),
     };
 
     runner.run();
