@@ -115,6 +115,9 @@ impl RoseyWorld {
                     source: options.source.map(PathBuf::from),
                     dest: options.dest.map(PathBuf::from),
                     version: options.version,
+                    tag: options.tag,
+                    separator: options.separator,
+                    locale_dest: options.locale_dest.map(PathBuf::from),
                 };
                 runner.run();
             },

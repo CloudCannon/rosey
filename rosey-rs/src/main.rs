@@ -5,6 +5,8 @@ use std::{env, path::PathBuf};
 
 fn main() {
     let start = Instant::now();
+
+    // TODO: Implement the rest of the flags
     let matches = App::new("Rosey")
         .version("1.0")
         .author("CloudCannon")
@@ -28,12 +30,16 @@ fn main() {
         )
         .get_matches();
 
+    // I think these are the current defaults
     let mut runner = RoseyRunner {
         working_directory: env::current_dir().unwrap(),
         source: Some(PathBuf::from(matches.value_of("source").unwrap_or("."))),
         dest: Some(PathBuf::from(matches.value_of("dest").unwrap())),
         command: "build".to_string(),
         version: Some(2),
+        tag: Some("data-rosey".to_string()),
+        separator: Some(":".to_string()),
+        locale_dest: Some(PathBuf::from("rosey/source.json")),
     };
 
     runner.run();
