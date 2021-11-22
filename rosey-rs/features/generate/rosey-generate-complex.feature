@@ -1,4 +1,4 @@
-Feature: Rosey Generate v2
+Feature: Rosey Generate Complex
 
   Scenario: Rosey generate includes whitespace
     Given I have a "source/index.html" file with the content:
