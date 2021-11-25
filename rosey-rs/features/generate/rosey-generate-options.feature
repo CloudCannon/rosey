@@ -21,11 +21,11 @@ Feature: Rosey Generate Options
     When I run Rosey generate with options:
       | separator | ~ |
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
-      | keys.home:meta~title.original | Home header title |
-      | keys.home:content~title.original | Home page title |
-      | keys.home:contact~contact-us.original | Contact content |
-      | keys.footer.original | Footer content |
+      | version                               | int:2             |
+      | keys.home:meta~title.original         | Home header title |
+      | keys.home:content~title.original      | Home page title   |
+      | keys.home:contact~contact-us.original | Contact content   |
+      | keys.footer.original                  | Footer content    |
 
   Scenario: Rosey generates from custom tags
     Given I have a "source/index.html" file with the content:
@@ -48,11 +48,11 @@ Feature: Rosey Generate Options
     When I run Rosey generate with options:
       | tag | something-else |
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
-      | keys.home:meta:title.original | Home header title |
-      | keys.home:content:title.original | Home page title |
-      | keys.home:contact:contact-us.original | Contact content |
-      | keys.footer.original | Footer content |
+      | version                               | int:2             |
+      | keys.home:meta:title.original         | Home header title |
+      | keys.home:content:title.original      | Home page title   |
+      | keys.home:contact:contact-us.original | Contact content   |
+      | keys.footer.original                  | Footer content    |
 
   Scenario: Rosey generates to a custom dest
     Given I have a "source/index.html" file with the content:
@@ -66,5 +66,5 @@ Feature: Rosey Generate Options
     When I run Rosey generate with options:
       | locale-dest | row-z/source.json |
     Then I should see "row-z/source.json" containing the values:
-      | version | int:2 |
+      | version            | int:2            |
       | keys.seal.original | Kiss From A Rose |

@@ -13,7 +13,7 @@ Feature: Rosey Generate Complex
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
+      | version            | int:2                  |
       | keys.seal.original | \n  Kiss From A Rose\n |
 
   Scenario: Rosey generate includes HTML
@@ -27,7 +27,7 @@ Feature: Rosey Generate Complex
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
+      | version            | int:2                   |
       | keys.seal.original | <p>Kiss From A Rose</p> |
 
   Scenario: Rosey generate includes utf8
@@ -41,6 +41,6 @@ Feature: Rosey Generate Complex
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
-      | keys.seal.original | 🦭 |
+      | version            | int:2 |
+      | keys.seal.original | 🦭    |
 

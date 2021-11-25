@@ -11,7 +11,7 @@ Feature: Rosey Generate v2
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
+      | version            | int:2            |
       | keys.seal.original | Kiss From A Rose |
 
   Scenario: Rosey generates source.json files with attrs
@@ -25,10 +25,10 @@ Feature: Rosey Generate v2
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
-      | keys.title.original | Home page title |
+      | version                      | int:2             |
+      | keys.title.original          | Home page title   |
       | keys.title\.content.original | Content attribute |
-      | keys.title\.alt.original | alt attribute |
+      | keys.title\.alt.original     | alt attribute     |
 
   Scenario: Rosey generates source.json files with explicit attrs
     Given I have a "source/index.html" file with the content:
@@ -41,9 +41,9 @@ Feature: Rosey Generate v2
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
+      | version                   | int:2             |
       | keys.content-tag.original | Content attribute |
-      | keys.alt-tag.original | alt attribute |
+      | keys.alt-tag.original     | alt attribute     |
 
   Scenario: Rosey generates source.json files with namespaces
     Given I have a "source/index.html" file with the content:
@@ -81,9 +81,9 @@ Feature: Rosey Generate v2
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
-      | keys.about:faq:row-0:col-0:title.original | Slot A |
-      | keys.about:faq:row-1:col-0:title.original | Slot B |
+      | version                                        | int:2  |
+      | keys.about:faq:row-0:col-0:title.original      | Slot A |
+      | keys.about:faq:row-1:col-0:title.original      | Slot B |
       | keys.about:benefits:row-0:col-0:title.original | Slot C |
       | keys.about:benefits:row-1:col-0:title.original | Slot D |
 
@@ -107,8 +107,8 @@ Feature: Rosey Generate v2
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
-      | keys.home:meta:title.original | Home header title |
-      | keys.home:content:title.original | Home page title |
-      | keys.home:contact:contact-us.original | Contact content |
-      | keys.footer.original | Footer content |
+      | version                               | int:2             |
+      | keys.home:meta:title.original         | Home header title |
+      | keys.home:content:title.original      | Home page title   |
+      | keys.home:contact:contact-us.original | Contact content   |
+      | keys.footer.original                  | Footer content    |
