@@ -9,7 +9,7 @@ use globwalk::DirEntry;
 use kuchiki::{traits::TendrilSink, NodeRef};
 use sha2::{Digest, Sha256};
 
-use crate::RoseyRunner;
+use crate::{RoseyLocale, RoseyRunner};
 
 pub struct RoseyGenerator {
     pub working_directory: PathBuf,
@@ -18,7 +18,7 @@ pub struct RoseyGenerator {
     pub tag: String,
     pub separator: String,
     pub locale_dest: PathBuf,
-    pub locale: HashMap<String, String>,
+    pub locale: RoseyLocale,
 }
 
 impl From<RoseyRunner> for RoseyGenerator {
@@ -30,7 +30,7 @@ impl From<RoseyRunner> for RoseyGenerator {
             tag: runner.tag,
             separator: runner.separator,
             locale_dest: runner.locale_dest,
-            locale: HashMap::default(),
+            locale: RoseyLocale::default(),
         }
     }
 }
@@ -55,7 +55,8 @@ impl RoseyGenerator {
         let locale_dest = self.working_directory.join(&self.locale_dest);
         let locale_folder = locale_dest.parent().unwrap();
         create_dir_all(locale_folder).unwrap();
-        write(locale_dest, format!("{:?}", self.locale)).unwrap();
+        let output = self.locale.output(self.version);
+        write(locale_dest, output).unwrap();
     }
 
     fn process_file(&mut self, file: DirEntry) {
@@ -66,7 +67,7 @@ impl RoseyGenerator {
     fn process_node(&mut self, node: NodeRef, root: Option<String>, namespace: Option<String>) {
         let (root, namespace) = if let Some(element) = node.as_element() {
             let attributes = element.attributes.borrow();
-            if let Some(key) = attributes.get("data-rosey") {
+            if let Some(key) = attributes.get(&self.tag[..]) {
                 let key = match (&root, &namespace, key) {
                     (_, _, "") => {
                         let mut hasher = Sha256::new();
@@ -80,14 +81,14 @@ impl RoseyGenerator {
                         if root.is_empty() {
                             String::from(key)
                         } else {
-                            format!("{}:{}", root, key)
+                            format!("{}{}{}", root, self.separator, key)
                         }
                     }
-                    (None, Some(namespace), _) => format!("{}:{}", namespace, key),
+                    (None, Some(namespace), _) => format!("{}{}{}", namespace, self.separator, key),
                     _ => String::from(key),
                 };
 
-                if let Some(attrs) = attributes.get("data-rosey-attrs") {
+                if let Some(attrs) = attributes.get(format!("{}-attrs", self.tag)) {
                     for attr in attrs.split(',') {
                         if let Some(value) = attributes.get(attr) {
                             self.locale
@@ -96,7 +97,7 @@ impl RoseyGenerator {
                     }
                 }
 
-                if let Some(attrs_map) = attributes.get("data-rosey-attrs-explicit") {
+                if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
                     let attrs_map: HashMap<String, String> =
                         serde_json::from_str(attrs_map).unwrap();
                     for (attr, key) in attrs_map.iter() {
@@ -109,9 +110,12 @@ impl RoseyGenerator {
                 self.locale.insert(key, node.text_contents());
             }
 
-            let new_root = attributes.get("data-rosey-root").map(String::from).or(root);
+            let new_root = attributes
+                .get(format!("{}-root", self.tag))
+                .map(String::from)
+                .or(root);
 
-            let new_namespace = match (namespace, attributes.get("data-rosey-ns")) {
+            let new_namespace = match (namespace, attributes.get(format!("{}-ns", self.tag))) {
                 (Some(namespace), Some(new_namespace)) => {
                     Some(format!("{}:{}", namespace, new_namespace))
                 }
