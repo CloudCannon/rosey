@@ -13,7 +13,6 @@ pub struct RoseyRunner {
     pub working_directory: PathBuf,
     pub source: PathBuf,
     pub dest: PathBuf,
-    pub command: RoseyCommand,
     pub version: u8,
     pub tag: String,
     pub separator: String,
@@ -25,7 +24,6 @@ impl RoseyRunner {
         working_directory: PathBuf,
         source: Option<String>,
         dest: Option<String>,
-        command: RoseyCommand,
         version: Option<u8>,
         tag: Option<String>,
         separator: Option<String>,
@@ -35,7 +33,6 @@ impl RoseyRunner {
             working_directory,
             source: PathBuf::from(source.unwrap_or_else(|| String::from("."))),
             dest: PathBuf::from(dest.unwrap()),
-            command: RoseyCommand::Generate,
             version: version.unwrap_or(2),
             tag: tag.unwrap_or_else(|| String::from("data-rosey")),
             separator: separator.unwrap_or_else(|| String::from(":")),
@@ -43,8 +40,8 @@ impl RoseyRunner {
         }
     }
 
-    pub fn run(self) {
-        match self.command {
+    pub fn run(self, command: RoseyCommand) {
+        match command {
             RoseyCommand::Generate => RoseyGenerator::from(self).run(),
             _ => todo!(),
         }
@@ -84,8 +81,14 @@ impl Default for RoseyLocale {
 }
 
 impl RoseyLocale {
-    pub fn insert(&mut self, key: String, value: String) {
-        self.keys.insert(key, RoseyTranslation::new(value));
+    pub fn insert(&mut self, key: String, value: String, page: &str) {
+        let mut translation = self
+            .keys
+            .entry(key)
+            .or_insert_with(|| RoseyTranslation::new(value));
+        translation.total += 1;
+        let page = translation.pages.entry(page.to_string()).or_insert(0);
+        *page += 1;
     }
 
     pub fn output(&mut self, version: u8) -> String {

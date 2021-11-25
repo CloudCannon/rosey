@@ -19,6 +19,7 @@ pub struct RoseyGenerator {
     pub separator: String,
     pub locale_dest: PathBuf,
     pub locale: RoseyLocale,
+    pub current_file: String,
 }
 
 impl From<RoseyRunner> for RoseyGenerator {
@@ -31,6 +32,7 @@ impl From<RoseyRunner> for RoseyGenerator {
             separator: runner.separator,
             locale_dest: runner.locale_dest,
             locale: RoseyLocale::default(),
+            current_file: String::default(),
         }
     }
 }
@@ -61,6 +63,13 @@ impl RoseyGenerator {
 
     fn process_file(&mut self, file: DirEntry) {
         let dom = kuchiki::parse_html().one(read_to_string(file.path()).unwrap());
+        self.current_file = String::from(
+            file.path()
+                .strip_prefix(self.working_directory.join(&self.source))
+                .unwrap()
+                .to_str()
+                .unwrap(),
+        );
         self.process_node(dom, None, None);
     }
 
@@ -91,8 +100,11 @@ impl RoseyGenerator {
                 if let Some(attrs) = attributes.get(format!("{}-attrs", self.tag)) {
                     for attr in attrs.split(',') {
                         if let Some(value) = attributes.get(attr) {
-                            self.locale
-                                .insert(format!("{}.{}", key, attr), String::from(value));
+                            self.locale.insert(
+                                format!("{}.{}", key, attr),
+                                String::from(value),
+                                &self.current_file,
+                            );
                         }
                     }
                 }
@@ -102,12 +114,17 @@ impl RoseyGenerator {
                         serde_json::from_str(attrs_map).unwrap();
                     for (attr, key) in attrs_map.iter() {
                         if let Some(value) = attributes.get(attr.as_str()) {
-                            self.locale.insert(key.clone(), String::from(value));
+                            self.locale.insert(
+                                key.clone(),
+                                String::from(value),
+                                &self.current_file,
+                            );
                         }
                     }
                 }
 
-                self.locale.insert(key, node.text_contents());
+                let inner_html: String = node.children().map(|child| child.to_string()).collect();
+                self.locale.insert(key, inner_html, &self.current_file);
             }
 
             let new_root = attributes

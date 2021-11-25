@@ -1,5 +1,5 @@
 use cucumber::gherkin::Table;
-use rosey::RoseyRunner;
+use rosey::{RoseyCommand, RoseyRunner};
 use std::convert::Infallible;
 use std::io::{Read, Write};
 use std::process::Command;
@@ -109,17 +109,20 @@ impl RoseyWorld {
                 }
             },
             Ok("rs") => {
+                let command = match command.as_str(){
+                    "generate" => RoseyCommand::Generate,
+                    _ => todo!()
+                };
                 let runner = RoseyRunner::new(
                     self.tmp_dir(),
                     options.source,
                     options.dest,
-                    rosey::RoseyCommand::Generate, //Todo hook this up properly
                     options.version,
                     options.tag,
                     options.separator,
                     options.locale_dest.map(PathBuf::from),
                 );
-                runner.run();
+                runner.run(command);
             },
             Ok(other) => panic!("{} is not a valid ROSEY_IMPL. Valid impls are 'js' or 'rs'", other),
             Err(_) => panic!("\n---\nNeed an implementation to test. Please use:\nROSEY_IMPL=js cargo test\nor\nROSEY_IMPL=rs cargo test\n---\n"),

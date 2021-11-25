@@ -1,5 +1,5 @@
 use clap::{App, Arg};
-use rosey::RoseyRunner;
+use rosey::{RoseyCommand, RoseyRunner};
 use std::env;
 use std::path::PathBuf;
 use std::time::Instant;
@@ -35,14 +35,13 @@ fn main() {
         env::current_dir().unwrap(),
         matches.value_of("source").map(String::from),
         matches.value_of("dest").map(String::from),
-        rosey::RoseyCommand::Generate,
         Some(2),
         Some("data-rosey".to_string()),
         Some(":".to_string()),
         Some(PathBuf::from("rosey/source.json")),
     );
 
-    runner.run();
+    runner.run(RoseyCommand::Generate);
 
     let duration = start.elapsed();
     println!(
