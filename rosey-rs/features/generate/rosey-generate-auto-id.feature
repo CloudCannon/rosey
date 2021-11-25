@@ -11,5 +11,5 @@ Feature: Rosey Generate AutoID
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version | int:2 |
+      | version                                                   | int:2 |
       | keys.GtSzGc6Rr44nj796fYIRTDxQNRua2jzNIeF2qU3kpFI.original | rose! |

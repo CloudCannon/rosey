@@ -1,7 +1,8 @@
 use clap::{App, Arg};
 use rosey::RoseyRunner;
+use std::env;
+use std::path::PathBuf;
 use std::time::Instant;
-use std::{env, path::PathBuf};
 
 fn main() {
     let start = Instant::now();
@@ -30,17 +31,16 @@ fn main() {
         )
         .get_matches();
 
-    // I think these are the current defaults
-    let mut runner = RoseyRunner {
-        working_directory: env::current_dir().unwrap(),
-        source: Some(PathBuf::from(matches.value_of("source").unwrap_or("."))),
-        dest: Some(PathBuf::from(matches.value_of("dest").unwrap())),
-        command: "build".to_string(),
-        version: Some(2),
-        tag: Some("data-rosey".to_string()),
-        separator: Some(":".to_string()),
-        locale_dest: Some(PathBuf::from("rosey/source.json")),
-    };
+    let runner = RoseyRunner::new(
+        env::current_dir().unwrap(),
+        matches.value_of("source").map(String::from),
+        matches.value_of("dest").map(String::from),
+        rosey::RoseyCommand::Generate,
+        Some(2),
+        Some("data-rosey".to_string()),
+        Some(":".to_string()),
+        Some(PathBuf::from("rosey/source.json")),
+    );
 
     runner.run();
 

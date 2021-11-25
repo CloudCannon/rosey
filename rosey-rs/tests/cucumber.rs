@@ -109,16 +109,16 @@ impl RoseyWorld {
                 }
             },
             Ok("rs") => {
-                let mut runner = RoseyRunner {
-                    working_directory: self.tmp_dir(),
-                    command,
-                    source: options.source.map(PathBuf::from),
-                    dest: options.dest.map(PathBuf::from),
-                    version: options.version,
-                    tag: options.tag,
-                    separator: options.separator,
-                    locale_dest: options.locale_dest.map(PathBuf::from),
-                };
+                let runner = RoseyRunner::new(
+                    self.tmp_dir(),
+                    options.source,
+                    options.dest,
+                    rosey::RoseyCommand::Generate, //Todo hook this up properly
+                    options.version,
+                    options.tag,
+                    options.separator,
+                    options.locale_dest.map(PathBuf::from),
+                );
                 runner.run();
             },
             Ok(other) => panic!("{} is not a valid ROSEY_IMPL. Valid impls are 'js' or 'rs'", other),
