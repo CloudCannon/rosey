@@ -36,11 +36,13 @@ Feature: Rosey Generate Complex
       <html>
       <body>
       <p data-rosey="seal">🦭</p>
+      <p data-rosey="e">𓀞𓂗𓃛𓄫𓋟</p>
       </body>
       </html>
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version            | int:2 |
-      | keys.seal.original | 🦭    |
+      | version            | int:2      |
+      | keys.seal.original | 🦭          |
+      | keys.e.original    | 𓀞𓂗𓃛𓄫𓋟  | 
 
