@@ -35,7 +35,7 @@ Feature: Rosey Generate v2
       """
       <html>
       <body>
-      <h1 data-rosey="title" data-rosey-attrs-explicit='{"content":"content-tag","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Home page title</h1>
+      <h1 data-rosey-attrs-explicit='{"content":"content-tag","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Home page title</h1>
       </body>
       </html>
       """
