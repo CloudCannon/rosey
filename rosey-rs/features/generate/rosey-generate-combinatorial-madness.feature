@@ -38,7 +38,7 @@ Feature: Rosey Generate Complex
       """
       <html>
       <body>
-      <p data-rosey-ns="a" data-rosey="b">c</p>
+      <p data-rosey="b" data-rosey-ns="a">c</p>
       <p data-rosey-ns="one" data-rosey-attrs-explicit='{"alt":"two"}' alt="three"></p>
       </body>
       </html>
@@ -55,7 +55,7 @@ Feature: Rosey Generate Complex
       <html>
       <body>
       <p data-rosey-root="1" data-rosey="2">3</p>
-      <p data-rosey-root="one" data-rosey-attrs-explicit='{"alt":"two"}' alt="three"></p>
+      <p data-rosey-attrs-explicit='{"alt":"two"}' alt="three" data-rosey-root="one"></p>
       </body>
       </html>
       """
