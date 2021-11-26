@@ -32,3 +32,35 @@ Feature: Rosey Generate Complex
       | keys.home:contact:content-tag.original       | Content attribute  |
       | keys.home:contact:alt-tag.original           | alt attribute      |
       | keys.footer.original                         | Footer content     |
+
+  Scenario: Rosey namespace doesn't apply to self element
+    Given I have a "source/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <p data-rosey-ns="a" data-rosey="b">c</p>
+      <p data-rosey-ns="one" data-rosey-attrs-explicit='{"alt":"two"}' alt="three"></p>
+      </body>
+      </html>
+      """
+    When I run Rosey generate
+    Then I should see "rosey/source.json" containing the values:
+      | version           | int:2 |
+      | keys.b.original   | c     |
+      | keys.two.original | three |
+
+  Scenario: Rosey root doesn't apply to self element
+    Given I have a "source/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <p data-rosey-root="1" data-rosey="2">3</p>
+      <p data-rosey-root="one" data-rosey-attrs-explicit='{"alt":"two"}' alt="three"></p>
+      </body>
+      </html>
+      """
+    When I run Rosey generate
+    Then I should see "rosey/source.json" containing the values:
+      | version           | int:2 |
+      | keys.2.original   | 3     |
+      | keys.two.original | three |
