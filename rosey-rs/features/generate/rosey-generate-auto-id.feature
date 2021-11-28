@@ -31,5 +31,49 @@ Feature: Rosey Generate AutoID
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version                                                   | int:2 |
+      | version                                                   | int:2                                                                             |
       | keys.2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0.original | \n  <ul>\n    <li>rose!</li>\n    <li>🦭</li>\n    <li>𓀞𓂗𓃛𓄫𓋟</li>\n  </ul>\n |
+
+  Scenario: Rosey generate creates a hash id with correct roots
+    Given I have a "source/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <div data-rosey-root="root">
+      <div data-rosey>
+        <ul>
+          <li>rose!</li>
+          <li>🦭</li>
+          <li>𓀞𓂗𓃛𓄫𓋟</li>
+        </ul>
+      </div>
+      </div>
+      </body>
+      </html>
+      """
+    When I run Rosey generate
+    Then I should see "rosey/source.json" containing the values:
+      | version                                                        | int:2                                                                             |
+      | keys.root:2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0.original | \n  <ul>\n    <li>rose!</li>\n    <li>🦭</li>\n    <li>𓀞𓂗𓃛𓄫𓋟</li>\n  </ul>\n |
+
+  Scenario: Rosey generate creates a hash id with correct namespaces
+    Given I have a "source/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <div data-rosey-ns="namespace">
+      <div data-rosey>
+        <ul>
+          <li>rose!</li>
+          <li>🦭</li>
+          <li>𓀞𓂗𓃛𓄫𓋟</li>
+        </ul>
+      </div>
+      </div>
+      </body>
+      </html>
+      """
+    When I run Rosey generate
+    Then I should see "rosey/source.json" containing the values:
+      | version                                                             | int:2                                                                             |
+      | keys.namespace:2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0.original | \n  <ul>\n    <li>rose!</li>\n    <li>🦭</li>\n    <li>𓀞𓂗𓃛𓄫𓋟</li>\n  </ul>\n |

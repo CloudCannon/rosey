@@ -76,25 +76,29 @@ impl RoseyGenerator {
     fn process_node(&mut self, node: NodeRef, root: Option<String>, namespace: Option<String>) {
         let (root, namespace) = if let Some(element) = node.as_element() {
             let attributes = element.attributes.borrow();
+            let prefix = match (&root, &namespace) {
+                (Some(root), _) => {
+                    if root.is_empty() {
+                        String::default()
+                    } else {
+                        format!("{}{}", root, self.separator)
+                    }
+                }
+                (None, Some(namespace)) => format!("{}{}", namespace, self.separator),
+                _ => String::default(),
+            };
+
             if let Some(key) = attributes.get(&self.tag[..]) {
-                let key = match (&root, &namespace, key) {
-                    (_, _, "") => {
-                        let mut hasher = Sha256::new();
-                        hasher.update(node.to_string());
-                        encode_config(
-                            hasher.finalize(),
-                            Config::new(CharacterSet::Standard, false),
-                        )
-                    }
-                    (Some(root), _, _) => {
-                        if root.is_empty() {
-                            String::from(key)
-                        } else {
-                            format!("{}{}{}", root, self.separator, key)
-                        }
-                    }
-                    (None, Some(namespace), _) => format!("{}{}{}", namespace, self.separator, key),
-                    _ => String::from(key),
+                let key = if key.is_empty() {
+                    let mut hasher = Sha256::new();
+                    hasher.update(node.to_string());
+                    let hash = encode_config(
+                        hasher.finalize(),
+                        Config::new(CharacterSet::Standard, false),
+                    );
+                    format!("{}{}", &prefix, hash)
+                } else {
+                    format!("{}{}", &prefix, key)
                 };
 
                 if let Some(attrs) = attributes.get(format!("{}-attrs", self.tag)) {
@@ -109,22 +113,21 @@ impl RoseyGenerator {
                     }
                 }
 
-                if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
-                    let attrs_map: HashMap<String, String> =
-                        serde_json::from_str(attrs_map).unwrap();
-                    for (attr, key) in attrs_map.iter() {
-                        if let Some(value) = attributes.get(attr.as_str()) {
-                            self.locale.insert(
-                                key.clone(),
-                                String::from(value),
-                                &self.current_file,
-                            );
-                        }
-                    }
-                }
-
                 let inner_html: String = node.children().map(|child| child.to_string()).collect();
                 self.locale.insert(key, inner_html, &self.current_file);
+            }
+
+            if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
+                let attrs_map: HashMap<String, String> = serde_json::from_str(attrs_map).unwrap();
+                for (attr, key) in attrs_map.iter() {
+                    if let Some(value) = attributes.get(attr.as_str()) {
+                        self.locale.insert(
+                            format!("{}{}", prefix, key),
+                            String::from(value),
+                            &self.current_file,
+                        );
+                    }
+                }
             }
 
             let new_root = attributes
