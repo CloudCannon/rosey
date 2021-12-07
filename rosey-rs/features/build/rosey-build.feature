@@ -166,7 +166,7 @@ Feature: Rosey Build v2
       }
       """
     When I run Rosey build
-    Then I should see a selector 'p' in "destr/en/index.html" with the attributes:
+    Then I should see a selector 'p' in "dest/en/index.html" with the attributes:
       | data-rosey | contact-us |
       | innerText | Contact content |
     Then I should see a selector 'title' in "dest/uuids/index.html" with the attributes:
