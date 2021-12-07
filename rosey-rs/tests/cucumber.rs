@@ -6,6 +6,7 @@ use std::process::Command;
 use std::str::from_utf8;
 use std::{fs, path::PathBuf};
 use tempfile::tempdir;
+use wax::Glob;
 
 use async_trait::async_trait;
 use cucumber::{World, WorldInit};
@@ -88,6 +89,17 @@ impl RoseyWorld {
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
         contents
+    }
+
+    fn print_file_tree(&mut self) {
+        println!("File tree of test temp folder:");
+        let glob = Glob::new("**/*").unwrap();
+        let base_dir = self.tmp_file_path(".");
+        for entry in glob.walk(&base_dir, usize::MAX).flatten() {
+            let file = entry.path().strip_prefix(&base_dir).unwrap();
+            let indentation = "  ".repeat(file.components().count() - 1);
+            println!("{}{:?}", indentation, file.file_name().unwrap());
+        }
     }
 
     fn check_file_exists(&mut self, filename: &str) -> bool {
