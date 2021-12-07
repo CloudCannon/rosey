@@ -18,6 +18,15 @@ struct RoseyOptions {
     tag: Option<String>,
     separator: Option<String>,
     locale_dest: Option<String>,
+    locale_source: Option<String>,
+    languages: Option<Vec<String>>,
+    credentials: Option<String>,
+    exclusions: Option<String>,
+    images_source: Option<String>,
+    default_language: Option<String>,
+    source_delimiter: Option<String>,
+    redirect_page: Option<String>,
+    verbose: bool,
 }
 
 impl Default for RoseyOptions {
@@ -29,6 +38,15 @@ impl Default for RoseyOptions {
             tag: None,
             separator: None,
             locale_dest: None,
+            locale_source: None,
+            languages: None,
+            credentials: None,
+            exclusions: None,
+            images_source: None,
+            default_language: None,
+            source_delimiter: None,
+            redirect_page: None,
+            verbose: false,
         }
     }
 }
@@ -46,6 +64,18 @@ impl From<&Table> for RoseyOptions {
                 "tag" => options.tag = Some(row[1].clone()),
                 "separator" => options.separator = Some(row[1].clone()),
                 "locale-dest" => options.locale_dest = Some(row[1].clone()),
+                "locale-source" => options.locale_source = Some(row[1].clone()),
+                "languages" => {
+                    options.languages =
+                        Some(row[1].clone().split(',').map(|s| s.to_string()).collect())
+                }
+                "credentials" => options.credentials = Some(row[1].clone()),
+                "exclusions" => options.exclusions = Some(row[1].clone()),
+                "images-source" => options.images_source = Some(row[1].clone()),
+                "default-language" => options.default_language = Some(row[1].clone()),
+                "source-delimiter" => options.source_delimiter = Some(row[1].clone()),
+                "redirect-page" => options.redirect_page = Some(row[1].clone()),
+                "verbose" => options.verbose = row[1].parse().expect("Verbose needs to be a bool"),
                 _ => panic!("Unknown Rosey option {}", row[0]),
             }
         }
@@ -144,6 +174,8 @@ impl RoseyWorld {
                     "generate" => RoseyCommand::Generate,
                     _ => todo!()
                 };
+                // TODO: Tate: Get the rest of RoseyOptions through
+                // and slash or refactor this so the options aren't duplicated
                 let runner = RoseyRunner::new(
                     self.tmp_dir(),
                     options.source,
@@ -183,9 +215,19 @@ async fn main() {
 struct RoseyJsCommand(String);
 
 impl RoseyJsCommand {
+    fn add<F: Fn(String) -> String>(&mut self, field: String, formatter: F) {
+        self.0 = format!("{} {}", self.0, formatter(field));
+    }
+
     fn try_add<F: Fn(String) -> String>(&mut self, field: Option<String>, formatter: F) {
         if let Some(field) = field {
-            self.0 = format!("{} {}", self.0, formatter(field));
+            self.add(field, formatter);
+        }
+    }
+
+    fn add_flag(&mut self, field: bool, flag: String) {
+        if field {
+            self.0 = format!("{} {}", self.0, flag);
         }
     }
 
@@ -209,6 +251,24 @@ fn build_js_rosey_command(command: &str, options: RoseyOptions) -> String {
     command.try_add(options.tag, |s| format!("-t \"{}\"", s));
     command.try_add(options.separator, |s| format!("--separator \"{}\"", s));
     command.try_add(options.locale_dest, |s| format!("--locale-dest {}", s));
+
+    command.try_add(options.locale_source, |s| format!("--locale_source {}", s));
+    command.try_add(options.credentials, |s| format!("--credentials \"{}\"", s));
+    command.try_add(options.exclusions, |s| format!("--exclusions \"{}\"", s));
+    command.try_add(options.images_source, |s| format!("--images_source {}", s));
+    command.try_add(options.default_language, |s| {
+        format!("--default_language \"{}\"", s)
+    });
+    command.try_add(options.source_delimiter, |s| {
+        format!("--source_delimiter \"{}\"", s)
+    });
+    command.try_add(options.redirect_page, |s| format!("--redirect_page {}", s));
+
+    command.add_flag(options.verbose, "--verbose".to_string());
+
+    if let Some(languages) = options.languages {
+        command.add(languages.join(","), |s| format!("--languages \"{}\"", s));
+    }
 
     command.consume()
 }
