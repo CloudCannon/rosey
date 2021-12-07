@@ -1,4 +1,4 @@
-Feature: Rosey Build v2
+Feature: Rosey Build
 
   Scenario: Rosey builds from locales
     Given I have a "source/index.html" file with the content:
