@@ -85,6 +85,8 @@ Feature: Rosey Build Complex
       """
       { "אֱלֹהִים": "١٢٣", "🦭": "بين ما, يذكر" }
       """
+    # 👆 This whole line is RTL, it's likely rendering as
+    # { "value" :"key" ,"value" :"key" }
     When I run Rosey build
     Then I should see a selector 'p' in "dest/en/index.html" with the attributes:
       | data-rosey | 🦭 |
