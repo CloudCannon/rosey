@@ -91,14 +91,33 @@ impl RoseyWorld {
         contents
     }
 
-    fn print_file_tree(&mut self) {
+    fn get_file_tree(&mut self) -> String {
         println!("File tree of test temp folder:");
         let glob = Glob::new("**/*").unwrap();
         let base_dir = self.tmp_file_path(".");
-        for entry in glob.walk(&base_dir, usize::MAX).flatten() {
-            let file = entry.path().strip_prefix(&base_dir).unwrap();
-            let indentation = "  ".repeat(file.components().count() - 1);
-            println!("{}{:?}", indentation, file.file_name().unwrap());
+        let entries: Vec<String> = glob
+            .walk(&base_dir, usize::MAX)
+            .flatten()
+            .map(|entry| {
+                let file = entry.path().strip_prefix(&base_dir).unwrap();
+                let indentation = "  ".repeat(file.components().count() - 1);
+                format!(
+                    "| {}{}",
+                    indentation,
+                    file.file_name().unwrap().to_str().unwrap()
+                )
+            })
+            .collect();
+        entries.join("\n")
+    }
+
+    fn assert_file_exists(&mut self, filename: &str) {
+        if !self.check_file_exists(filename) {
+            panic!(
+                "\"{}\" does not exist in the tree:\n-----\n{}\n-----\n",
+                filename,
+                self.get_file_tree()
+            );
         }
     }
 

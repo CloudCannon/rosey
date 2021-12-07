@@ -62,12 +62,7 @@ fn run_rosey_with_options(world: &mut RoseyWorld, step: &Step, command: String) 
 
 #[then(regex = "^(DEBUG )?I should see (?:\"|')(.*)(?:\"|') in (?:\"|')(.*)(?:\"|')$")]
 fn file_does_contain(world: &mut RoseyWorld, debug: StepDebug, expected: String, filename: String) {
-    if !world.check_file_exists(&filename) {
-        if debug.0 {
-            world.print_file_tree();
-        }
-        panic!("Referenced file did not exist");
-    }
+    world.assert_file_exists(&filename);
     let contents = world.read_file(&filename);
     debug.log(&contents);
     assert!(contents.contains(&expected));
@@ -80,23 +75,15 @@ fn file_does_not_contain(
     expected: String,
     filename: String,
 ) {
-    if !world.check_file_exists(&filename) {
-        if debug.0 {
-            world.print_file_tree();
-        }
-        panic!("Referenced file did not exist");
-    }
+    world.assert_file_exists(&filename);
     let contents = world.read_file(&filename);
     debug.log(&contents);
     assert!(!contents.contains(&expected));
 }
 
-#[then(regex = "^(DEBUG )?I should see the file (?:\"|')(.*)(?:\"|')$")]
-fn file_does_exist(world: &mut RoseyWorld, debug: StepDebug, filename: String) {
-    if debug.0 {
-        world.print_file_tree();
-    }
-    assert!(world.check_file_exists(&filename));
+#[then(regex = "^I should see the file (?:\"|')(.*)(?:\"|')$")]
+fn file_does_exist(world: &mut RoseyWorld, filename: String) {
+    world.assert_file_exists(&filename);
 }
 
 #[then(regex = "^I should not see the file (?:\"|')(.*)(?:\"|')$")]
@@ -106,12 +93,7 @@ fn file_does_not_exist(world: &mut RoseyWorld, filename: String) {
 
 #[then(regex = "^(DEBUG )?I should see a selector (?:\"|')(.*)(?:\"|') in (?:\"|')(\\S*)(?:\"|')$")]
 fn selector_exists(world: &mut RoseyWorld, debug: StepDebug, selector: String, filename: String) {
-    if !world.check_file_exists(&filename) {
-        if debug.0 {
-            world.print_file_tree();
-        }
-        panic!("Referenced file did not exist");
-    }
+    world.assert_file_exists(&filename);
     let contents = world.read_file(&filename);
     debug.log(&contents);
     let parsed_file = parse_html_file(&contents);
@@ -128,12 +110,7 @@ fn selector_attributes(
     selector: String,
     filename: String,
 ) {
-    if !world.check_file_exists(&filename) {
-        if debug.0 {
-            world.print_file_tree();
-        }
-        panic!("Referenced file did not exist");
-    }
+    world.assert_file_exists(&filename);
     let contents = world.read_file(&filename);
     debug.log(&contents);
     let parsed_file = parse_html_file(&contents);
@@ -178,12 +155,7 @@ fn selector_attributes(
 
 #[then(regex = "^(DEBUG )?I should see (?:\"|')(\\S+\\.json)(?:\"|') containing the values:$")]
 fn json_contains_values(world: &mut RoseyWorld, debug: StepDebug, step: &Step, filename: String) {
-    if !world.check_file_exists(&filename) {
-        if debug.0 {
-            world.print_file_tree();
-        }
-        panic!("Referenced file did not exist");
-    }
+    world.assert_file_exists(&filename);
     let contents = world.read_file(&filename);
     debug.log(&contents);
     let parsed_json = parse_json_file(&contents);
