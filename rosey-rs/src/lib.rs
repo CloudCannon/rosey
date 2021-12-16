@@ -1,8 +1,9 @@
 mod runners;
 
 use crate::runners::generator::RoseyGenerator;
+use runners::builder::RoseyBuilder;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
 pub enum RoseyCommand {
     Generate,
@@ -16,7 +17,9 @@ pub struct RoseyRunner {
     pub version: u8,
     pub tag: String,
     pub separator: String,
+    pub locale_source: PathBuf,
     pub locale_dest: PathBuf,
+    pub default_locale: String,
 }
 
 impl RoseyRunner {
@@ -28,6 +31,7 @@ impl RoseyRunner {
         tag: Option<String>,
         separator: Option<String>,
         locale_dest: Option<PathBuf>,
+        locale_source: Option<PathBuf>,
     ) -> RoseyRunner {
         RoseyRunner {
             working_directory,
@@ -36,14 +40,16 @@ impl RoseyRunner {
             version: version.unwrap_or(2),
             tag: tag.unwrap_or_else(|| String::from("data-rosey")),
             separator: separator.unwrap_or_else(|| String::from(":")),
+            locale_source: locale_source.unwrap_or_else(|| PathBuf::from("rosey/locales/")),
             locale_dest: locale_dest.unwrap_or_else(|| PathBuf::from("rosey/source.json")),
+            default_locale: String::from("en"),
         }
     }
 
     pub fn run(self, command: RoseyCommand) {
         match command {
             RoseyCommand::Generate => RoseyGenerator::from(self).run(),
-            _ => todo!(),
+            RoseyCommand::Build => RoseyBuilder::from(self).run(),
         }
     }
 }
@@ -80,6 +86,31 @@ impl Default for RoseyLocale {
     }
 }
 
+impl FromStr for RoseyLocale {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if let Ok(result) = serde_json::from_str(s) {
+            return Ok(result);
+        }
+
+        if let Ok(map) = serde_json::from_str::<HashMap<String, String>>(s) {
+            let mut result = RoseyLocale::default();
+            result.version = 1;
+
+            map.iter().for_each(|(key, value)| {
+                result
+                    .keys
+                    .insert(key.clone(), RoseyTranslation::new(value.clone()));
+            });
+
+            return Ok(result);
+        }
+
+        return Err(());
+    }
+}
+
 impl RoseyLocale {
     pub fn insert(&mut self, key: String, value: String, page: &str) {
         let mut translation = self
@@ -89,6 +120,10 @@ impl RoseyLocale {
         translation.total += 1;
         let page = translation.pages.entry(page.to_string()).or_insert(0);
         *page += 1;
+    }
+
+    pub fn get(&self, key: &str) -> Option<&String> {
+        return self.keys.get(key).map(|entry| &entry.original);
     }
 
     pub fn output(&mut self, version: u8) -> String {

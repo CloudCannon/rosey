@@ -39,9 +39,10 @@ fn main() {
         Some("data-rosey".to_string()),
         Some(":".to_string()),
         Some(PathBuf::from("rosey/source.json")),
+        Some(PathBuf::from("rosey/locale/")),
     );
 
-    runner.run(RoseyCommand::Generate);
+    runner.run(RoseyCommand::Build);
 
     let duration = start.elapsed();
     println!(

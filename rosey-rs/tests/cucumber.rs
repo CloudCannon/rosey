@@ -172,6 +172,7 @@ impl RoseyWorld {
             Ok("rs") => {
                 let command = match command.as_str(){
                     "generate" => RoseyCommand::Generate,
+                    "build" => RoseyCommand::Build,
                     _ => todo!()
                 };
                 // TODO: Tate: Get the rest of RoseyOptions through
@@ -184,6 +185,7 @@ impl RoseyWorld {
                     options.tag,
                     options.separator,
                     options.locale_dest.map(PathBuf::from),
+                    options.locale_source.map(PathBuf::from),
                 );
                 runner.run(command);
             },
