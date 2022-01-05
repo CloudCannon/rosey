@@ -17,10 +17,10 @@ globwalk = "0.8.1"
 base64 = "0.13.0"
 sha2 = "0.9.8"
 serde = { version = "1.0", features = ["derive"] }
+cucumber = "0.10"
 
 [dev-dependencies]
 async-trait = "0.1"
-cucumber = "0.10"
 json_dotpath = "1.1.0"
 regex = "1"
 tokio = { version = "1.10", features = ["macros", "rt-multi-thread", "time"] }

@@ -1,7 +1,7 @@
 use std::{
     collections::HashMap,
     fs::{create_dir_all, read_to_string, write},
-    path::PathBuf,
+    path::{Path, PathBuf},
     str::FromStr,
 };
 
@@ -10,7 +10,7 @@ use globwalk::DirEntry;
 use kuchiki::{traits::TendrilSink, NodeRef};
 use sha2::{Digest, Sha256};
 
-use crate::{RoseyLocale, RoseyRunner};
+use crate::{RoseyLocale, RoseyOptions};
 
 pub struct RoseyBuilder {
     pub working_directory: PathBuf,
@@ -18,22 +18,22 @@ pub struct RoseyBuilder {
     pub locale_source: PathBuf,
     pub dest: PathBuf,
     pub tag: String,
-    pub default_locale: String,
+    pub default_language: String,
     pub locales: HashMap<String, RoseyLocale>,
     pub separator: String,
 }
 
-impl From<RoseyRunner> for RoseyBuilder {
-    fn from(runner: RoseyRunner) -> Self {
+impl From<RoseyOptions> for RoseyBuilder {
+    fn from(runner: RoseyOptions) -> Self {
         RoseyBuilder {
             working_directory: runner.working_directory,
-            source: runner.source,
-            locale_source: runner.locale_source,
-            dest: runner.dest,
-            tag: runner.tag,
-            default_locale: runner.default_locale,
+            source: runner.source.unwrap(),
+            locale_source: runner.locale_source.unwrap(),
+            dest: runner.dest.unwrap(),
+            tag: runner.tag.unwrap(),
+            default_language: runner.default_language.unwrap(),
             locales: HashMap::default(),
-            separator: runner.separator,
+            separator: runner.separator.unwrap(),
         }
     }
 }
@@ -83,38 +83,27 @@ impl RoseyBuilder {
 
     pub fn process_file(&mut self, file: DirEntry) {
         let source_folder = self.working_directory.join(&self.source);
+        let relative_path = file.path().strip_prefix(&source_folder).unwrap();
 
         for (key, locale) in (&self.locales).into_iter() {
-            let dest_folder = self.working_directory.join(&self.dest).join(key);
-            create_dir_all(&dest_folder).unwrap();
-            let output = self.rewrite_file(&file, locale);
-            let relative_path = file.path().strip_prefix(&source_folder).unwrap();
-            let dest_path = dest_folder.join(&relative_path);
-            write(dest_path, output).unwrap();
+            let content = self.rewrite_file(&file, locale);
+            self.output_file(key, relative_path, content)
         }
 
-        let dest_folder = self
-            .working_directory
-            .join(&self.dest)
-            .join(&self.default_locale);
+        let content = read_to_string(file.path()).unwrap();
+        self.output_file(&self.default_language, relative_path, content);
+    }
+
+    pub fn output_file(&self, locale: &str, relative_path: &Path, content: String) {
+        let dest_folder = self.working_directory.join(&self.dest).join(locale);
         create_dir_all(&dest_folder).unwrap();
-        let output = read_to_string(file.path()).unwrap();
-        let relative_path = file.path().strip_prefix(&source_folder).unwrap();
         let dest_path = dest_folder.join(&relative_path);
-        write(dest_path, output).unwrap();
+        write(dest_path, content).unwrap();
     }
 
     pub fn rewrite_file(&self, file: &DirEntry, locale: &RoseyLocale) -> String {
         let dom = kuchiki::parse_html().one(read_to_string(file.path()).unwrap());
-        /* self.current_file = String::from(
-            file.path()
-                .strip_prefix(self.working_directory.join(&self.source))
-                .unwrap()
-                .to_str()
-                .unwrap(),
-        ); */
         self.process_node(&dom, None, None, locale);
-
         return dom.to_string();
     }
 
@@ -167,21 +156,8 @@ impl RoseyBuilder {
                     attributes.insert(format!("{}-attrs", self.tag), attrs.value);
                 }
 
-                node.children().for_each(|child| {
-                    child.detach();
-                });
                 if let Some(value) = locale.get(&key) {
-                    let new_content = kuchiki::parse_html()
-                        .one(format!("<html><head></head><body>{}</body></html>", value));
-                    new_content
-                        .select_first("body")
-                        .unwrap()
-                        .as_node()
-                        .children()
-                        .for_each(|child| {
-                            child.detach();
-                            node.append(child);
-                        });
+                    replace_content(node, value)
                 }
             }
 
@@ -234,8 +210,28 @@ impl RoseyBuilder {
                 </body>
             </html>
             "#,
-            self.default_locale
+            self.default_language
         );
         write(dest_index, output).unwrap();
     }
+}
+
+pub fn replace_content(node: &NodeRef, content: &str) {
+    node.children().for_each(|child| {
+        child.detach();
+    });
+
+    let dom = kuchiki::parse_html().one(format!(
+        "<html><head></head><body>{}</body></html>",
+        content
+    ));
+
+    dom.select_first("body")
+        .unwrap()
+        .as_node()
+        .children()
+        .for_each(|child| {
+            child.detach();
+            node.append(child);
+        });
 }

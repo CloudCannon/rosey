@@ -9,7 +9,7 @@ use globwalk::DirEntry;
 use kuchiki::{traits::TendrilSink, NodeRef};
 use sha2::{Digest, Sha256};
 
-use crate::{RoseyLocale, RoseyRunner};
+use crate::{RoseyLocale, RoseyOptions};
 
 pub struct RoseyGenerator {
     pub working_directory: PathBuf,
@@ -22,15 +22,15 @@ pub struct RoseyGenerator {
     pub current_file: String,
 }
 
-impl From<RoseyRunner> for RoseyGenerator {
-    fn from(runner: RoseyRunner) -> Self {
+impl From<RoseyOptions> for RoseyGenerator {
+    fn from(runner: RoseyOptions) -> Self {
         RoseyGenerator {
             working_directory: runner.working_directory,
-            source: runner.source,
-            version: runner.version,
-            tag: runner.tag,
-            separator: runner.separator,
-            locale_dest: runner.locale_dest,
+            source: runner.source.unwrap(),
+            version: runner.version.unwrap(),
+            tag: runner.tag.unwrap(),
+            separator: runner.separator.unwrap(),
+            locale_dest: runner.locale_dest.unwrap(),
             locale: RoseyLocale::default(),
             current_file: String::default(),
         }
