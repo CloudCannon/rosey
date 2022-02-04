@@ -1,3 +1,4 @@
+use cucumber::gherkin::Table;
 use rosey::{RoseyCommand, RoseyOptions};
 use std::convert::Infallible;
 use std::io::{Read, Write};
@@ -155,6 +156,36 @@ impl RoseyJsCommand {
 }
 
 // Some helpers
+fn build_rosey_options(step_table: &Table) -> RoseyOptions {
+    let mut options = RoseyOptions::default();
+    for row in &step_table.rows {
+        match row[0].as_ref() {
+            "source" => options.source = Some(PathBuf::from(row[1].clone())),
+            "dest" => options.dest = Some(PathBuf::from(row[1].clone())),
+            "version" => {
+                options.version = Some(row[1].parse().expect("Version needs to be an integer"))
+            }
+            "tag" => options.tag = Some(row[1].clone()),
+            "separator" => options.separator = Some(row[1].clone()),
+            "locale-dest" => options.locale_dest = Some(PathBuf::from(row[1].clone())),
+            "locale-source" => options.locale_source = Some(PathBuf::from(row[1].clone())),
+            "languages" => {
+                options.languages =
+                    Some(row[1].clone().split(',').map(|s| s.to_string()).collect())
+            }
+            "credentials" => options.credentials = Some(row[1].clone()),
+            "exclusions" => options.exclusions = Some(row[1].clone()),
+            "images-source" => options.images_source = Some(row[1].clone()),
+            "default-language" => options.default_language = Some(row[1].clone()),
+            "source-delimiter" => options.source_delimiter = Some(row[1].clone()),
+            "redirect-page" => options.redirect_page = Some(row[1].clone()),
+            "verbose" => options.verbose = row[1].parse().expect("Verbose needs to be a bool"),
+            _ => panic!("Unknown Rosey option {}", row[0]),
+        }
+    }
+    options
+}
+
 fn build_js_rosey_command(command: &str, options: RoseyOptions) -> String {
     let cwd = std::env::current_dir().unwrap();
     let rosey_path = cwd.join(PathBuf::from("../index.js"));

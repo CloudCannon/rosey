@@ -10,7 +10,7 @@ use kuchiki::{Attributes, ElementData, NodeDataRef, NodeRef};
 use regex::Regex;
 use serde_json::Value;
 
-use crate::{RoseyOptions, RoseyWorld};
+use crate::{build_rosey_options, RoseyOptions, RoseyWorld};
 
 // GIVENS
 
@@ -51,7 +51,7 @@ fn run_rosey(world: &mut RoseyWorld, command: String) {
 fn run_rosey_with_options(world: &mut RoseyWorld, step: &Step, command: String) {
     match &step.table {
         Some(table) => {
-            let options = RoseyOptions::from(table);
+            let options = build_rosey_options(table);
             world.run_rosey(command, options);
         }
         None => panic!("`{}` step expected a docstring", step.value),

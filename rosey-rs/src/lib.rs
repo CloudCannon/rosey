@@ -2,7 +2,6 @@ mod runners;
 
 use crate::runners::generator::RoseyGenerator;
 use clap::ArgMatches;
-use cucumber::gherkin::Table;
 use runners::builder::RoseyBuilder;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, env, path::PathBuf, str::FromStr};
@@ -63,38 +62,6 @@ impl Default for RoseyOptions {
             redirect_page: None,
             verbose: false,
         }
-    }
-}
-
-impl From<&Table> for RoseyOptions {
-    fn from(step_table: &Table) -> Self {
-        let mut options = RoseyOptions::default();
-        for row in &step_table.rows {
-            match row[0].as_ref() {
-                "source" => options.source = Some(PathBuf::from(row[1].clone())),
-                "dest" => options.dest = Some(PathBuf::from(row[1].clone())),
-                "version" => {
-                    options.version = Some(row[1].parse().expect("Version needs to be an integer"))
-                }
-                "tag" => options.tag = Some(row[1].clone()),
-                "separator" => options.separator = Some(row[1].clone()),
-                "locale-dest" => options.locale_dest = Some(PathBuf::from(row[1].clone())),
-                "locale-source" => options.locale_source = Some(PathBuf::from(row[1].clone())),
-                "languages" => {
-                    options.languages =
-                        Some(row[1].clone().split(',').map(|s| s.to_string()).collect())
-                }
-                "credentials" => options.credentials = Some(row[1].clone()),
-                "exclusions" => options.exclusions = Some(row[1].clone()),
-                "images-source" => options.images_source = Some(row[1].clone()),
-                "default-language" => options.default_language = Some(row[1].clone()),
-                "source-delimiter" => options.source_delimiter = Some(row[1].clone()),
-                "redirect-page" => options.redirect_page = Some(row[1].clone()),
-                "verbose" => options.verbose = row[1].parse().expect("Verbose needs to be a bool"),
-                _ => panic!("Unknown Rosey option {}", row[0]),
-            }
-        }
-        options
     }
 }
 
