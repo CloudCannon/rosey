@@ -27,7 +27,6 @@ Feature: Rosey Build Images
     And I should see a selector 'img' in "dest/fr/index.html" with the attributes:
       | src | /image.fr.png |
 
-  # TODO: Failing in Rosey js
   Scenario: Rosey build uses translated images from another location
     Given I have a "source/image.png" file with the content:
       """

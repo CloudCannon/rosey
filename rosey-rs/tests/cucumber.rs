@@ -50,7 +50,6 @@ impl RoseyWorld {
     }
 
     fn get_file_tree(&mut self) -> String {
-        println!("File tree of test temp folder:");
         let glob = Glob::new("**/*").unwrap();
         let base_dir = self.tmp_file_path(".");
         let entries: Vec<String> = glob
