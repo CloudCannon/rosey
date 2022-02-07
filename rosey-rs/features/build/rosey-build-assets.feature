@@ -27,7 +27,7 @@ Feature: Rosey Build Assets
       {}
       """
     When I run Rosey build
-    And I should not see the file "dest/about.htm"
+    Then I should not see the file "dest/about.htm"
     And I should not see the file "dest/about.json"
 
   Scenario: Rosey build doesn't copy excluded assets
