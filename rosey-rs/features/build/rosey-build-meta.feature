@@ -20,7 +20,7 @@ Feature: Rosey Build Redirect
       {}
       """
     When I run Rosey build
-    Then I should see a selector 'link' in "dest/about.html" with the attributes:
+    Then I should not see a selector 'link' in "dest/about.html" with the attributes:
       | rel      | alternate      |
       | href     | /en/about.html |
       | hreflang | en             |

@@ -101,12 +101,13 @@ fn selector_exists(world: &mut RoseyWorld, debug: StepDebug, selector: String, f
 }
 
 #[then(
-    regex = "^(DEBUG )?I should see a selector (?:\"|')(.*)(?:\"|') in (?:\"|')(.*)(?:\"|') with the attributes:$"
+    regex = "^(DEBUG )?I should (not )?see a selector (?:\"|')(.*)(?:\"|') in (?:\"|')(.*)(?:\"|') with the attributes:$"
 )]
 fn selector_attributes(
     world: &mut RoseyWorld,
     step: &Step,
     debug: StepDebug,
+    negation: Not,
     selector: String,
     filename: String,
 ) {
@@ -150,13 +151,18 @@ fn selector_attributes(
                 continue 'nodes;
             }
         }
+        if negation.0 {
+            panic!("A ndoe that exactly matched all provided attributes was found.")
+        }
         return;
     }
-    match last_looked_at {
-        Some(last_node) => panic!(
-            "No nodes found that exactly match all provided attributes. Last node had attributes {:#?}", last_node.attributes
-        ),
-        None => panic!("No nodes found with that selector!"),
+    if !negation.0 {
+        match last_looked_at {
+            Some(last_node) => panic!(
+                "No nodes found that exactly match all provided attributes. Last node had attributes {:#?}", last_node.attributes
+            ),
+            None => panic!("No nodes found with that selector!"),
+        }
     }
 }
 
@@ -241,7 +247,7 @@ fn template_file(body_contents: &str) -> String {
     )
 }
 
-// DEBUGGING
+// Helpers
 
 struct StepDebug(bool);
 
@@ -259,6 +265,18 @@ impl StepDebug {
     fn log(&self, contents: &str) {
         if self.0 {
             println!("\n\nDEBUG:\n---\n{:?}\n---\n\n", contents);
+        }
+    }
+}
+
+struct Not(bool);
+
+impl FromStr for Not {
+    type Err = &'static str;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "not " => Ok(Not(true)),
+            _ => Ok(Not(false)),
         }
     }
 }
