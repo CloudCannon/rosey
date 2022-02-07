@@ -88,7 +88,7 @@ fn file_does_exist(world: &mut RoseyWorld, filename: String) {
 
 #[then(regex = "^I should not see the file (?:\"|')(.*)(?:\"|')$")]
 fn file_does_not_exist(world: &mut RoseyWorld, filename: String) {
-    assert!(!world.check_file_exists(&filename));
+    world.assert_file_doesnt_exist(&filename);
 }
 
 #[then(regex = "^(DEBUG )?I should see a selector (?:\"|')(.*)(?:\"|') in (?:\"|')(\\S*)(?:\"|')$")]
@@ -114,8 +114,10 @@ fn selector_attributes(
     let contents = world.read_file(&filename);
     debug.log(&contents);
     let parsed_file = parse_html_file(&contents);
+    let mut last_looked_at: Option<NodeDataRef<ElementData>> = None;
 
     'nodes: for node in select_nodes(&parsed_file, &selector) {
+        last_looked_at = Some(node.clone());
         let atts = node_attributes(&node);
         let attributes = atts.borrow_mut();
         let rows = &step
@@ -150,7 +152,12 @@ fn selector_attributes(
         }
         return;
     }
-    panic!("No nodes found that exactly match all provided attributes");
+    match last_looked_at {
+        Some(last_node) => panic!(
+            "No nodes found that exactly match all provided attributes. Last node had attributes {:#?}", last_node.attributes
+        ),
+        None => panic!("No nodes found with that selector!"),
+    }
 }
 
 #[then(regex = "^(DEBUG )?I should see (?:\"|')(\\S+\\.json)(?:\"|') containing the values:$")]

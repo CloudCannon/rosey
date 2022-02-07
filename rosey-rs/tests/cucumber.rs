@@ -79,6 +79,16 @@ impl RoseyWorld {
         }
     }
 
+    fn assert_file_doesnt_exist(&mut self, filename: &str) {
+        if self.check_file_exists(filename) {
+            panic!(
+                "\"{}\" should not exist but does in the tree:\n-----\n{}\n-----\n",
+                filename,
+                self.get_file_tree()
+            );
+        }
+    }
+
     fn check_file_exists(&mut self, filename: &str) -> bool {
         self.tmp_file_path(filename).exists()
     }
