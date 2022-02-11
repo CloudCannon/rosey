@@ -185,7 +185,12 @@ fn json_contains_values(world: &mut RoseyWorld, debug: StepDebug, step: &Step, f
             let value: i64 = parsed_json
                 .dot_get(&row[0])
                 .unwrap_or_else(|_| panic!("JSON path {} lookup failed", &row[0]))
-                .unwrap_or_else(|| panic!("JSON path {} yielded none", &row[0]));
+                .unwrap_or_else(|| {
+                    panic!(
+                        "JSON path {} yielded none\nLooked at the structure {:#?}",
+                        &row[0], parsed_json
+                    )
+                });
             let expected_int: i64 = expected_int
                 .get(1)
                 .unwrap()
@@ -197,7 +202,12 @@ fn json_contains_values(world: &mut RoseyWorld, debug: StepDebug, step: &Step, f
             let value: String = parsed_json
                 .dot_get(&row[0])
                 .unwrap_or_else(|_| panic!("JSON path {} lookup failed", &row[0]))
-                .unwrap_or_else(|| panic!("JSON path {} yielded none", &row[0]));
+                .unwrap_or_else(|| {
+                    panic!(
+                        "JSON path {} yielded none\nLooked at the structure {:#?}",
+                        &row[0], parsed_json
+                    )
+                });
             assert_eq!(value, expected_value);
         }
     }
