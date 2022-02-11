@@ -82,6 +82,16 @@ fn main() {
                         .short("a")
                         .long("default-language")
                         .default_value("en"),
+                )
+                .arg(
+                    Arg::with_name("exclusions")
+                        .long("exclusions")
+                        .default_value(r#"\.(html?|json)$"#),
+                )
+                .arg(
+                    Arg::with_name("images-source")
+                        .long("images-source")
+                        .default_value("source"),
                 ),
         )
         .subcommand(App::new("check"))

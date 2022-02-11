@@ -35,7 +35,7 @@ pub struct RoseyOptions {
     pub languages: Option<Vec<String>>,
     pub credentials: Option<String>,
     pub exclusions: Option<String>,
-    pub images_source: Option<String>,
+    pub images_source: Option<PathBuf>,
     pub default_language: Option<String>,
     pub source_delimiter: Option<String>,
     pub redirect_page: Option<PathBuf>,
@@ -55,8 +55,8 @@ impl Default for RoseyOptions {
             locale_source: Some(PathBuf::from("rosey/locales/")),
             languages: None,
             credentials: None,
-            exclusions: None,
-            images_source: None,
+            exclusions: Some(String::from(r#"\.(html?|json)$"#)),
+            images_source: Some(PathBuf::from("source")),
             default_language: Some("en".to_string()),
             source_delimiter: None,
             redirect_page: None,
@@ -77,6 +77,11 @@ impl From<&ArgMatches<'_>> for RoseyOptions {
             locale_dest: matches.value_of("locale-source").map(PathBuf::from),
             default_language: matches.value_of("default-language").map(String::from),
             redirect_page: matches.value_of("redirect-page").map(PathBuf::from),
+            exclusions: matches.value_of("exclusions").map(String::from),
+            images_source: matches
+                .value_of("images-source")
+                .or_else(|| matches.value_of("source"))
+                .map(PathBuf::from),
             ..Default::default()
         }
     }

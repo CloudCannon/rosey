@@ -2,7 +2,7 @@ mod redirect_page;
 
 use std::{
     collections::{BTreeMap, HashMap},
-    fs::{create_dir_all, read_to_string, write},
+    fs::{copy, create_dir_all, read_to_string, write},
     path::{Path, PathBuf},
     str::FromStr,
 };
@@ -11,6 +11,7 @@ use base64::{encode_config, CharacterSet, Config};
 use globwalk::DirEntry;
 use kuchiki::{traits::TendrilSink, Attribute, ExpandedName, NodeRef};
 use markup5ever::{local_name, namespace_url, ns, QualName};
+use regex::Regex;
 use sha2::{Digest, Sha256};
 
 use crate::{RoseyLocale, RoseyOptions};
@@ -25,6 +26,8 @@ pub struct RoseyBuilder {
     pub locales: HashMap<String, RoseyLocale>,
     pub separator: String,
     pub redirect_page: Option<PathBuf>,
+    pub exclusions: String,
+    pub images_source: PathBuf,
 }
 
 impl From<RoseyOptions> for RoseyBuilder {
@@ -39,6 +42,8 @@ impl From<RoseyOptions> for RoseyBuilder {
             locales: HashMap::default(),
             separator: runner.separator.unwrap(),
             redirect_page: runner.redirect_page,
+            exclusions: runner.exclusions.unwrap(),
+            images_source: runner.images_source.unwrap(),
         }
     }
 }
@@ -46,10 +51,44 @@ impl From<RoseyOptions> for RoseyBuilder {
 impl RoseyBuilder {
     pub fn run(&mut self) {
         self.read_locales();
+        self.process_assets();
+        self.process_html();
+    }
 
+    pub fn process_assets(&mut self) {
+        let re = Regex::new(&self.exclusions).expect("Invalid regex");
         let walker = globwalk::GlobWalkerBuilder::from_patterns(
             self.working_directory.join(&self.source),
-            &["*.{htm,html}"],
+            &["*"],
+        )
+        .build()
+        .unwrap()
+        .into_iter()
+        .filter_map(Result::ok)
+        .filter(|file| {
+            file.file_type().is_file() && !re.is_match(&file.path().display().to_string())
+        });
+
+        walker.for_each(|file| {
+            let source_folder = self.working_directory.join(&self.source);
+            let dest_folder = self.working_directory.join(&self.dest);
+            let relative_path = file.path().strip_prefix(&source_folder).unwrap();
+            let dest_file = dest_folder.join(relative_path);
+
+            if let Some(parent) = dest_file.parent() {
+                create_dir_all(parent).unwrap();
+            }
+
+            if file.path() != dest_file {
+                copy(file.path(), dest_file).unwrap();
+            }
+        });
+    }
+
+    pub fn process_html(&mut self) {
+        let walker = globwalk::GlobWalkerBuilder::from_patterns(
+            self.working_directory.join(&self.source),
+            &["*.html"],
         )
         .build()
         .unwrap()
@@ -93,6 +132,7 @@ impl RoseyBuilder {
             let dom = kuchiki::parse_html().one(content.clone());
             self.rewrite_file(&dom, locale);
             self.add_meta_tags(&dom, key, relative_path);
+            self.rewrite_images(&dom, key);
 
             let content = dom.to_string();
             self.output_file(key, relative_path, content);
@@ -105,6 +145,36 @@ impl RoseyBuilder {
         let content = dom.to_string();
         self.output_file(&self.default_language, relative_path, content);
         self.output_redirect_file(&self.default_language, relative_path);
+    }
+
+    pub fn rewrite_images(&self, dom: &NodeRef, locale: &str) {
+        let source_folder = self.working_directory.join(&self.source);
+        let images_source = self.working_directory.join(&self.images_source);
+
+        for img in dom.select("img[src]").unwrap() {
+            let mut attributes = img.attributes.borrow_mut();
+            let src = attributes.remove("src").unwrap();
+            let src_path = Path::new(&src.value);
+
+            if let (Some(stem), Some(ext)) = (src_path.file_stem(), src_path.extension()) {
+                let stem = stem.to_str().unwrap();
+                let ext = ext.to_str().unwrap();
+                let translated_path = PathBuf::from(&format!("{stem}.{locale}.{ext}"));
+                let translated_path = images_source.join(translated_path);
+
+                if translated_path.exists() {
+                    let src = translated_path
+                        .strip_prefix(&source_folder)
+                        .unwrap()
+                        .to_str()
+                        .unwrap()
+                        .to_string();
+                    attributes.insert("src", format!("/{src}"));
+                } else {
+                    attributes.insert("src", src.value);
+                }
+            }
+        }
     }
 
     pub fn add_meta_tags(&self, dom: &NodeRef, locale: &str, relative_path: &Path) {

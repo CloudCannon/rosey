@@ -184,7 +184,7 @@ fn build_rosey_options(step_table: &Table) -> RoseyOptions {
             }
             "credentials" => options.credentials = Some(row[1].clone()),
             "exclusions" => options.exclusions = Some(row[1].clone()),
-            "images-source" => options.images_source = Some(row[1].clone()),
+            "images-source" => options.images_source = Some(PathBuf::from(row[1].clone())),
             "default-language" => options.default_language = Some(row[1].clone()),
             "source-delimiter" => options.source_delimiter = Some(row[1].clone()),
             "redirect-page" => options.redirect_page = Some(PathBuf::from(row[1].clone())),
@@ -226,7 +226,7 @@ fn build_js_rosey_command(command: &str, options: RoseyOptions) -> String {
     );
     command.try_add(options.credentials, |s| format!("--credentials \"{}\"", s));
     command.try_add(options.exclusions, |s| format!("--exclusions \"{}\"", s));
-    command.try_add(options.images_source, |s| format!("--images_source {}", s));
+    command.try_add(options.images_source.map(|p| p.to_str().unwrap().to_string()), |s| format!("--images_source {}", s));
     command.try_add(options.default_language, |s| {
         format!("--default_language \"{}\"", s)
     });

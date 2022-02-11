@@ -18,6 +18,7 @@ base64 = "0.13.0"
 sha2 = "0.9.8"
 serde = { version = "1.0", features = ["derive"] }
 markup5ever = "0.10.1"
+regex ="1.5.4"
 
 [dev-dependencies]
 async-trait = "0.1"
