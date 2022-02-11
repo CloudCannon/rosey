@@ -1,4 +1,4 @@
-Feature: Rosey Build Redirect
+Feature: Rosey Build Meta
 
   Scenario: Rosey adds alternates to meta
     Given I have a "source/index.html" file with the content:

@@ -38,7 +38,7 @@ pub struct RoseyOptions {
     pub images_source: Option<String>,
     pub default_language: Option<String>,
     pub source_delimiter: Option<String>,
-    pub redirect_page: Option<String>,
+    pub redirect_page: Option<PathBuf>,
     pub verbose: bool,
 }
 
@@ -67,16 +67,18 @@ impl Default for RoseyOptions {
 
 impl From<&ArgMatches<'_>> for RoseyOptions {
     fn from(matches: &ArgMatches) -> Self {
-        let mut result = RoseyOptions::default();
-        result.source = matches.value_of("source").map(PathBuf::from);
-        result.dest = matches.value_of("dest").map(PathBuf::from);
-        result.version = matches.value_of("version").map(|s| s.parse().unwrap());
-        result.tag = matches.value_of("tag").map(String::from);
-        result.separator = matches.value_of("separator").map(String::from);
-        result.locale_source = matches.value_of("locale-dest").map(PathBuf::from);
-        result.locale_dest = matches.value_of("locale-source").map(PathBuf::from);
-        result.default_language = matches.value_of("default-language").map(String::from);
-        result
+        RoseyOptions {
+            source: matches.value_of("source").map(PathBuf::from),
+            dest: matches.value_of("dest").map(PathBuf::from),
+            version: matches.value_of("version").map(|s| s.parse().unwrap()),
+            tag: matches.value_of("tag").map(String::from),
+            separator: matches.value_of("separator").map(String::from),
+            locale_source: matches.value_of("locale-dest").map(PathBuf::from),
+            locale_dest: matches.value_of("locale-source").map(PathBuf::from),
+            default_language: matches.value_of("default-language").map(String::from),
+            redirect_page: matches.value_of("redirect-page").map(PathBuf::from),
+            ..Default::default()
+        }
     }
 }
 
@@ -130,8 +132,10 @@ impl FromStr for RoseyLocale {
         }
 
         if let Ok(map) = serde_json::from_str::<HashMap<String, String>>(s) {
-            let mut result = RoseyLocale::default();
-            result.version = 1;
+            let mut result = RoseyLocale {
+                version: 1,
+                ..Default::default()
+            };
 
             map.iter().for_each(|(key, value)| {
                 result
@@ -142,7 +146,7 @@ impl FromStr for RoseyLocale {
             return Ok(result);
         }
 
-        return Err(());
+        Err(())
     }
 }
 

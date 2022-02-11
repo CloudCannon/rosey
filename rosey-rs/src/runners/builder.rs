@@ -1,5 +1,7 @@
+mod redirect_page;
+
 use std::{
-    collections::HashMap,
+    collections::{BTreeMap, HashMap},
     fs::{create_dir_all, read_to_string, write},
     path::{Path, PathBuf},
     str::FromStr,
@@ -7,7 +9,8 @@ use std::{
 
 use base64::{encode_config, CharacterSet, Config};
 use globwalk::DirEntry;
-use kuchiki::{traits::TendrilSink, NodeRef};
+use kuchiki::{traits::TendrilSink, Attribute, ExpandedName, NodeRef};
+use markup5ever::{local_name, namespace_url, ns, QualName};
 use sha2::{Digest, Sha256};
 
 use crate::{RoseyLocale, RoseyOptions};
@@ -21,6 +24,7 @@ pub struct RoseyBuilder {
     pub default_language: String,
     pub locales: HashMap<String, RoseyLocale>,
     pub separator: String,
+    pub redirect_page: Option<PathBuf>,
 }
 
 impl From<RoseyOptions> for RoseyBuilder {
@@ -34,6 +38,7 @@ impl From<RoseyOptions> for RoseyBuilder {
             default_language: runner.default_language.unwrap(),
             locales: HashMap::default(),
             separator: runner.separator.unwrap(),
+            redirect_page: runner.redirect_page,
         }
     }
 }
@@ -52,8 +57,6 @@ impl RoseyBuilder {
         .filter_map(Result::ok);
 
         walker.for_each(|file| self.process_file(file));
-
-        self.output_static_files();
     }
 
     pub fn read_locales(&mut self) {
@@ -84,27 +87,108 @@ impl RoseyBuilder {
     pub fn process_file(&mut self, file: DirEntry) {
         let source_folder = self.working_directory.join(&self.source);
         let relative_path = file.path().strip_prefix(&source_folder).unwrap();
+        let content = read_to_string(file.path()).unwrap();
 
-        for (key, locale) in (&self.locales).into_iter() {
-            let content = self.rewrite_file(&file, locale);
-            self.output_file(key, relative_path, content)
+        for (key, locale) in (&self.locales).iter() {
+            let dom = kuchiki::parse_html().one(content.clone());
+            self.rewrite_file(&dom, locale);
+            self.add_meta_tags(&dom, key, relative_path);
+
+            let content = dom.to_string();
+            self.output_file(key, relative_path, content);
+            self.output_redirect_file(key, relative_path);
         }
 
-        let content = read_to_string(file.path()).unwrap();
+        let dom = kuchiki::parse_html().one(content);
+        self.add_meta_tags(&dom, &self.default_language, relative_path);
+
+        let content = dom.to_string();
         self.output_file(&self.default_language, relative_path, content);
+        self.output_redirect_file(&self.default_language, relative_path);
+    }
+
+    pub fn add_meta_tags(&self, dom: &NodeRef, locale: &str, relative_path: &Path) {
+        let path = relative_path.display().to_string();
+        let path = path.trim_end_matches("index.html");
+        let head = if let Ok(head) = dom.select_first("head") {
+            head
+        } else {
+            let head = NodeRef::new_element(
+                QualName::new(None, ns!(html), local_name!("input")),
+                BTreeMap::default(),
+            );
+            dom.prepend(head);
+            dom.select_first("head").unwrap()
+        };
+        let head = head.as_node();
+
+        let mut attributes = BTreeMap::new();
+        attributes.insert(
+            ExpandedName::new("", "http-equiv"),
+            Attribute {
+                prefix: None,
+                value: String::from("content-language"),
+            },
+        );
+        attributes.insert(
+            ExpandedName::new("", "content"),
+            Attribute {
+                prefix: None,
+                value: String::from(locale),
+            },
+        );
+
+        head.append(NodeRef::new_element(
+            QualName::new(None, ns!(html), local_name!("meta")),
+            attributes,
+        ));
+
+        for key in (&self.locales)
+            .iter()
+            .map(|(key, _)| key)
+            .chain(std::iter::once(&self.default_language))
+            .filter(|key| *key != locale)
+        {
+            let mut attributes = BTreeMap::new();
+            attributes.insert(
+                ExpandedName::new("", "rel"),
+                Attribute {
+                    prefix: None,
+                    value: String::from("alternate"),
+                },
+            );
+            attributes.insert(
+                ExpandedName::new("", "hreflang"),
+                Attribute {
+                    prefix: None,
+                    value: String::from(key),
+                },
+            );
+            attributes.insert(
+                ExpandedName::new("", "href"),
+                Attribute {
+                    prefix: None,
+                    value: format!("/{key}/{path}"),
+                },
+            );
+            head.append(NodeRef::new_element(
+                QualName::new(None, ns!(html), local_name!("link")),
+                attributes,
+            ));
+        }
     }
 
     pub fn output_file(&self, locale: &str, relative_path: &Path, content: String) {
         let dest_folder = self.working_directory.join(&self.dest).join(locale);
-        create_dir_all(&dest_folder).unwrap();
         let dest_path = dest_folder.join(&relative_path);
+        if let Some(parent) = dest_path.parent() {
+            create_dir_all(parent).unwrap();
+        }
         write(dest_path, content).unwrap();
     }
 
-    pub fn rewrite_file(&self, file: &DirEntry, locale: &RoseyLocale) -> String {
-        let dom = kuchiki::parse_html().one(read_to_string(file.path()).unwrap());
-        self.process_node(&dom, None, None, locale);
-        return dom.to_string();
+    pub fn rewrite_file(&self, dom: &NodeRef, locale: &RoseyLocale) {
+        self.process_node(dom, None, None, locale);
     }
 
     fn process_node(
@@ -195,24 +279,62 @@ impl RoseyBuilder {
         }
     }
 
-    pub fn output_static_files(&mut self) {
+    pub fn output_redirect_file(&self, locale: &str, relative_path: &Path) {
         let dest_folder = self.working_directory.join(&self.dest);
-        let dest_index = dest_folder.join("index.html");
-        create_dir_all(dest_folder).unwrap();
-        let output = format!(
-            r#"
-            <html>
-                <head>
-                    <title>Redirecting...</title>
-                </head>
-                <body>
-                    <a href="/{}/">Click here if you are not redirected.</a>
-                </body>
-            </html>
-            "#,
-            self.default_language
-        );
-        write(dest_index, output).unwrap();
+        let dest_file = dest_folder.join(relative_path);
+        let path = relative_path.display().to_string();
+        let path = path.trim_end_matches("index.html");
+
+        if let Some(parent) = dest_file.parent() {
+            create_dir_all(parent).unwrap();
+        }
+
+        let output = if let Some(redirect_page) = &self.redirect_page {
+            read_to_string(self.working_directory.join(redirect_page))
+                .expect("Failed to load custom redirect page.")
+        } else {
+            redirect_page::DEFAULT.to_string()
+        };
+
+        let mut alternates = String::default();
+        for key in (&self.locales)
+            .iter()
+            .map(|(key, _)| key)
+            .chain(std::iter::once(&self.default_language))
+            .filter(|key| *key != locale)
+        {
+            alternates.push_str(&format!(
+                r#"<link rel="alternate" href="/{key}/{path}" hreflang="{key}">"#
+            ))
+        }
+
+        let mut lookup: BTreeMap<String, &str> = BTreeMap::default();
+        for key in (&self.locales)
+            .iter()
+            .map(|(key, _)| key)
+            .chain(std::iter::once(&self.default_language))
+        {
+            let mut split = key.split('-');
+            let language = split.next().unwrap();
+
+            lookup.insert(key.to_string(), key);
+            lookup.insert(language.to_string(), key);
+            if let Some(country) = split.next() {
+                lookup.insert(format!("{language}-{country}"), key);
+                lookup.insert(format!("{language}_{country}"), key);
+            }
+        }
+
+        let mut output = output
+            .replace("DEFAULT_LANGUAGE", locale)
+            .replace("SITE_PATH", &format!("/{path}"))
+            .replace("ALTERNATES", &alternates);
+
+        if let Ok(lookup) = serde_json::to_string(&lookup) {
+            output = output.replace("LOCALE_LOOKUP", &lookup)
+        }
+
+        write(dest_file, output).unwrap();
     }
 }
 

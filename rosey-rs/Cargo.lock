@@ -1078,6 +1078,7 @@ dependencies = [
  "globwalk",
  "json_dotpath",
  "kuchiki",
+ "markup5ever",
  "regex",
  "serde",
  "serde_json",

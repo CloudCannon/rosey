@@ -187,7 +187,7 @@ fn build_rosey_options(step_table: &Table) -> RoseyOptions {
             "images-source" => options.images_source = Some(row[1].clone()),
             "default-language" => options.default_language = Some(row[1].clone()),
             "source-delimiter" => options.source_delimiter = Some(row[1].clone()),
-            "redirect-page" => options.redirect_page = Some(row[1].clone()),
+            "redirect-page" => options.redirect_page = Some(PathBuf::from(row[1].clone())),
             "verbose" => options.verbose = row[1].parse().expect("Verbose needs to be a bool"),
             _ => panic!("Unknown Rosey option {}", row[0]),
         }
@@ -233,7 +233,7 @@ fn build_js_rosey_command(command: &str, options: RoseyOptions) -> String {
     command.try_add(options.source_delimiter, |s| {
         format!("--source_delimiter \"{}\"", s)
     });
-    command.try_add(options.redirect_page, |s| format!("--redirect_page {}", s));
+    command.try_add(options.redirect_page.map(|p| p.to_str().unwrap().to_string()), |s| format!("--redirect_page {}", s));
 
     command.add_flag(options.verbose, "--verbose".to_string());
 
