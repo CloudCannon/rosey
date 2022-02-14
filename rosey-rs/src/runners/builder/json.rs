@@ -1,4 +1,6 @@
-use super::RoseyGenerator;
+use crate::RoseyLocale;
+
+use super::RoseyBuilder;
 
 use std::{
     fs::read_to_string,
@@ -8,7 +10,7 @@ use std::{
 
 use serde_json::Value;
 
-impl RoseyGenerator {
+impl RoseyBuilder {
     pub fn process_json_file(&mut self, file: &Path) {
         let mut schema_path = PathBuf::from(file);
         schema_path.set_extension("rosey.json");
@@ -16,7 +18,8 @@ impl RoseyGenerator {
             return;
         }
 
-        let source = serde_json::from_str::<Value>(&read_to_string(&file).unwrap());
+        let content = read_to_string(&file).unwrap();
+        let source = serde_json::from_str::<Value>(&content);
         let schema = serde_json::from_str::<Value>(&read_to_string(&schema_path).unwrap());
 
         if source.is_err() {
@@ -29,17 +32,29 @@ impl RoseyGenerator {
             return;
         }
 
-        self.current_file = String::from(
-            file.strip_prefix(self.working_directory.join(&self.source))
-                .unwrap()
-                .to_str()
-                .unwrap(),
-        );
+        let mut source = source.unwrap();
+        let schema = schema.unwrap();
 
-        self.process_json_node(&source.unwrap(), &schema.unwrap(), None)
+        let source_folder = self.working_directory.join(&self.source);
+        let relative_path = file.strip_prefix(&source_folder).unwrap();
+
+        self.output_file(&self.default_language, relative_path, content);
+
+        for (key, locale) in (&self.locales).iter() {
+            self.process_json_node(&mut source, &schema, None, locale);
+
+            let content = serde_json::to_string(&source).unwrap();
+            self.output_file(key, relative_path, content);
+        }
     }
 
-    fn process_json_node(&mut self, source: &Value, schema: &Value, namespace: Option<String>) {
+    fn process_json_node(
+        &self,
+        source: &mut Value,
+        schema: &Value,
+        namespace: Option<String>,
+        locale: &RoseyLocale,
+    ) {
         if discriminant(source) != discriminant(schema) {
             eprintln!("Schema mismatch");
             return;
@@ -49,9 +64,10 @@ impl RoseyGenerator {
             (Value::Object(source_map), Value::Object(schema_map)) => {
                 let namespace = namespace.unwrap_or_default();
                 let mut local_namespace = String::default();
-                source_map.keys().for_each(|key| {
+                let keys = source_map.keys().cloned().collect::<Vec<_>>();
+                keys.iter().for_each(|key| {
                     if let (Some(Value::String(source_value)), Some(Value::String(schema_value))) =
-                        (source_map.get(key), schema_map.get(key))
+                        (source_map.get_mut(key), schema_map.get(key))
                     {
                         let mut key: Option<String> = None;
                         schema_value.trim().split('|').for_each(|part| {
@@ -62,18 +78,21 @@ impl RoseyGenerator {
                                 key = part.strip_prefix("rosey:").map(String::from);
                             }
                         });
-                        self.locale.insert(
-                            format!("{}{}{}", namespace, local_namespace, key.unwrap()),
-                            String::from(source_value),
-                            &self.current_file,
-                        );
+
+                        let locale_key =
+                            format!("{}{}{}", namespace, local_namespace, key.unwrap());
+
+                        if let Some(value) = locale.get(&locale_key) {
+                            *source_value = value.clone();
+                        }
                     } else if let (Some(source_value), Some(schema_value)) =
-                        (source_map.get(key), schema_map.get(key))
+                        (source_map.get_mut(key), schema_map.get(key))
                     {
                         self.process_json_node(
                             source_value,
                             schema_value,
                             Some(format!("{}{}", namespace, local_namespace)),
+                            locale,
                         )
                     }
                 })
@@ -93,7 +112,7 @@ impl RoseyGenerator {
                             }
                         });
 
-                        source_array.iter().for_each(|source_value| {
+                        source_array.iter_mut().for_each(|source_value| {
                             if let Value::String(source_value) = source_value {
                                 let mut locale_key = namespace.clone();
                                 if array_namespace {
@@ -101,18 +120,17 @@ impl RoseyGenerator {
                                     locale_key.push('.');
                                 }
                                 locale_key.push_str(key.as_ref().unwrap());
-                                self.locale.insert(
-                                    locale_key,
-                                    String::from(source_value),
-                                    &self.current_file,
-                                );
+
+                                if let Some(value) = locale.get(&locale_key) {
+                                    *source_value = value.clone();
+                                }
                             } else {
-                                eprintln!("Schema mismatch in array: Expected String")
+                                eprintln!("Schema mismatch in array: Expected String");
                             }
                         })
                     }
-                    Some(schema_value) => source_array.iter().for_each(|source_value| {
-                        self.process_json_node(source_value, schema_value, None)
+                    Some(schema_value) => source_array.iter_mut().for_each(|source_value| {
+                        self.process_json_node(source_value, schema_value, None, locale)
                     }),
                     _ => eprintln!("Schema mismatch in array: Expected String|Object"),
                 }
