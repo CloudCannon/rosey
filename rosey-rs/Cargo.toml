@@ -12,7 +12,7 @@ harness = false   # Allows Cucumber to print output instead of libtest
 [dependencies]
 clap = "2.33.0"
 kuchiki = "0.8.1"
-serde_json = "1.0"
+serde_json = { version = "1.0", features = ["preserve_order"]}
 globwalk = "0.8.1"
 base64 = "0.13.0"
 sha2 = "0.9.8"
