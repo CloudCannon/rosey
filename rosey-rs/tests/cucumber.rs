@@ -197,7 +197,7 @@ fn build_rosey_options(step_table: &Table) -> RoseyOptions {
 
 fn build_js_rosey_command(command: &str, options: RoseyOptions) -> String {
     let cwd = std::env::current_dir().unwrap();
-    let rosey_path = cwd.join(PathBuf::from("../index.js"));
+    let rosey_path = cwd.join(PathBuf::from("../rosey-js/index.js"));
     let rosey_path = rosey_path.to_str().unwrap();
 
     let mut command = RoseyJsCommand(format!("{} {}", rosey_path, command));
