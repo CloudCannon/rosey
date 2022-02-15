@@ -95,7 +95,7 @@ impl RoseyWorld {
     fn run_rosey(&mut self, command: String, options: RoseyOptions) {
         match std::env::var("ROSEY_IMPL").as_deref() {
             Ok("js") => {
-                let js_cli = build_js_rosey_command(&command, options);
+                let js_cli = build_rosey_command(&command, "../rosey-js/index.js", options);
                 let output = Command::new("sh")
                     .arg("-c")
                     .current_dir(self.tmp_dir())
@@ -104,6 +104,18 @@ impl RoseyWorld {
                     .expect("failed to execute rosey js");
                 if !output.stderr.is_empty() {
                     panic!("Ran \"{}\" and stderr was not empty. Was:\n{}", &js_cli, from_utf8(&output.stderr).unwrap_or("failed utf8"));
+                }
+            },
+            Ok("rs-cli") => {
+                let rs_cli = build_rosey_command(&command, "./target/debug/rosey", options);
+                let output = Command::new("sh")
+                    .arg("-c")
+                    .current_dir(self.tmp_dir())
+                    .arg(&rs_cli)
+                    .output()
+                    .expect("failed to execute rosey CLI — make sure you have a debug build");
+                if !output.stderr.is_empty() {
+                    panic!("Ran \"{}\" and stderr was not empty. Was:\n{}", &rs_cli, from_utf8(&output.stderr).unwrap_or("failed utf8"));
                 }
             },
             Ok("rs") => {
@@ -195,9 +207,9 @@ fn build_rosey_options(step_table: &Table) -> RoseyOptions {
     options
 }
 
-fn build_js_rosey_command(command: &str, options: RoseyOptions) -> String {
+fn build_rosey_command(command: &str, binary: &str, options: RoseyOptions) -> String {
     let cwd = std::env::current_dir().unwrap();
-    let rosey_path = cwd.join(PathBuf::from("../rosey-js/index.js"));
+    let rosey_path = cwd.join(PathBuf::from(binary));
     let rosey_path = rosey_path.to_str().unwrap();
 
     let mut command = RoseyJsCommand(format!("{} {}", rosey_path, command));
