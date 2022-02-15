@@ -77,6 +77,50 @@ Feature: Rosey Build JSON
       | mushroom.title           | Hm pg ttl |
       | mushroom.nested.subtitle | Hll       |
 
+  Scenario: Rosey builds JSON with multiple namespaces
+    Given I have a "source/titles.json" file with the content:
+      """
+      {
+        "mushroom": {
+          "name": "Home",
+          "meow": "Woof",
+          "title": "Homepagetitle",
+          "hotdog": "Sandwich"
+        }
+      }
+      """
+    And I have a "source/titles.rosey.json" file with the content:
+      """
+      {
+        "mushroom": {
+          "name": "rosey-ns|rosey:name",
+          "meow": "rosey:animal",
+          "title": "rosey-ns|rosey:title",
+          "hotdog": "rosey:food"
+        }
+      }
+      """
+    And I have a "rosey/locales/consonants.json" file with the content:
+      """
+      {
+        "home.name": "Hm",
+        "home.animal": "Wf",
+        "home.homepagetitle.title": "Hm pg ttl",
+        "home.homepagetitle.food": "Sndwch"
+      }
+      """
+    When I run Rosey build
+    Then I should see "dest/en/titles.json" containing the values:
+      | mushroom.name   | Home          |
+      | mushroom.meow   | Woof          |
+      | mushroom.title  | Homepagetitle |
+      | mushroom.hotdog | Sandwich      |
+    Then I should see "dest/consonants/titles.json" containing the values:
+      | mushroom.name   | Hm        |
+      | mushroom.meow   | Wf        |
+      | mushroom.title  | Hm pg ttl |
+      | mushroom.hotdog | Sndwch    |
+
   Scenario: Rosey builds JSON with array namespaces
     Given I have a "source/titles.json" file with the content:
       """

@@ -107,6 +107,37 @@ Feature: Rosey Generate JSON
       | keys.home\.title.original | Home page title |
       | keys.home\.sub.original   | Hello :)        |
 
+  Scenario: Rosey generates JSON with multiple namespaces
+    Given I have a "source/titles.json" file with the content:
+      """
+      {
+        "mushroom": {
+          "name": "Home",
+          "meow": "Woof",
+          "title": "Homepagetitle",
+          "hotdog": "Sandwich"
+        }
+      }
+      """
+    And I have a "source/titles.rosey.json" file with the content:
+      """
+      {
+        "mushroom": {
+          "name": "rosey-ns|rosey:name",
+          "meow": "rosey:animal",
+          "title": "rosey-ns|rosey:title",
+          "hotdog": "rosey:food"
+        }
+      }
+      """
+    When I run Rosey generate
+    Then I should see "rosey/source.json" containing the values:
+      | version                                  | int:2         |
+      | keys.home\.name.original                 | Home          |
+      | keys.home\.animal.original               | Woof          |
+      | keys.home\.homepagetitle\.title.original | Homepagetitle |
+      | keys.home\.homepagetitle\.food.original  | Sandwich      |
+
   Scenario: Rosey generates source.json files from JSON with array namespaces
     Given I have a "source/titles.json" file with the content:
       """

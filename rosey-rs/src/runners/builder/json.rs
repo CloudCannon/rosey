@@ -62,8 +62,7 @@ impl RoseyBuilder {
 
         match (source, schema) {
             (Value::Object(source_map), Value::Object(schema_map)) => {
-                let namespace = namespace.unwrap_or_default();
-                let mut local_namespace = String::default();
+                let mut namespace = namespace.unwrap_or_default();
                 let keys = source_map.keys().cloned().collect::<Vec<_>>();
                 keys.iter().for_each(|key| {
                     if let (Some(Value::String(source_value)), Some(Value::String(schema_value))) =
@@ -72,15 +71,14 @@ impl RoseyBuilder {
                         let mut key: Option<String> = None;
                         schema_value.trim().split('|').for_each(|part| {
                             if part == "rosey-ns" {
-                                local_namespace = source_value.to_lowercase();
-                                local_namespace.push('.');
+                                namespace.push_str(&source_value.to_lowercase());
+                                namespace.push('.');
                             } else if part.starts_with("rosey:") {
                                 key = part.strip_prefix("rosey:").map(String::from);
                             }
                         });
 
-                        let locale_key =
-                            format!("{}{}{}", namespace, local_namespace, key.unwrap());
+                        let locale_key = format!("{}{}", namespace, key.unwrap());
 
                         if let Some(value) = locale.get(&locale_key) {
                             *source_value = value.clone();
@@ -91,7 +89,7 @@ impl RoseyBuilder {
                         self.process_json_node(
                             source_value,
                             schema_value,
-                            Some(format!("{}{}", namespace, local_namespace)),
+                            Some(namespace.clone()),
                             locale,
                         )
                     }
