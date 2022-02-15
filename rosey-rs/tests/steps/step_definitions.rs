@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::env;
 use std::str::FromStr;
 
 use cucumber::gherkin::Step;
@@ -43,7 +44,24 @@ fn new_templated_file(world: &mut RoseyWorld, step: &Step, filename: String) {
 
 #[when(regex = "^I run Rosey ([a-z]+)$")]
 fn run_rosey(world: &mut RoseyWorld, command: String) {
-    let options = RoseyOptions::default();
+    let options = RoseyOptions {
+        working_directory: env::current_dir().unwrap(),
+        source: None,
+        dest: None,
+        version: None,
+        tag: None,
+        separator: None,
+        locale_dest: None,
+        locale_source: None,
+        languages: None,
+        credentials: None,
+        exclusions: None,
+        images_source: None,
+        default_language: None,
+        source_delimiter: None,
+        redirect_page: None,
+        verbose: false,
+    };
     world.run_rosey(command, options);
 }
 

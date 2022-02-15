@@ -1,6 +1,7 @@
 use cucumber::gherkin::Table;
 use rosey::{RoseyCommand, RoseyOptions};
 use std::convert::Infallible;
+use std::env;
 use std::io::{Read, Write};
 use std::process::Command;
 use std::str::{from_utf8, FromStr};
@@ -178,7 +179,24 @@ impl RoseyJsCommand {
 
 // Some helpers
 fn build_rosey_options(step_table: &Table) -> RoseyOptions {
-    let mut options = RoseyOptions::default();
+    let mut options = RoseyOptions {
+        working_directory: env::current_dir().unwrap(),
+        source: None,
+        dest: None,
+        version: None,
+        tag: None,
+        separator: None,
+        locale_dest: None,
+        locale_source: None,
+        languages: None,
+        credentials: None,
+        exclusions: None,
+        images_source: None,
+        default_language: None,
+        source_delimiter: None,
+        redirect_page: None,
+        verbose: false,
+    };
     for row in &step_table.rows {
         match row[0].as_ref() {
             "source" => options.source = Some(PathBuf::from(row[1].clone())),
