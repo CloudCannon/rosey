@@ -88,6 +88,12 @@ fn main() {
                         .long("exclusions")
                         .default_value(r#"\.(html?|json)$"#),
                 )
+                .arg(
+                    Arg::with_name("separator")
+                        .short("e")
+                        .long("separator")
+                        .default_value(":"),
+                )
                 .arg(Arg::with_name("images-source").long("images-source")),
         )
         .subcommand(App::new("check"))
