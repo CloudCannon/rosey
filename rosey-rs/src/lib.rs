@@ -162,7 +162,10 @@ impl RoseyLocale {
             .entry(key)
             .or_insert_with(|| RoseyTranslation::new(value));
         translation.total += 1;
-        let page = translation.pages.entry(page.to_string()).or_insert(0);
+        let page = translation
+            .pages
+            .entry(page.replace('\\', "/"))
+            .or_insert(0);
         *page += 1;
     }
 

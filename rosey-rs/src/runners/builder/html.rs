@@ -1,6 +1,7 @@
 use super::redirect_page;
 use super::RoseyBuilder;
 
+use std::path::MAIN_SEPARATOR;
 use std::{
     collections::{BTreeMap, HashMap},
     fs::{create_dir_all, read_to_string, write},
@@ -47,10 +48,13 @@ impl RoseyBuilder {
             let src = attributes.remove("src").unwrap();
             let src_path = Path::new(&src.value);
 
-            if let (Some(stem), Some(ext)) = (src_path.file_stem(), src_path.extension()) {
-                let stem = stem.to_str().unwrap();
-                let ext = ext.to_str().unwrap();
-                let translated_path = PathBuf::from(&format!("{stem}.{locale}.{ext}"));
+            if let Some(ext) = src_path.extension() {
+                let mut translated_path = PathBuf::from(src_path);
+                translated_path.set_extension(format!("{locale}.{}", ext.to_str().unwrap()));
+                if let Ok(stripped_path) = translated_path.strip_prefix(MAIN_SEPARATOR.to_string())
+                {
+                    translated_path = stripped_path.to_path_buf();
+                }
                 let translated_path = images_source.join(translated_path);
 
                 if translated_path.exists() {
@@ -59,7 +63,7 @@ impl RoseyBuilder {
                         .unwrap()
                         .to_str()
                         .unwrap()
-                        .to_string();
+                        .replace('\\', "/");
                     attributes.insert("src", format!("/{src}"));
                 } else {
                     attributes.insert("src", src.value);
@@ -235,7 +239,7 @@ impl RoseyBuilder {
         let dest_folder = self.working_directory.join(&self.dest);
         let dest_file = dest_folder.join(relative_path);
         let path = relative_path.display().to_string();
-        let path = path.trim_end_matches("index.html");
+        let path = path.trim_end_matches("index.html").replace('\\', "/");
 
         if let Some(parent) = dest_file.parent() {
             create_dir_all(parent).unwrap();
