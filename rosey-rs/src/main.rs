@@ -18,7 +18,7 @@ fn main() {
                     Arg::with_name("source")
                         .short("s")
                         .long("source")
-                        .default_value("."),
+                        .default_value("source"),
                 )
                 .arg(
                     Arg::with_name("version")
@@ -54,7 +54,7 @@ fn main() {
                         .long("source")
                         .value_name("PATH")
                         .help("Sets the source directory of the website to parse")
-                        .takes_value(true),
+                        .default_value("source"),
                 )
                 .arg(
                     Arg::with_name("dest")
@@ -88,11 +88,7 @@ fn main() {
                         .long("exclusions")
                         .default_value(r#"\.(html?|json)$"#),
                 )
-                .arg(
-                    Arg::with_name("images-source")
-                        .long("images-source")
-                        .default_value("source"),
-                ),
+                .arg(Arg::with_name("images-source").long("images-source")),
         )
         .subcommand(App::new("check"))
         .subcommand(App::new("convert"))
