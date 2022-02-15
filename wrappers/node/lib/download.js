@@ -9,7 +9,7 @@ const child_process = require('child_process');
 const proxy_from_env = require('proxy-from-env');
 
 const packageVersion = require('../package.json').version;
-const tmpDir = path.join(os.tmpdir(), `vscode-ripgrep-cache-${packageVersion}`);
+const tmpDir = path.join(os.tmpdir(), `rosey-cache-${packageVersion}`);
 
 const fsUnlink = util.promisify(fs.unlink);
 const fsExists = util.promisify(fs.exists);
@@ -17,11 +17,7 @@ const fsMkdir = util.promisify(fs.mkdir);
 
 const isWindows = os.platform() === 'win32';
 
-const REPO = 'microsoft/ripgrep-prebuilt';
-
-function isGithubUrl(_url) {
-    return url.parse(_url).hostname === 'api.github.com';
-}
+const REPO = 'CloudCannon/rosey';
 
 function downloadWin(url, dest, opts) {
     return new Promise((resolve, reject) => {
@@ -82,10 +78,6 @@ function download(_url, dest, opts) {
         // This alternative strategy shouldn't be necessary but sometimes on Windows the file does not get closed,
         // so unzipping it fails, and I don't know why.
         return downloadWin(_url, dest, opts);
-    }
-
-    if (opts.headers && opts.headers.authorization && !isGithubUrl(_url)) {
-        delete opts.headers.authorization;
     }
 
     return new Promise((resolve, reject) => {
@@ -156,6 +148,7 @@ function get(_url, opts) {
 }
 
 function getApiUrl(repo, tag) {
+    console.log(`https://api.github.com/repos/${repo}/releases/tags/${tag}`)
     return `https://api.github.com/repos/${repo}/releases/tags/${tag}`;
 }
 
@@ -175,13 +168,9 @@ async function getAssetFromGithubApi(opts, assetName, downloadFolder) {
 
     const downloadOpts = {
         headers: {
-            'user-agent': 'vscode-ripgrep'
+            'user-agent': 'rosey'
         }
     };
-
-    if (opts.token) {
-        downloadOpts.headers.authorization = `token ${opts.token}`;
-    }
 
     console.log(`Finding release for ${opts.version}`);
     const release = await get(getApiUrl(REPO, opts.version), downloadOpts);
@@ -206,29 +195,6 @@ async function getAssetFromGithubApi(opts, assetName, downloadFolder) {
 
     downloadOpts.headers.accept = 'application/octet-stream';
     await download(asset.url, assetDownloadPath, downloadOpts);
-}
-
-function unzipWindows(zipPath, destinationDir) {
-    return new Promise((resolve, reject) => {
-        zipPath = sanitizePathForPowershell(zipPath);
-        destinationDir = sanitizePathForPowershell(destinationDir);
-        const expandCmd = 'powershell -ExecutionPolicy Bypass -Command Expand-Archive ' + ['-Path', zipPath, '-DestinationPath', destinationDir, '-Force'].join(' ');
-        child_process.exec(expandCmd, (err, _stdout, stderr) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            if (stderr) {
-                console.log(stderr);
-                reject(new Error(stderr));
-                return;
-            }
-
-            console.log('Expand-Archive completed');
-            resolve();
-        });
-    });
 }
 
 // Handle whitespace in filepath as powershell split's path with whitespaces
@@ -256,13 +222,9 @@ function untar(zipPath, destinationDir) {
 }
 
 async function unzipRipgrep(zipPath, destinationDir) {
-    if (isWindows) {
-        await unzipWindows(zipPath, destinationDir);
-    } else {
-        await untar(zipPath, destinationDir);
-    }
+    await untar(zipPath, destinationDir);
 
-    const expectedName = path.join(destinationDir, 'rg');
+    const expectedName = path.join(destinationDir, 'rosey');
     if (await fsExists(expectedName)) {
         return expectedName;
     }
@@ -271,7 +233,7 @@ async function unzipRipgrep(zipPath, destinationDir) {
         return expectedName + '.exe';
     }
 
-    throw new Error(`Expecting rg or rg.exe unzipped into ${destinationDir}, didn't find one.`);
+    throw new Error(`Expecting rosey or rosey.exe unzipped into ${destinationDir}, didn't find one.`);
 }
 
 module.exports = async opts => {
@@ -283,8 +245,7 @@ module.exports = async opts => {
         return Promise.reject(new Error('Missing target'));
     }
 
-    const extension = isWindows ? '.zip' : '.tar.gz';
-    const assetName = ['ripgrep', opts.version, opts.target].join('-') + extension;
+    const assetName = ['rosey', opts.version, opts.target].join('-') + '.tar.gz';
 
     if (!await fsExists(tmpDir)) {
         await fsMkdir(tmpDir);

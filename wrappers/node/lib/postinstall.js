@@ -15,7 +15,7 @@ if (forceInstall) {
     console.log('--force, ignoring caches');
 }
 
-const VERSION = 'v13.0.0-4';
+const VERSION = 'v2.0.0-rc1';
 const BIN_PATH = path.join(__dirname, '../bin');
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -71,7 +71,6 @@ async function main() {
 
     const opts = {
         version: VERSION,
-        token: process.env['GITHUB_TOKEN'],
         target: await getTarget(),
         destDir: BIN_PATH,
         force: forceInstall
@@ -79,7 +78,7 @@ async function main() {
     try {
         await download(opts);
     } catch (err) {
-        console.error(`Downloading ripgrep failed: ${err.stack}`);
+        console.error(`Downloading rosey failed: ${err.stack}`);
         process.exit(1);
     }
 }
