@@ -94,7 +94,11 @@ fn main() {
                         .long("separator")
                         .default_value(":"),
                 )
-                .arg(Arg::with_name("images-source").long("images-source")),
+                .arg(
+                    Arg::with_name("images-source")
+                        .long("images-source")
+                        .takes_value(true),
+                ),
         )
         .subcommand(App::new("check"))
         .subcommand(App::new("convert"))
