@@ -32,11 +32,11 @@ Feature: Rosey Build Images
       """
       Pretend that I'm a png
       """
-    And I have a "source/translated_images/image.fr.png" file with the content:
+    And I have a "source/image.fr.png" file with the content:
       """
       Pretend that I'm a french png
       """
-    And I have a "source/index.html" file with the content:
+    And I have a "translated/index.html" file with the content:
       """
       <html>
       <body>
@@ -49,8 +49,9 @@ Feature: Rosey Build Images
       {}
       """
     When I run Rosey build with options:
-      | images-source | source/translated_images |
-    Then I should see a selector 'img' in "dest/en/index.html" with the attributes:
+      | source        | translated |
+      | images-source | source     |
+    Then I should see a selector 'img' in "dist/translated_site/en/index.html" with the attributes:
       | src | /image.png |
-    And I should see a selector 'img' in "dest/fr/index.html" with the attributes:
-      | src | /translated_images/image.fr.png |
+    And I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
+      | src | /image.fr.png |
