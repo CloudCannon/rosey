@@ -46,8 +46,8 @@ impl Default for RoseyOptions {
     fn default() -> Self {
         Self {
             working_directory: env::current_dir().unwrap(),
-            source: Some(PathBuf::from("source")),
-            dest: Some(PathBuf::from("dest")),
+            source: Some(PathBuf::from("dist/site")),
+            dest: Some(PathBuf::from("dist/translated_site")),
             version: Some(2),
             tag: Some("data-rosey".to_string()),
             separator: Some(":".to_string()),
