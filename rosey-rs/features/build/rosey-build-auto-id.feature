@@ -45,7 +45,7 @@ Feature: Rosey Build AutoID
       }
       """
     When I run Rosey build
-    Then DEBUG I should see a selector 'div > ul > li' in "dist/translated_site/en/index.html" with the attributes:
+    Then I should see a selector 'div > ul > li' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | 🦭 |
     And I should see a selector 'div' in "dist/translated_site/simple/index.html" with the attributes:
       | data-rosey |          |
