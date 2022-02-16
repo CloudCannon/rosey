@@ -55,5 +55,8 @@ jobs:
         run: |
           rustup install ${{ matrix.rust }}
 
-      - name: Test
+      - name: Test Internal
         run: ROSEY_IMPL=rs cargo test
+
+      - name: Test CLI
+        run: ROSEY_IMPL=rs-cli cargo test
