@@ -54,7 +54,7 @@ fn main() {
                         .long("source")
                         .value_name("PATH")
                         .help("Sets the source directory of the website to parse")
-                        .default_value("source"),
+                        .default_value("dist/site"),
                 )
                 .arg(
                     Arg::with_name("dest")
@@ -62,8 +62,7 @@ fn main() {
                         .long("dest")
                         .value_name("PATH")
                         .help("Sets the output directory")
-                        .required(true)
-                        .takes_value(true),
+                        .default_value("dist/translated_site"),
                 )
                 .arg(
                     Arg::with_name("tag")
