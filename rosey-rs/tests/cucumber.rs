@@ -179,23 +179,26 @@ impl RoseyJsCommand {
 
 // Some helpers
 fn build_rosey_options(step_table: &Table) -> RoseyOptions {
-    let mut options = RoseyOptions {
-        working_directory: env::current_dir().unwrap(),
-        source: None,
-        dest: None,
-        version: None,
-        tag: None,
-        separator: None,
-        locale_dest: None,
-        locale_source: None,
-        languages: None,
-        credentials: None,
-        exclusions: None,
-        images_source: None,
-        default_language: None,
-        source_delimiter: None,
-        redirect_page: None,
-        verbose: false,
+    let mut options = match std::env::var("ROSEY_IMPL").as_deref() {
+        Ok("rs") => RoseyOptions::default(),
+        _ => RoseyOptions {
+            working_directory: env::current_dir().unwrap(),
+            source: None,
+            dest: None,
+            version: None,
+            tag: None,
+            separator: None,
+            locale_dest: None,
+            locale_source: None,
+            languages: None,
+            credentials: None,
+            exclusions: None,
+            images_source: None,
+            default_language: None,
+            source_delimiter: None,
+            redirect_page: None,
+            verbose: false,
+        }
     };
     for row in &step_table.rows {
         match row[0].as_ref() {
