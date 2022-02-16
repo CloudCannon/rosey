@@ -255,16 +255,16 @@ fn build_rosey_command(command: &str, binary: &str, options: RoseyOptions) -> St
         options
             .locale_source
             .map(|p| p.to_str().unwrap().to_string()),
-        |s| format!("--locale_source {}", s),
+        |s| format!("--locale-source {}", s),
     );
     command.try_add(options.credentials, |s| format!("--credentials \"{}\"", s));
     command.try_add(options.exclusions, |s| format!("--exclusions \"{}\"", s));
     command.try_add(options.images_source.map(|p| p.to_str().unwrap().to_string()), |s| format!("--images_source {}", s));
     command.try_add(options.default_language, |s| {
-        format!("--default_language \"{}\"", s)
+        format!("--default-language \"{}\"", s)
     });
     command.try_add(options.source_delimiter, |s| {
-        format!("--source_delimiter \"{}\"", s)
+        format!("--source-delimiter \"{}\"", s)
     });
     command.try_add(options.redirect_page.map(|p| p.to_str().unwrap().to_string()), |s| format!("--redirect_page {}", s));
 
