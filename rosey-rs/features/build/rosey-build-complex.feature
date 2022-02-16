@@ -110,32 +110,3 @@ Feature: Rosey Build Complex
     And I should see a selector 'p' in "dist/translated_site/rtl/index.html" with the attributes:
       | data-rosey | אֱלֹהִים |
       | innerText  | ١٢٣      |
-
-  Scenario: Rosey build works with complex directories
-    Given I have a "build/source/index.html" file with the content:
-      """
-      <html>
-      <body>
-      <p data-i18n="seal">Kiss From A Rose</p>
-      </body>
-      </html>
-      """
-    And I have a "rosey/locales/test.json" file with the content:
-      """
-      {
-        "seal": "Test"
-      }
-      """
-    When I run Rosey build with options:
-      | source        | build/source    |
-      | dest          | build/dest      |
-      | images-source | src             |
-      | locale-source | ./rosey/locales |
-      | tag           | data-i18n       |
-      | version       | 1               |
-    Then I should see a selector 'p' in "build/dest/en/index.html" with the attributes:
-      | data-i18n | seal             |
-      | innerText | Kiss From A Rose |
-    And I should see a selector 'p' in "build/dest/test/index.html" with the attributes:
-      | data-i18n | seal |
-      | innerText | Test |
