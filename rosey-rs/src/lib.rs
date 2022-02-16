@@ -56,7 +56,7 @@ impl Default for RoseyOptions {
             languages: None,
             credentials: None,
             exclusions: Some(String::from(r#"\.(html?|json)$"#)),
-            images_source: Some(PathBuf::from("source")),
+            images_source: None,
             default_language: Some("en".to_string()),
             source_delimiter: None,
             redirect_page: None,
@@ -78,10 +78,7 @@ impl From<&ArgMatches<'_>> for RoseyOptions {
             default_language: matches.value_of("default-language").map(String::from),
             redirect_page: matches.value_of("redirect-page").map(PathBuf::from),
             exclusions: matches.value_of("exclusions").map(String::from),
-            images_source: matches
-                .value_of("images-source")
-                .or_else(|| matches.value_of("source"))
-                .map(PathBuf::from),
+            images_source: matches.value_of("images-source").map(PathBuf::from),
             ..Default::default()
         }
     }

@@ -1,27 +1,31 @@
 use super::redirect_page;
 use super::RoseyBuilder;
 
+use std::fs::File;
+use std::io::BufWriter;
+use std::io::Write;
 use std::path::MAIN_SEPARATOR;
 use std::{
     collections::{BTreeMap, HashMap},
-    fs::{create_dir_all, read_to_string, write},
+    fs::{create_dir_all, read_to_string},
     path::{Path, PathBuf},
 };
 
 use base64::{encode_config, CharacterSet, Config};
 use kuchiki::{traits::TendrilSink, Attribute, ExpandedName, NodeRef};
 use markup5ever::{local_name, namespace_url, ns, QualName};
+use rayon::prelude::*;
 use sha2::{Digest, Sha256};
 
 use crate::RoseyLocale;
 
 impl RoseyBuilder {
-    pub fn process_html_file(&mut self, file: &Path) {
+    pub fn process_html_file(&self, file: &Path) {
         let source_folder = self.working_directory.join(&self.source);
         let relative_path = file.strip_prefix(&source_folder).unwrap();
         let content = read_to_string(file).unwrap();
 
-        for (key, locale) in (&self.locales).iter() {
+        self.locales.par_iter().for_each(|(key, locale)| {
             let dom = kuchiki::parse_html().one(content.clone());
             self.rewrite_html_file(&dom, locale);
             self.add_meta_tags(&dom, key, relative_path);
@@ -29,7 +33,7 @@ impl RoseyBuilder {
 
             let content = dom.to_string();
             self.output_file(key, relative_path, content);
-        }
+        });
 
         let dom = kuchiki::parse_html().one(content);
         self.add_meta_tags(&dom, &self.default_language, relative_path);
@@ -40,8 +44,9 @@ impl RoseyBuilder {
     }
 
     pub fn rewrite_images(&self, dom: &NodeRef, locale: &str) {
-        let source_folder = self.working_directory.join(&self.source);
-        let images_source = self.working_directory.join(&self.images_source);
+        let images_source = self
+            .working_directory
+            .join(self.images_source.as_ref().unwrap_or(&self.source));
 
         for img in dom.select("img[src]").unwrap() {
             let mut attributes = img.attributes.borrow_mut();
@@ -49,21 +54,17 @@ impl RoseyBuilder {
             let src_path = Path::new(&src.value);
 
             if let Some(ext) = src_path.extension() {
-                let mut translated_path = PathBuf::from(src_path);
-                translated_path.set_extension(format!("{locale}.{}", ext.to_str().unwrap()));
-                if let Ok(stripped_path) = translated_path.strip_prefix(MAIN_SEPARATOR.to_string())
+                let mut translated_image = PathBuf::from(src_path);
+                translated_image.set_extension(format!("{locale}.{}", ext.to_str().unwrap()));
+                if let Ok(stripped_path) = translated_image.strip_prefix(MAIN_SEPARATOR.to_string())
                 {
-                    translated_path = stripped_path.to_path_buf();
+                    translated_image = stripped_path.to_path_buf();
                 }
-                let translated_path = images_source.join(translated_path);
+
+                let translated_path = images_source.join(&translated_image);
 
                 if translated_path.exists() {
-                    let src = translated_path
-                        .strip_prefix(&source_folder)
-                        .unwrap()
-                        .to_str()
-                        .unwrap()
-                        .replace('\\', "/");
+                    let src = translated_image.to_str().unwrap().replace('\\', "/");
                     attributes.insert("src", format!("/{src}"));
                 } else {
                     attributes.insert("src", src.value);
@@ -290,7 +291,14 @@ impl RoseyBuilder {
             output = output.replace("LOCALE_LOOKUP", &lookup)
         }
 
-        write(dest_file, output).unwrap();
+        if let Ok(file) = File::create(&dest_file) {
+            let mut writer = BufWriter::new(file);
+            if writer.write(output.as_bytes()).is_err() {
+                eprintln!("Failed to write: {dest_file:?}")
+            }
+        } else {
+            eprintln!("Failed to open: {dest_file:?}")
+        }
     }
 }
 

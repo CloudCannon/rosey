@@ -4,12 +4,14 @@ mod redirect_page;
 
 use std::{
     collections::HashMap,
-    fs::{copy, create_dir_all, read_to_string, write},
+    fs::{copy, create_dir_all, read_to_string, File},
+    io::{BufWriter, Write},
     path::{Path, PathBuf},
     str::FromStr,
 };
 
 use globwalk::DirEntry;
+use rayon::prelude::*;
 use regex::Regex;
 
 use crate::{RoseyLocale, RoseyOptions};
@@ -25,7 +27,7 @@ pub struct RoseyBuilder {
     pub separator: String,
     pub redirect_page: Option<PathBuf>,
     pub exclusions: String,
-    pub images_source: PathBuf,
+    pub images_source: Option<PathBuf>,
 }
 
 impl From<RoseyOptions> for RoseyBuilder {
@@ -41,7 +43,7 @@ impl From<RoseyOptions> for RoseyBuilder {
             separator: runner.separator.unwrap(),
             redirect_page: runner.redirect_page,
             exclusions: runner.exclusions.unwrap(),
-            images_source: runner.images_source.unwrap(),
+            images_source: runner.images_source,
         }
     }
 }
@@ -67,7 +69,7 @@ impl RoseyBuilder {
             file.file_type().is_file() && !re.is_match(&file.path().display().to_string())
         });
 
-        walker.for_each(|file| {
+        walker.collect::<Vec<_>>().par_iter().for_each(|file| {
             let source_folder = self.working_directory.join(&self.source);
             let dest_folder = self.working_directory.join(&self.dest);
             let relative_path = file.path().strip_prefix(&source_folder).unwrap();
@@ -93,7 +95,10 @@ impl RoseyBuilder {
         .into_iter()
         .filter_map(Result::ok);
 
-        walker.for_each(|file| self.process_file(file));
+        walker
+            .collect::<Vec<_>>()
+            .par_iter()
+            .for_each(|file| self.process_file(file));
     }
 
     pub fn read_locales(&mut self) {
@@ -121,7 +126,7 @@ impl RoseyBuilder {
         });
     }
 
-    pub fn process_file(&mut self, file: DirEntry) {
+    pub fn process_file(&self, file: &DirEntry) {
         match file.path().extension().map(|ext| ext.to_str().unwrap()) {
             Some("htm" | "html") => self.process_html_file(file.path()),
             Some("json") => self.process_json_file(file.path()),
@@ -135,6 +140,14 @@ impl RoseyBuilder {
         if let Some(parent) = dest_path.parent() {
             create_dir_all(parent).unwrap();
         }
-        write(dest_path, content).unwrap();
+
+        if let Ok(file) = File::create(&dest_path) {
+            let mut writer = BufWriter::new(file);
+            if writer.write(content.as_bytes()).is_err() {
+                eprintln!("Failed to write: {dest_path:?}")
+            }
+        } else {
+            eprintln!("Failed to open: {dest_path:?}")
+        }
     }
 }

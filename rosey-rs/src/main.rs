@@ -18,7 +18,7 @@ fn main() {
                     Arg::with_name("source")
                         .short("s")
                         .long("source")
-                        .default_value("source"),
+                        .default_value("dist/site"),
                 )
                 .arg(
                     Arg::with_name("version")
@@ -96,6 +96,11 @@ fn main() {
                 .arg(
                     Arg::with_name("images-source")
                         .long("images-source")
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("redirect-page")
+                        .long("redirect-page")
                         .takes_value(true),
                 ),
         )

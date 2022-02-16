@@ -2,7 +2,8 @@ mod html;
 mod json;
 
 use std::{
-    fs::{create_dir_all, write},
+    fs::{create_dir_all, File},
+    io::{BufWriter, Write},
     path::PathBuf,
 };
 
@@ -57,7 +58,15 @@ impl RoseyGenerator {
         let locale_folder = locale_dest.parent().unwrap();
         create_dir_all(locale_folder).unwrap();
         let output = self.locale.output(self.version);
-        write(locale_dest, output).unwrap();
+
+        if let Ok(file) = File::create(&locale_dest) {
+            let mut writer = BufWriter::new(file);
+            if writer.write(output.as_bytes()).is_err() {
+                eprintln!("Failed to write: {locale_dest:?}")
+            }
+        } else {
+            eprintln!("Failed to open: {locale_dest:?}")
+        }
     }
 
     fn process_file(&mut self, file: DirEntry) {

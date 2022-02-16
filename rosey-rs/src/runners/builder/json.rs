@@ -8,10 +8,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use rayon::prelude::*;
 use serde_json::Value;
 
 impl RoseyBuilder {
-    pub fn process_json_file(&mut self, file: &Path) {
+    pub fn process_json_file(&self, file: &Path) {
         let mut schema_path = PathBuf::from(file);
         schema_path.set_extension("rosey.json");
         if !schema_path.exists() {
@@ -32,7 +33,7 @@ impl RoseyBuilder {
             return;
         }
 
-        let mut source = source.unwrap();
+        let source = source.unwrap();
         let schema = schema.unwrap();
 
         let source_folder = self.working_directory.join(&self.source);
@@ -40,12 +41,13 @@ impl RoseyBuilder {
 
         self.output_file(&self.default_language, relative_path, content);
 
-        for (key, locale) in (&self.locales).iter() {
+        self.locales.par_iter().for_each(|(key, locale)| {
+            let mut source = source.clone();
             self.process_json_node(&mut source, &schema, None, locale);
 
             let content = serde_json::to_string(&source).unwrap();
             self.output_file(key, relative_path, content);
-        }
+        });
     }
 
     fn process_json_node(
