@@ -31,7 +31,7 @@ Feature: Rosey Build Options
       | innerText  | 👄🌹 |
 
   Scenario: Rosey builds with custom separators
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <head data-rosey-root='home:meta'>
@@ -59,21 +59,21 @@ Feature: Rosey Build Options
       """
     When I run Rosey build with options:
       | separator | ~ |
-    Then I should see a selector 'title' in "dest/cc/index.html" with the attributes:
+    Then I should see a selector 'title' in "dist/translated_site/cc/index.html" with the attributes:
       | data-rosey | title |
       | innerText  | 🥩    |
-    And I should see a selector 'h1' in "dest/cc/index.html" with the attributes:
+    And I should see a selector 'h1' in "dist/translated_site/cc/index.html" with the attributes:
       | data-rosey | title |
       | innerText  | 🏚️   |
-    And I should see a selector 'p' in "dest/cc/index.html" with the attributes:
+    And I should see a selector 'p' in "dist/translated_site/cc/index.html" with the attributes:
       | data-rosey | contact-us |
       | innerText  | 🇺🇸       |
-    And I should see a selector 'p' in "dest/cc/index.html" with the attributes:
+    And I should see a selector 'p' in "dist/translated_site/cc/index.html" with the attributes:
       | data-rosey | footer |
       | innerText  | 🦶     |
 
   Scenario: Rosey builds from custom tags
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <head something-else-root='home:meta'>
@@ -101,21 +101,21 @@ Feature: Rosey Build Options
       """
     When I run Rosey build with options:
       | tag | something-else |
-    Then I should see a selector 'title' in "dest/s-e/index.html" with the attributes:
+    Then I should see a selector 'title' in "dist/translated_site/s-e/index.html" with the attributes:
       | something-else | title |
       | innerText      | 🥩    |
-    And I should see a selector 'h1' in "dest/s-e/index.html" with the attributes:
+    And I should see a selector 'h1' in "dist/translated_site/s-e/index.html" with the attributes:
       | something-else | title |
       | innerText      | 🏚️   |
-    And I should see a selector 'p' in "dest/s-e/index.html" with the attributes:
+    And I should see a selector 'p' in "dist/translated_site/s-e/index.html" with the attributes:
       | something-else | contact-us |
       | innerText      | 🇺🇸       |
-    And I should see a selector 'p' in "dest/s-e/index.html" with the attributes:
+    And I should see a selector 'p' in "dist/translated_site/s-e/index.html" with the attributes:
       | something-else | footer |
       | innerText      | 🦶     |
 
   Scenario: Rosey builds from a custom locale source
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -131,20 +131,20 @@ Feature: Rosey Build Options
       """
     When I run Rosey build with options:
       | locale-source | cloud |
-    Then I should see a selector 'title' in "dest/index.html" with the attributes:
+    Then I should see a selector 'title' in "dist/translated_site/index.html" with the attributes:
       | innerText | Redirecting... |
-    And I should see a selector 'a' in "dest/index.html" with the attributes:
+    And I should see a selector 'a' in "dist/translated_site/index.html" with the attributes:
       | href      | /en/                                  |
       | innerText | Click here if you are not redirected. |
-    And I should see a selector 'p' in "dest/en/index.html" with the attributes:
+    And I should see a selector 'p' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey | seal             |
       | innerText  | Kiss From A Rose |
-    And I should see a selector 'p' in "dest/cannon/index.html" with the attributes:
+    And I should see a selector 'p' in "dist/translated_site/cannon/index.html" with the attributes:
       | data-rosey | seal |
       | innerText  | 👄🌹 |
 
   Scenario: Rosey builds with an alternate default language
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -160,14 +160,14 @@ Feature: Rosey Build Options
       """
     When I run Rosey build with options:
       | default-language | poultry |
-    Then I should see a selector 'title' in "dest/index.html" with the attributes:
+    Then I should see a selector 'title' in "dist/translated_site/index.html" with the attributes:
       | innerText | Redirecting... |
-    And I should see a selector 'a' in "dest/index.html" with the attributes:
+    And I should see a selector 'a' in "dist/translated_site/index.html" with the attributes:
       | href      | /poultry/                             |
       | innerText | Click here if you are not redirected. |
-    And I should see a selector 'p' in "dest/poultry/index.html" with the attributes:
+    And I should see a selector 'p' in "dist/translated_site/poultry/index.html" with the attributes:
       | data-rosey | goose  |
       | innerText  | gander |
-    And I should see a selector 'p' in "dest/em/index.html" with the attributes:
+    And I should see a selector 'p' in "dist/translated_site/em/index.html" with the attributes:
       | data-rosey | goose |
       | innerText  | 👹    |

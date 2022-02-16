@@ -1,15 +1,15 @@
 Feature: Rosey Build Images
 
   Scenario: Rosey build uses translated images
-    Given I have a "source/image.png" file with the content:
+    Given I have a "dist/site/image.png" file with the content:
       """
       Pretend that I'm a png
       """
-    And I have a "source/image.fr.png" file with the content:
+    And I have a "dist/site/image.fr.png" file with the content:
       """
       Pretend that I'm a french png
       """
-    And I have a "source/index.html" file with the content:
+    And I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -22,17 +22,17 @@ Feature: Rosey Build Images
       {}
       """
     When I run Rosey build
-    Then I should see a selector 'img' in "dest/en/index.html" with the attributes:
+    Then I should see a selector 'img' in "dist/translated_site/en/index.html" with the attributes:
       | src | /image.png |
-    And I should see a selector 'img' in "dest/fr/index.html" with the attributes:
+    And I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
       | src | /image.fr.png |
 
   Scenario: Rosey build uses translated images from another location
-    Given I have a "source/image.png" file with the content:
+    Given I have a "dist/site/image.png" file with the content:
       """
       Pretend that I'm a png
       """
-    And I have a "source/image.fr.png" file with the content:
+    And I have a "dist/site/image.fr.png" file with the content:
       """
       Pretend that I'm a french png
       """

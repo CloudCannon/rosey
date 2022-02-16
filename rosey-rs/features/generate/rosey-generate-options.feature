@@ -1,7 +1,7 @@
 Feature: Rosey Generate Options
 
   Scenario: Rosey generates custom separators
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <head data-rosey-root='home:meta'>
@@ -28,7 +28,7 @@ Feature: Rosey Generate Options
       | keys.footer.original                  | Footer content    |
 
   Scenario: Rosey generates from custom tags
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <head something-else-root='home:meta'>
@@ -55,7 +55,7 @@ Feature: Rosey Generate Options
       | keys.footer.original                  | Footer content    |
 
   Scenario: Rosey generates to a custom dest
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>

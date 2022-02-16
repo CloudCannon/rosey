@@ -1,7 +1,7 @@
 Feature: Rosey Build JSON
 
   Scenario: Rosey builds JSON
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -10,7 +10,7 @@ Feature: Rosey Build JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {
@@ -35,7 +35,7 @@ Feature: Rosey Build JSON
       | mushroom.title | Hm pg ttl |
 
   Scenario: Rosey builds JSON with namespaces
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -47,7 +47,7 @@ Feature: Rosey Build JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {
@@ -78,7 +78,7 @@ Feature: Rosey Build JSON
       | mushroom.nested.subtitle | Hll       |
 
   Scenario: Rosey builds JSON with multiple namespaces
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -89,7 +89,7 @@ Feature: Rosey Build JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {
@@ -122,7 +122,7 @@ Feature: Rosey Build JSON
       | mushroom.hotdog | Sndwch    |
 
   Scenario: Rosey builds JSON with array namespaces
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "myCollection": [
@@ -145,7 +145,7 @@ Feature: Rosey Build JSON
         ]
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "myCollection": [
@@ -192,7 +192,7 @@ Feature: Rosey Build JSON
       | myCollection.1.tags.2 | tp  |
 
   Scenario: Rosey builds JSON retaining untagged fields
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -201,7 +201,7 @@ Feature: Rosey Build JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {

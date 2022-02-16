@@ -2,7 +2,7 @@ Feature: Rosey Base
 
   Scenario: Rosey build is working
     Given I have a "rosey/locales/stub" file
-    And I have a "source/index.html" file with the content:
+    And I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -11,11 +11,11 @@ Feature: Rosey Base
       </html>
       """
     When I run Rosey build
-    Then I should see the file "dest/index.html"
-    Then I should see the file "dest/en/index.html"
+    Then I should see the file "dist/translated_site/index.html"
+    Then I should see the file "dist/translated_site/en/index.html"
 
   Scenario: Rosey generate is working
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>

@@ -1,22 +1,22 @@
 Feature: Rosey Generate Complex
 
   Scenario: Rosey generates source.json [ns, root, attr, explicit-attr]
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <head data-rosey-root='home:meta'>
-        <title data-rosey='title'>Home header title</title>
+      <title data-rosey='title'>Home header title</title>
       </head>
       <body data-rosey-ns='home:content'>
-        <h1 data-rosey="title">Home page title</h1>
-        <h2 data-rosey="subtitle" data-rosey-attrs="content,alt" content="Content attribute" alt="alt attribute">Home page subtitle</h2>
-        <div data-rosey-root="home:contact">
-          <p data-rosey="contact-us">Contact content</p>
-          <h3 data-rosey-attrs-explicit='{"content":"content-tag","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Contact title</h3>
-        </div>
-        <div data-rosey-root="">
-          <p data-rosey="footer">Footer content</p>
-        </div>
+      <h1 data-rosey="title">Home page title</h1>
+      <h2 data-rosey="subtitle" data-rosey-attrs="content,alt" content="Content attribute" alt="alt attribute">Home page subtitle</h2>
+      <div data-rosey-root="home:contact">
+      <p data-rosey="contact-us">Contact content</p>
+      <h3 data-rosey-attrs-explicit='{"content":"content-tag","alt":"alt-tag"}' content="Content attribute" alt="alt attribute">Contact title</h3>
+      </div>
+      <div data-rosey-root="">
+      <p data-rosey="footer">Footer content</p>
+      </div>
       </body>
       </html>
       """
@@ -34,7 +34,7 @@ Feature: Rosey Generate Complex
       | keys.footer.original                         | Footer content     |
 
   Scenario: Rosey namespace doesn't apply to self element
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -50,7 +50,7 @@ Feature: Rosey Generate Complex
       | keys.two.original | three |
 
   Scenario: Rosey root doesn't apply to self element
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>

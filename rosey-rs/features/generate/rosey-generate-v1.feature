@@ -1,7 +1,7 @@
 Feature: Rosey Generate v1
 
   Scenario: Rosey generates source.json files
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -15,7 +15,7 @@ Feature: Rosey Generate v1
       | seal | Kiss From A Rose |
 
   Scenario: Rosey generates source.json files with attrs
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -31,7 +31,7 @@ Feature: Rosey Generate v1
       | title\.alt     | alt attribute     |
 
   Scenario: Rosey generates source.json files with explicit attrs
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -46,7 +46,7 @@ Feature: Rosey Generate v1
       | alt-tag     | alt attribute     |
 
   Scenario: Rosey generates source.json files with namespaces
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -88,7 +88,7 @@ Feature: Rosey Generate v1
       | about:benefits:row-1:col-0:title | Slot D |
 
   Scenario: Rosey generates source.json files with roots
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <head data-rosey-root='home:meta'>

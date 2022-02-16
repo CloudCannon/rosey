@@ -1,7 +1,7 @@
 Feature: Rosey Generate Metadata
 
   Scenario: Rosey includes translation counts
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -10,7 +10,7 @@ Feature: Rosey Generate Metadata
       </body>
       </html>
       """
-    And I have a "source/about/index.html" file with the content:
+    And I have a "dist/site/about/index.html" file with the content:
       """
       <html>
       <body>

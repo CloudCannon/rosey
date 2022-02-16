@@ -1,7 +1,7 @@
 Feature: Rosey Generate JSON
 
   Scenario: Rosey generates source.json files from JSON
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -10,7 +10,7 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {
@@ -26,7 +26,7 @@ Feature: Rosey Generate JSON
       | keys.mushroom\.title.original | Home page title |
 
   Scenario: Rosey includes JSON translation counts
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -35,7 +35,7 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {
@@ -51,7 +51,7 @@ Feature: Rosey Generate JSON
       | keys.mushroom\.title.pages.titles\.json | int:1 |
 
   Scenario: Rosey generates v1 source.json files from JSON
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -60,7 +60,7 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {
@@ -76,7 +76,7 @@ Feature: Rosey Generate JSON
       | mushroom\.title | Home page title |
 
   Scenario: Rosey generates source.json files from JSON with namespaces
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -88,7 +88,7 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {
@@ -108,7 +108,7 @@ Feature: Rosey Generate JSON
       | keys.home\.sub.original   | Hello :)        |
 
   Scenario: Rosey generates JSON with multiple namespaces
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "mushroom": {
@@ -119,7 +119,7 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "mushroom": {
@@ -139,7 +139,7 @@ Feature: Rosey Generate JSON
       | keys.home\.homepagetitle\.food.original  | Sandwich      |
 
   Scenario: Rosey generates source.json files from JSON with array namespaces
-    Given I have a "source/titles.json" file with the content:
+    Given I have a "dist/site/titles.json" file with the content:
       """
       {
         "myCollection": [
@@ -162,7 +162,7 @@ Feature: Rosey Generate JSON
         ]
       }
       """
-    And I have a "source/titles.rosey.json" file with the content:
+    And I have a "dist/site/titles.rosey.json" file with the content:
       """
       {
         "myCollection": [

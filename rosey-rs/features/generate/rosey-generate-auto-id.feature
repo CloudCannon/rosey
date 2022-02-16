@@ -1,7 +1,7 @@
 Feature: Rosey Generate AutoID
 
   Scenario: Rosey generate creates a hash id if none supplied
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -15,16 +15,16 @@ Feature: Rosey Generate AutoID
       | keys.GtSzGc6Rr44nj796fYIRTDxQNRua2jzNIeF2qU3kpFI.original | rose! |
 
   Scenario: Rosey generate creates a hash id from complex input
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
       <div data-rosey>
-        <ul>
-          <li>rose!</li>
-          <li>🦭</li>
-          <li>𓀞𓂗𓃛𓄫𓋟</li>
-        </ul>
+      <ul>
+      <li>rose!</li>
+      <li>🦭</li>
+      <li>𓀞𓂗𓃛𓄫𓋟</li>
+      </ul>
       </div>
       </body>
       </html>
@@ -35,17 +35,17 @@ Feature: Rosey Generate AutoID
       | keys.2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0.original | \n  <ul>\n    <li>rose!</li>\n    <li>🦭</li>\n    <li>𓀞𓂗𓃛𓄫𓋟</li>\n  </ul>\n |
 
   Scenario: Rosey generate creates a hash id with correct roots
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
       <div data-rosey-root="root">
       <div data-rosey>
-        <ul>
-          <li>rose!</li>
-          <li>🦭</li>
-          <li>𓀞𓂗𓃛𓄫𓋟</li>
-        </ul>
+      <ul>
+      <li>rose!</li>
+      <li>🦭</li>
+      <li>𓀞𓂗𓃛𓄫𓋟</li>
+      </ul>
       </div>
       </div>
       </body>
@@ -57,17 +57,17 @@ Feature: Rosey Generate AutoID
       | keys.root:2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0.original | \n  <ul>\n    <li>rose!</li>\n    <li>🦭</li>\n    <li>𓀞𓂗𓃛𓄫𓋟</li>\n  </ul>\n |
 
   Scenario: Rosey generate creates a hash id with correct namespaces
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
       <div data-rosey-ns="namespace">
       <div data-rosey>
-        <ul>
-          <li>rose!</li>
-          <li>🦭</li>
-          <li>𓀞𓂗𓃛𓄫𓋟</li>
-        </ul>
+      <ul>
+      <li>rose!</li>
+      <li>🦭</li>
+      <li>𓀞𓂗𓃛𓄫𓋟</li>
+      </ul>
       </div>
       </div>
       </body>

@@ -1,7 +1,7 @@
 Feature: Rosey Generate v2
 
   Scenario: Rosey generates source.json files
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -15,7 +15,7 @@ Feature: Rosey Generate v2
       | keys.seal.original | Kiss From A Rose |
 
   Scenario: Rosey generates source.json files with attrs
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -31,7 +31,7 @@ Feature: Rosey Generate v2
       | keys.title\.alt.original     | alt attribute     |
 
   Scenario: Rosey generates source.json files with explicit attrs
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
@@ -46,35 +46,35 @@ Feature: Rosey Generate v2
       | keys.alt-tag.original     | alt attribute     |
 
   Scenario: Rosey generates source.json files with namespaces
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <body>
       <div data-rosey-ns="about">
-        <div data-rosey-ns="faq">
-            <div data-rosey-ns="row-0">
-              <div data-rosey-ns="col-0">
-                <div data-rosey="title">Slot A</div>
-              </div>
-            </div>
-            <div data-rosey-ns="row-1">
-              <div data-rosey-ns="col-0">
-                <div data-rosey="title">Slot B</div>
-              </div>
-            </div>
-        </div>
-        <div data-rosey-ns="benefits">
-            <div data-rosey-ns="row-0">
-              <div data-rosey-ns="col-0">
-                <div data-rosey="title">Slot C</div>
-              </div>
-            </div>
-            <div data-rosey-ns="row-1">
-              <div data-rosey-ns="col-0">
-                <div data-rosey="title">Slot D</div>
-              </div>
-            </div>
-        </div>
+      <div data-rosey-ns="faq">
+      <div data-rosey-ns="row-0">
+      <div data-rosey-ns="col-0">
+      <div data-rosey="title">Slot A</div>
+      </div>
+      </div>
+      <div data-rosey-ns="row-1">
+      <div data-rosey-ns="col-0">
+      <div data-rosey="title">Slot B</div>
+      </div>
+      </div>
+      </div>
+      <div data-rosey-ns="benefits">
+      <div data-rosey-ns="row-0">
+      <div data-rosey-ns="col-0">
+      <div data-rosey="title">Slot C</div>
+      </div>
+      </div>
+      <div data-rosey-ns="row-1">
+      <div data-rosey-ns="col-0">
+      <div data-rosey="title">Slot D</div>
+      </div>
+      </div>
+      </div>
       </div>
       </body>
       </html>
@@ -88,20 +88,20 @@ Feature: Rosey Generate v2
       | keys.about:benefits:row-1:col-0:title.original | Slot D |
 
   Scenario: Rosey generates source.json files with roots
-    Given I have a "source/index.html" file with the content:
+    Given I have a "dist/site/index.html" file with the content:
       """
       <html>
       <head data-rosey-root='home:meta'>
-        <title data-rosey='title'>Home header title</title>
+      <title data-rosey='title'>Home header title</title>
       </head>
       <body data-rosey-ns='home:content'>
-        <h1 data-rosey="title">Home page title</h1>
-        <div data-rosey-root="home:contact">
-          <p data-rosey="contact-us">Contact content</p>
-        </div>
-        <div data-rosey-root="">
-          <p data-rosey="footer">Footer content</p>
-        </div>
+      <h1 data-rosey="title">Home page title</h1>
+      <div data-rosey-root="home:contact">
+      <p data-rosey="contact-us">Contact content</p>
+      </div>
+      <div data-rosey-root="">
+      <p data-rosey="footer">Footer content</p>
+      </div>
       </body>
       </html>
       """
