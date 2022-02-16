@@ -27,10 +27,10 @@ Feature: Rosey Build JSON
       }
       """
     When I run Rosey build
-    Then I should see "dest/en/titles.json" containing the values:
+    Then I should see "dist/translated_site/en/titles.json" containing the values:
       | mushroom.name  | Home Page       |
       | mushroom.title | Home page title |
-    Then I should see "dest/consonants/titles.json" containing the values:
+    Then I should see "dist/translated_site/consonants/titles.json" containing the values:
       | mushroom.name  | Hm Pg     |
       | mushroom.title | Hm pg ttl |
 
@@ -68,11 +68,11 @@ Feature: Rosey Build JSON
       }
       """
     When I run Rosey build
-    Then I should see "dest/en/titles.json" containing the values:
+    Then I should see "dist/translated_site/en/titles.json" containing the values:
       | mushroom.name            | Home            |
       | mushroom.title           | Home page title |
       | mushroom.nested.subtitle | Hello :)        |
-    Then I should see "dest/consonants/titles.json" containing the values:
+    Then I should see "dist/translated_site/consonants/titles.json" containing the values:
       | mushroom.name            | Hm        |
       | mushroom.title           | Hm pg ttl |
       | mushroom.nested.subtitle | Hll       |
@@ -110,12 +110,12 @@ Feature: Rosey Build JSON
       }
       """
     When I run Rosey build
-    Then I should see "dest/en/titles.json" containing the values:
+    Then I should see "dist/translated_site/en/titles.json" containing the values:
       | mushroom.name   | Home          |
       | mushroom.meow   | Woof          |
       | mushroom.title  | Homepagetitle |
       | mushroom.hotdog | Sandwich      |
-    Then I should see "dest/consonants/titles.json" containing the values:
+    Then I should see "dist/translated_site/consonants/titles.json" containing the values:
       | mushroom.name   | Hm        |
       | mushroom.meow   | Wf        |
       | mushroom.title  | Hm pg ttl |
@@ -172,7 +172,7 @@ Feature: Rosey Build JSON
       }
       """
     When I run Rosey build
-    Then I should see "dest/en/titles.json" containing the values:
+    Then I should see "dist/translated_site/en/titles.json" containing the values:
       | myCollection.0.name   | John   |
       | myCollection.0.tags.0 | cool   |
       | myCollection.0.tags.1 | blue   |
@@ -181,7 +181,7 @@ Feature: Rosey Build JSON
       | myCollection.1.tags.0 | green  |
       | myCollection.1.tags.1 | square |
       | myCollection.1.tags.2 | top    |
-    Then I should see "dest/consonants/titles.json" containing the values:
+    Then I should see "dist/translated_site/consonants/titles.json" containing the values:
       | myCollection.0.name   | Jhn |
       | myCollection.0.tags.0 | cl  |
       | myCollection.0.tags.1 | bl  |
@@ -216,9 +216,9 @@ Feature: Rosey Build JSON
       }
       """
     When I run Rosey build
-    Then I should see "dest/en/titles.json" containing the values:
+    Then I should see "dist/translated_site/en/titles.json" containing the values:
       | mushroom.name  | Home Page       |
       | mushroom.title | Home page title |
-    Then I should see "dest/consonants/titles.json" containing the values:
+    Then I should see "dist/translated_site/consonants/titles.json" containing the values:
       | mushroom.name  | Hm Pg           |
       | mushroom.title | Home page title |

@@ -31,8 +31,8 @@ Feature: Rosey Generate AutoID
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version                                                   | int:2                                                                             |
-      | keys.2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0.original | \n  <ul>\n    <li>rose!</li>\n    <li>🦭</li>\n    <li>𓀞𓂗𓃛𓄫𓋟</li>\n  </ul>\n |
+      | version                                                   | int:2                                                             |
+      | keys.9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg.original | \n<ul>\n<li>rose!</li>\n<li>🦭</li>\n<li>𓀞𓂗𓃛𓄫𓋟</li>\n</ul>\n |
 
   Scenario: Rosey generate creates a hash id with correct roots
     Given I have a "dist/site/index.html" file with the content:
@@ -53,8 +53,8 @@ Feature: Rosey Generate AutoID
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version                                                        | int:2                                                                             |
-      | keys.root:2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0.original | \n  <ul>\n    <li>rose!</li>\n    <li>🦭</li>\n    <li>𓀞𓂗𓃛𓄫𓋟</li>\n  </ul>\n |
+      | version                                                        | int:2                                                             |
+      | keys.root:9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg.original | \n<ul>\n<li>rose!</li>\n<li>🦭</li>\n<li>𓀞𓂗𓃛𓄫𓋟</li>\n</ul>\n |
 
   Scenario: Rosey generate creates a hash id with correct namespaces
     Given I have a "dist/site/index.html" file with the content:
@@ -75,5 +75,5 @@ Feature: Rosey Generate AutoID
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version                                                             | int:2                                                                             |
-      | keys.namespace:2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0.original | \n  <ul>\n    <li>rose!</li>\n    <li>🦭</li>\n    <li>𓀞𓂗𓃛𓄫𓋟</li>\n  </ul>\n |
+      | version                                                             | int:2                                                             |
+      | keys.namespace:9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg.original | \n<ul>\n<li>rose!</li>\n<li>🦭</li>\n<li>𓀞𓂗𓃛𓄫𓋟</li>\n</ul>\n |

@@ -41,11 +41,11 @@ Feature: Rosey Build AutoID
     And I have a "rosey/locales/simple.json" file with the content:
       """
       {
-        "2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0": "emptyish"
+        "9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg": "emptyish"
       }
       """
     When I run Rosey build
-    Then I should see a selector 'div > ul > li' in "dist/translated_site/en/index.html" with the attributes:
+    Then DEBUG I should see a selector 'div > ul > li' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | 🦭 |
     And I should see a selector 'div' in "dist/translated_site/simple/index.html" with the attributes:
       | data-rosey |          |
@@ -71,7 +71,7 @@ Feature: Rosey Build AutoID
     And I have a "rosey/locales/simple.json" file with the content:
       """
       {
-        "root:2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0": "emptyish"
+        "root:9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg": "emptyish"
       }
       """
     When I run Rosey build
@@ -101,7 +101,7 @@ Feature: Rosey Build AutoID
     And I have a "rosey/locales/simple.json" file with the content:
       """
       {
-        "namespace:2ncxJRhmNutvN2YmbMHGSWyJVRCG5smK4+7e2JV/Nl0": "emptyish"
+        "namespace:9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg": "emptyish"
       }
       """
     When I run Rosey build

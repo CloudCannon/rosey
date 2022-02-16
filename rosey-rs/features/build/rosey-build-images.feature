@@ -50,7 +50,7 @@ Feature: Rosey Build Images
       """
     When I run Rosey build with options:
       | source        | translated |
-      | images-source | source     |
+      | images-source | dist/site  |
     Then I should see a selector 'img' in "dist/translated_site/en/index.html" with the attributes:
       | src | /image.png |
     And I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:

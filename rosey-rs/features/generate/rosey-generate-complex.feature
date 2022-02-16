@@ -13,8 +13,8 @@ Feature: Rosey Generate Complex
       """
     When I run Rosey generate
     Then I should see "rosey/source.json" containing the values:
-      | version            | int:2                  |
-      | keys.seal.original | \n  Kiss From A Rose\n |
+      | version            | int:2                |
+      | keys.seal.original | \nKiss From A Rose\n |
 
   Scenario: Rosey generate includes HTML
     Given I have a "dist/site/index.html" file with the content:
