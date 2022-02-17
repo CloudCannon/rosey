@@ -193,11 +193,10 @@ impl RoseyPage {
         }
     }
 
-    pub fn rewrite_image_tags(&mut self, images_source: &PathBuf, locale: &str) {
+    pub fn rewrite_image_tags(&mut self, images_source: &Path, locale: &str) {
         for (original, img) in self.image_tags.iter() {
             let mut attributes = img.as_element().unwrap().attributes.borrow_mut();
-            let src = attributes.remove("src").unwrap();
-            let src_path = Path::new(&src.value);
+            let src_path = Path::new(original);
 
             if let Some(ext) = src_path.extension() {
                 let mut translated_image = PathBuf::from(src_path);
@@ -212,10 +211,10 @@ impl RoseyPage {
                 if translated_path.exists() {
                     let src = translated_image.to_str().unwrap().replace('\\', "/");
                     attributes.insert("src", format!("/{src}"));
-                } else {
-                    attributes.insert("src", original.clone());
+                    return;
                 }
             }
+            attributes.insert("src", original.clone());
         }
     }
 
