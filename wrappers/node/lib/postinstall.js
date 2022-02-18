@@ -15,7 +15,7 @@ if (forceInstall) {
     console.log('--force, ignoring caches');
 }
 
-const VERSION = 'v2.0.0-rc1';
+const VERSION = `v${require('../package.json').version}`;
 const BIN_PATH = path.join(__dirname, '../bin');
 
 process.on('unhandledRejection', (reason, promise) => {

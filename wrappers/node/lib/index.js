@@ -1,3 +1,11 @@
+#!/usr/bin/env node
 const path = require('path');
+const { execFileSync } = require('child_process');
 
-module.exports.rgPath = path.join(__dirname, `../bin/rg${process.platform === 'win32' ? '.exe' : ''}`);
+execFileSync(
+    path.join(__dirname, `../bin/rosey${process.platform === 'win32' ? '.exe' : ''}`),
+    process.argv.slice(2),
+    {
+        stdio: [process.stdin, process.stdout, process.stderr]
+    }
+)
