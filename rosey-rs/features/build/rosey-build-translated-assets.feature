@@ -1,4 +1,4 @@
-Feature: Rosey Build Images
+Feature: Rosey Build Translated Assets
 
   Scenario: Rosey build uses translated images
     Given I have a "dist/site/image.png" file with the content:
@@ -136,9 +136,11 @@ Feature: Rosey Build Images
       """
     When I run Rosey build
     Then I should see a selector 'source' in "dist/translated_site/en/index.html" with the attributes:
-      | src | /video.mp4 |
+      | src  | /video.mp4 |
+      | type | video/mp4  |
     And I should see a selector 'source' in "dist/translated_site/fr/index.html" with the attributes:
-      | src | /video.fr.mp4 |
+      | src  | /video.fr.mp4 |
+      | type | video/mp4     |
 
   Scenario: Rosey build uses translated audio
     Given I have a "dist/site/pod.wav" file with the content:

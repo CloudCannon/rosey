@@ -54,6 +54,7 @@ impl RoseyBuilder {
             page.rewrite_html(locale);
             page.rewrite_meta_tags(key, relative_path, &self.locales, &self.default_language);
             page.rewrite_image_tags(&images_source, key);
+            page.rewrite_assets(&images_source, key);
 
             let output_path = dest_folder.join(key).join(&relative_path);
             page.output_file(&output_path);
@@ -136,7 +137,8 @@ struct RoseyPage {
     edits: Vec<RoseyEdit>,
     meta_tag: Option<NodeRef>,
     link_tags: Vec<NodeRef>,
-    image_tags: Vec<(String, NodeRef)>,
+    image_tags: Vec<(Option<String>, Option<String>, NodeRef)>,
+    assets: Vec<(String, String, NodeRef)>,
     pub tag: String,
     pub separator: String,
 }
@@ -150,6 +152,7 @@ impl RoseyPage {
             edits: Vec::new(),
             link_tags: Vec::new(),
             image_tags: Vec::new(),
+            assets: Vec::new(),
             separator: separator.to_string(),
             tag: tag.to_string(),
             meta_tag: None,
@@ -159,7 +162,8 @@ impl RoseyPage {
     pub fn prepare(&mut self) {
         let dom = self.dom.clone();
         self.process_node(&dom, None, None);
-        self.process_image_tags()
+        self.process_image_tags();
+        self.process_assets();
     }
 
     pub fn rewrite_html(&mut self, locale: &RoseyLocale) {
@@ -193,29 +197,78 @@ impl RoseyPage {
         }
     }
 
+    pub fn rewrite_assets(&mut self, assets_source: &Path, locale: &str) {
+        for (attr, original, node) in self.assets.iter() {
+            let mut attributes = node.as_element().unwrap().attributes.borrow_mut();
+            if let Some(translated_asset) =
+                self.get_translated_asset(original, assets_source, locale)
+            {
+                attributes.insert(attr.as_str(), format!("/{translated_asset}"));
+            } else {
+                attributes.insert(attr.as_str(), original.clone());
+            }
+        }
+    }
+
     pub fn rewrite_image_tags(&mut self, images_source: &Path, locale: &str) {
-        for (original, img) in self.image_tags.iter() {
+        for (original_src, original_srcset, img) in self.image_tags.iter() {
             let mut attributes = img.as_element().unwrap().attributes.borrow_mut();
-            let src_path = Path::new(original);
-
-            if let Some(ext) = src_path.extension() {
-                let mut translated_image = PathBuf::from(src_path);
-                translated_image.set_extension(format!("{locale}.{}", ext.to_str().unwrap()));
-                if let Ok(stripped_path) = translated_image.strip_prefix(MAIN_SEPARATOR.to_string())
+            if let Some(original) = original_src {
+                if let Some(translated_asset) =
+                    self.get_translated_asset(original, images_source, locale)
                 {
-                    translated_image = stripped_path.to_path_buf();
-                }
-
-                let translated_path = images_source.join(&translated_image);
-
-                if translated_path.exists() {
-                    let src = translated_image.to_str().unwrap().replace('\\', "/");
-                    attributes.insert("src", format!("/{src}"));
-                    return;
+                    attributes.insert("src", format!("/{translated_asset}"));
+                } else {
+                    attributes.insert("src", original.clone());
                 }
             }
-            attributes.insert("src", original.clone());
+
+            if let Some(original) = original_srcset {
+                let srcset = original
+                    .split(',')
+                    .map(|part| {
+                        let mut split = part.split(' ');
+                        (split.next(), split.next(), part)
+                    })
+                    .map(|(src, width, original)| {
+                        if let (Some(src), Some(width)) = (src, width) {
+                            if let Some(translated_src) =
+                                self.get_translated_asset(src, images_source, locale)
+                            {
+                                return format!("/{} {}", translated_src, width);
+                            }
+                        }
+                        original.to_string()
+                    })
+                    .fold(String::default(), |mut acc, part| {
+                        if !acc.is_empty() {
+                            acc.push(',');
+                        }
+                        acc.push_str(&part);
+                        acc
+                    });
+                attributes.insert("srcset", srcset);
+            }
         }
+    }
+
+    fn get_translated_asset(&self, original: &str, source: &Path, locale: &str) -> Option<String> {
+        let original_path = Path::new(original);
+        if let Some(ext) = original_path.extension() {
+            let mut translated_asset = PathBuf::from(original_path);
+            translated_asset.set_extension(format!("{locale}.{}", ext.to_str().unwrap()));
+            if let Ok(stripped_path) = translated_asset.strip_prefix(MAIN_SEPARATOR.to_string()) {
+                translated_asset = stripped_path.to_path_buf();
+            }
+
+            let translated_path = source.join(&translated_asset);
+
+            if translated_path.exists() {
+                let src = translated_asset.to_str().unwrap().replace('\\', "/");
+                return Some(src);
+            }
+        }
+        None
     }
 
     pub fn prepare_head(&mut self, locales_count: usize) {
@@ -301,12 +354,44 @@ impl RoseyPage {
     }
 
     fn process_image_tags(&mut self) {
-        for img in self.dom.select("img[src]").unwrap() {
+        for img in self.dom.select("img[src], img[srcset]").unwrap() {
             let attributes = img.attributes.borrow();
+            let src = attributes.get("src");
+            let srcset = attributes.get("srcset");
+
+            self.image_tags.push((
+                src.map(String::from),
+                srcset.map(String::from),
+                img.as_node().clone(),
+            ));
+        }
+    }
+
+    fn process_assets(&mut self) {
+        for element in self
+            .dom
+            .select("source[src], video[src], audio[src]")
+            .unwrap()
+        {
+            let attributes = element.attributes.borrow();
             let src = attributes.get("src").unwrap();
 
-            self.image_tags
-                .push((src.to_string(), img.as_node().clone()));
+            self.assets.push((
+                "src".to_string(),
+                src.to_string(),
+                element.as_node().clone(),
+            ));
+        }
+
+        for element in self.dom.select("a[download][href]").unwrap() {
+            let attributes = element.attributes.borrow();
+            let href = attributes.get("href").unwrap();
+
+            self.assets.push((
+                "href".to_string(),
+                href.to_string(),
+                element.as_node().clone(),
+            ));
         }
     }
 
