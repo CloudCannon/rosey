@@ -393,6 +393,24 @@ impl RoseyPage {
                 element.as_node().clone(),
             ));
         }
+
+        for element in self
+            .dom
+            .select(&format!("[{}-asset-attrs]", self.tag))
+            .unwrap()
+        {
+            let attributes = element.attributes.borrow();
+            let attr = attributes.get(format!("{}-asset-attrs", self.tag));
+            if let Some(attr) = attr {
+                let original = attributes.get(attr).unwrap_or_default();
+
+                self.assets.push((
+                    attr.to_string(),
+                    original.to_string(),
+                    element.as_node().clone(),
+                ));
+            }
+        }
     }
 
     fn process_node(&mut self, node: &NodeRef, root: Option<String>, namespace: Option<String>) {
