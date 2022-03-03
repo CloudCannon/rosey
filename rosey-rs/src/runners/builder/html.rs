@@ -2,6 +2,7 @@ use super::redirect_page;
 use super::RoseyBuilder;
 
 use std::fs::File;
+use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::io::Write;
 use std::path::MAIN_SEPARATOR;
@@ -44,10 +45,26 @@ impl RoseyBuilder {
             &self.default_language,
         );
 
+        //If the file is already in a locale folder, then output it only for that locale
+        if let Some((key, locale)) = self
+            .locales
+            .iter()
+            .find(|(key, _)| relative_path.starts_with(key))
+        {
+            page.rewrite_html(locale);
+            page.rewrite_meta_tags(key, relative_path, &self.locales, &self.default_language);
+            page.rewrite_image_tags(&images_source, key);
+            page.rewrite_assets(&images_source, key);
+
+            let output_path = dest_folder.join(&relative_path);
+            page.output_file(&output_path, true);
+            return;
+        }
+
         let output_path = dest_folder
             .join(&self.default_language)
             .join(&relative_path);
-        page.output_file(&output_path);
+        page.output_file(&output_path, false);
         self.output_redirect_file(&self.default_language, relative_path);
 
         self.locales.iter().for_each(|(key, locale)| {
@@ -57,7 +74,7 @@ impl RoseyBuilder {
             page.rewrite_assets(&images_source, key);
 
             let output_path = dest_folder.join(key).join(&relative_path);
-            page.output_file(&output_path);
+            page.output_file(&output_path, false);
         });
     }
 
@@ -497,12 +514,19 @@ impl RoseyPage {
         }
     }
 
-    pub fn output_file(&self, output_path: &Path) {
+    pub fn output_file(&self, output_path: &Path, overwrite: bool) {
         if let Some(parent) = output_path.parent() {
             create_dir_all(parent).unwrap();
         }
 
-        if let Ok(file) = File::create(&output_path) {
+        let mut open_options = OpenOptions::new();
+        let open_options = open_options
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .create_new(!overwrite);
+
+        if let Ok(file) = open_options.open(&output_path) {
             let writer = BufWriter::new(file);
             let mut serializer = RoseySerializer::new(writer);
             if Serialize::serialize(
@@ -514,8 +538,6 @@ impl RoseyPage {
             {
                 eprintln!("Failed to write: {output_path:?}")
             }
-        } else {
-            eprintln!("Failed to open: {output_path:?}")
         }
     }
 }
