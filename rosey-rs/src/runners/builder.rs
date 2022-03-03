@@ -65,9 +65,7 @@ impl RoseyBuilder {
         .unwrap()
         .into_iter()
         .filter_map(Result::ok)
-        .filter(|file| {
-            file.file_type().is_file() && !re.is_match(&file.path().display().to_string())
-        });
+        .filter(|file| file.file_type().is_file() && !re.is_match(&file.path().to_string_lossy()));
 
         walker.collect::<Vec<_>>().par_iter().for_each(|file| {
             let source_folder = self.working_directory.join(&self.source);
