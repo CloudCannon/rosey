@@ -3,6 +3,7 @@ use rosey::{RoseyCommand, RoseyOptions};
 use std::convert::Infallible;
 use std::env;
 use std::io::{Read, Write};
+use std::path::MAIN_SEPARATOR;
 use std::process::Command;
 use std::str::{from_utf8, FromStr};
 use std::{fs, path::PathBuf};
@@ -31,7 +32,7 @@ impl RoseyWorld {
 
     fn tmp_file_path(&mut self, filename: &str) -> PathBuf {
         let tmp_dir = self.tmp_dir();
-        tmp_dir.join(PathBuf::from(filename))
+        tmp_dir.join(PathBuf::from(filename.replace('/', &MAIN_SEPARATOR.to_string())))
     }
 
     fn write_file(&mut self, filename: &str, contents: &str) {
