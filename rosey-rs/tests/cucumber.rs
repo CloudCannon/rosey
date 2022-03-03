@@ -108,11 +108,11 @@ impl RoseyWorld {
                 }
             },
             Ok("rs-cli") => {
-                let rs_cli = build_rosey_command(&command, &"./target/debug/rosey".replace('/', &std::path::MAIN_SEPARATOR.to_string()), options);
+                let rs_cli = build_rosey_command(&command, "./target/debug/rosey", options);
                 let output = Command::new("sh")
                     .arg("-c")
                     .current_dir(self.tmp_dir())
-                    .arg(&rs_cli)
+                    .arg(&rs_cli.replace(std::path::MAIN_SEPARATOR, "/"))
                     .output()
                     .expect("failed to execute rosey CLI — make sure you have a debug build");
                 if !output.stderr.is_empty() {
