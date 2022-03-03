@@ -108,7 +108,7 @@ impl RoseyWorld {
                 }
             },
             Ok("rs-cli") => {
-                let rs_cli = build_rosey_command(&command, "./target/debug/rosey", options);
+                let rs_cli = build_rosey_command(&command, &"./target/debug/rosey".replace('/', &std::path::MAIN_SEPARATOR.to_string()), options);
                 let output = Command::new("sh")
                     .arg("-c")
                     .current_dir(self.tmp_dir())
