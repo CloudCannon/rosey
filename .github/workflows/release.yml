@@ -44,6 +44,7 @@ jobs:
   publish-npm-package:
     name: Publish NPM package
     runs-on: ubuntu-20.04
+    needs: publish-to-github
     defaults:
       run:
         working-directory: ./wrappers/node
