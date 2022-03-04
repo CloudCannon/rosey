@@ -1,5 +1,5 @@
 {
-  "name": "@cloudcannon/rosey",
+  "name": "rosey",
   "version": "",
   "description": "Generate a translated version of your website based on the translation of tagged elements.",
   "bin": "lib/index.js",
