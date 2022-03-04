@@ -8,7 +8,7 @@ fn main() {
 
     // TODO: Implement the rest of the flags
     let matches = App::new("Rosey")
-        .version("2.0.0-rc6")
+        .version("2.0.0-rc10")
         .author("CloudCannon")
         .about("intl")
         .setting(AppSettings::SubcommandRequiredElseHelp)
