@@ -1,7 +1,7 @@
 {
   "name": "@cloudcannon/rosey",
-  "version": "2.0.0-rc6",
-  "description": "",
+  "version": "",
+  "description": "Generate a translated version of your website based on the translation of tagged elements.",
   "bin": "lib/index.js",
   "repository": {
     "type": "git",
@@ -18,5 +18,18 @@
   },
   "overrides": {
     "agent-base": "^6.0.2"
-  }
+  },
+  "keywords": [
+    "CloudCannon",
+    "Cloud",
+    "Cannon",
+    "i18n",
+    "rosey",
+    "translation",
+    "localisation"
+  ],
+  "bugs": {
+    "url": "https://github.com/CloudCannon/rosey/issues"
+  },
+  "homepage": "https://github.com/CloudCannon/rosey#readme"
 }

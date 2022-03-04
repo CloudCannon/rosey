@@ -41,6 +41,24 @@ jobs:
   #     env:
   #       CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
+  publish-npm-package:
+    name: Publish NPM package
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./wrappers/node
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Set Version
+        run: |
+          RELEASE_VERSION=${GITHUB_REF#refs/tags/}
+          npm version $(echo $RELEASE_VERSION | cut -c1-)
+      - name: Publish
+        run: npm publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   publish-to-github:
     name: Publish to Github
     runs-on: ${{matrix.os}}
