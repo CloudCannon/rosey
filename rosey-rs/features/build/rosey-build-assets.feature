@@ -1,16 +1,21 @@
 Feature: Rosey Build Assets
 
   Scenario: Rosey build copies assets
-    Given I have a "dist/site/image.png" file with the content:
+    Given I have a "dist/site/assets/image.png" file with the content:
       """
       Pretend that I'm a png
+      """
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      </html>
       """
     And I have a "rosey/locales/blank.json" file with the content:
       """
       {}
       """
     When I run Rosey build
-    Then I should see the file "dist/translated_site/image.png"
+    Then I should see "Pretend that I'm a png" in "dist/translated_site/assets/image.png"
 
   Scenario: Rosey build doesn't copy a default set of assets
     Given I have a "dist/site/about.htm" file with the content:
@@ -51,7 +56,9 @@ Feature: Rosey Build Assets
       """
     And I have a "dist/site/about.json" file with the content:
       """
-      {}
+      {
+        "ok": true
+      }
       """
     And I have a "rosey/locales/blank.json" file with the content:
       """
@@ -60,4 +67,4 @@ Feature: Rosey Build Assets
     When I run Rosey build with options:
       | exclusions | \.[png]{3} |
     Then I should see the file "dist/translated_site/about.htm"
-    And I should see the file "dist/translated_site/about.json"
+    And I should see "true" in "dist/translated_site/about.json"
