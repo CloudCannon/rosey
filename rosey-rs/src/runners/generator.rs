@@ -41,7 +41,7 @@ impl RoseyGenerator {
     pub fn run(&mut self) {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(
             self.working_directory.join(&self.source),
-            &["*.{htm,html,json}"],
+            &["**/*.{htm,html,json}"],
         )
         .build()
         .unwrap()

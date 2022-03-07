@@ -59,7 +59,7 @@ impl RoseyBuilder {
         let re = Regex::new(&self.exclusions).expect("Invalid regex");
         let walker = globwalk::GlobWalkerBuilder::from_patterns(
             self.working_directory.join(&self.source),
-            &["*"],
+            &["**/*"],
         )
         .build()
         .unwrap()
@@ -86,7 +86,7 @@ impl RoseyBuilder {
     pub fn process_files(&mut self) {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(
             self.working_directory.join(&self.source),
-            &["*{.html,.json}"],
+            &["**/*{.html,.json}"],
         )
         .build()
         .unwrap()
@@ -102,7 +102,7 @@ impl RoseyBuilder {
     pub fn read_locales(&mut self) {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(
             self.working_directory.join(&self.locale_source),
-            &["*.json"],
+            &["**/*.json"],
         )
         .build()
         .unwrap()
