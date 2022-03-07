@@ -10,7 +10,7 @@ fn main() {
     let matches = App::new("Rosey")
         .version(option_env!("RELEASE_VERSION").unwrap_or("Development"))
         .author("CloudCannon")
-        .about("intl")
+        .about("The CLI for the CloudCannon rosey package, an open-source tool for managing translations on static websites.")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(
             App::new("generate")

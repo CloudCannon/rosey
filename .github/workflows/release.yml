@@ -124,7 +124,7 @@ jobs:
           rustup target add ${{ matrix.target }}
           rustup show
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+        run: RELEASE_VERSION=${GITHUB_REF#refs/tags/} cargo build --release --target ${{ matrix.target }}
 
       - name: Package Artifacts
         run: |
