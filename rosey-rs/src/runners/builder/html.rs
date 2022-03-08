@@ -38,13 +38,6 @@ impl RoseyBuilder {
         page.prepare();
         page.prepare_head(self.locales.len());
 
-        page.rewrite_meta_tags(
-            &self.default_language,
-            relative_path,
-            &self.locales,
-            &self.default_language,
-        );
-
         //If the file is already in a locale folder, then output it only for that locale
         if let Some((key, locale)) = self
             .locales
@@ -55,11 +48,20 @@ impl RoseyBuilder {
             page.rewrite_meta_tags(key, relative_path, &self.locales, &self.default_language);
             page.rewrite_image_tags(&images_source, key);
             page.rewrite_assets(&images_source, key);
+            page.rewrite_anchors(key);
 
             let output_path = dest_folder.join(&relative_path);
             page.output_file(&output_path, true);
             return;
         }
+
+        page.rewrite_meta_tags(
+            &self.default_language,
+            relative_path,
+            &self.locales,
+            &self.default_language,
+        );
+        page.rewrite_anchors(&self.default_language);
 
         let output_path = dest_folder
             .join(&self.default_language)
@@ -72,6 +74,7 @@ impl RoseyBuilder {
             page.rewrite_meta_tags(key, relative_path, &self.locales, &self.default_language);
             page.rewrite_image_tags(&images_source, key);
             page.rewrite_assets(&images_source, key);
+            page.rewrite_anchors(key);
 
             let output_path = dest_folder.join(key).join(&relative_path);
             page.output_file(&output_path, false);
@@ -155,6 +158,7 @@ struct RoseyPage {
     meta_tag: Option<NodeRef>,
     link_tags: Vec<NodeRef>,
     image_tags: Vec<(Option<String>, Option<String>, NodeRef)>,
+    anchor_tags: Vec<(String, NodeRef)>,
     assets: Vec<(String, String, NodeRef)>,
     pub tag: String,
     pub separator: String,
@@ -169,6 +173,7 @@ impl RoseyPage {
             edits: Vec::new(),
             link_tags: Vec::new(),
             image_tags: Vec::new(),
+            anchor_tags: Vec::new(),
             assets: Vec::new(),
             separator: separator.to_string(),
             tag: tag.to_string(),
@@ -181,6 +186,32 @@ impl RoseyPage {
         self.process_node(&dom, None, None);
         self.process_image_tags();
         self.process_assets();
+        self.process_anchors();
+    }
+
+    pub fn process_anchors(&mut self) {
+        for element in self.dom.select("a[href]").unwrap() {
+            let attributes = element.attributes.borrow();
+            let src = attributes.get("href").unwrap();
+
+            self.anchor_tags
+                .push((src.to_string(), element.as_node().clone()));
+        }
+    }
+
+    pub fn rewrite_anchors(&mut self, locale: &str) {
+        for (original, node) in &self.anchor_tags {
+            let original_path = Path::new(original);
+            let ext = original_path.extension().map(|ext| ext.to_str().unwrap());
+
+            if original_path.is_absolute() && matches!(ext, Some("html") | Some("htm") | None) {
+                let element = node.as_element().unwrap();
+                let mut attributes = element.attributes.borrow_mut();
+
+                attributes.remove("href");
+                attributes.insert("href", format!("/{locale}{original}"));
+            }
+        }
     }
 
     pub fn rewrite_html(&mut self, locale: &RoseyLocale) {
