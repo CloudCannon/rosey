@@ -111,13 +111,25 @@ fn file_does_not_exist(world: &mut RoseyWorld, filename: String) {
     world.assert_file_doesnt_exist(&filename);
 }
 
-#[then(regex = "^(DEBUG )?I should see a selector (?:\"|')(.*)(?:\"|') in (?:\"|')(\\S*)(?:\"|')$")]
-fn selector_exists(world: &mut RoseyWorld, debug: StepDebug, selector: String, filename: String) {
+#[then(
+    regex = "^(DEBUG )?I should (not )?see a selector (?:\"|')(.*)(?:\"|') in (?:\"|')(\\S*)(?:\"|')$"
+)]
+fn selector_exists(
+    world: &mut RoseyWorld,
+    debug: StepDebug,
+    negation: Not,
+    selector: String,
+    filename: String,
+) {
     world.assert_file_exists(&filename);
     let contents = world.read_file(&filename);
     debug.log(&contents);
     let parsed_file = parse_html_file(&contents);
-    assert!(select_nodes(&parsed_file, &selector).next().is_some());
+    if negation.0 {
+        assert!(select_nodes(&parsed_file, &selector).next().is_none());
+    } else {
+        assert!(select_nodes(&parsed_file, &selector).next().is_some());
+    }
 }
 
 #[then(
