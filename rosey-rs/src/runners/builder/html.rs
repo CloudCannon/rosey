@@ -506,7 +506,7 @@ impl RoseyPage {
                 }
 
                 self.edits
-                    .push(RoseyEdit::Content(key, content, node.clone()));
+                    .push(RoseyEdit::Content(key, node.text_contents(), node.clone()));
             }
 
             if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
