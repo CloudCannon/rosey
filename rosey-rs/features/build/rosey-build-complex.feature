@@ -129,3 +129,25 @@ Feature: Rosey Build Complex
       | data-rosey | seal             |
       | innerText  | Kiss From A Rose |
     But I should not see a selector 'div>div' in "dist/translated_site/ohno/index.html"
+
+  Scenario: Rosey build handles missing HTML translations
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <div data-rosey="seal"><div>Kiss From A Rose</div></div>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/ohno.json" file with the content:
+      """
+      {}
+      """
+    When I run Rosey build
+    Then I should see a selector 'div' in "dist/translated_site/ohno/index.html" with the attributes:
+      | data-rosey | seal             |
+      | innerText  | Kiss From A Rose |
+    And I should see a selector 'div>div' in "dist/translated_site/ohno/index.html" with the attributes:
+      | innerText | Kiss From A Rose |
+    But I should not see a selector 'div>div>div' in "dist/translated_site/ohno/index.html"
+    And I should not see a selector 'div>div>div:nth-of-type(2)' in "dist/translated_site/ohno/index.html"
