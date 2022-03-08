@@ -505,8 +505,13 @@ impl RoseyPage {
                     }
                 }
 
+                let mut inner_html = String::default();
+                node.children().for_each(|child| {
+                    inner_html.push_str(&child.to_string());
+                });
+
                 self.edits
-                    .push(RoseyEdit::Content(key, node.text_contents(), node.clone()));
+                    .push(RoseyEdit::Content(key, inner_html, node.clone()));
             }
 
             if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
