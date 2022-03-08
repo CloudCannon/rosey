@@ -41,15 +41,15 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.rustup
-            target
-          key: ${{ runner.os }}-${{ matrix.rust }}
+      # - name: Cache
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/.cargo/registry
+      #       ~/.cargo/git
+      #       ~/.rustup
+      #       target
+      #     key: ${{ runner.os }}-${{ matrix.rust }}
 
       - name: Install Rust
         run: |
