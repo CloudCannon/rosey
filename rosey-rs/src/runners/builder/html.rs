@@ -35,7 +35,7 @@ impl RoseyBuilder {
         let content = read_to_string(file).unwrap();
 
         let mut page = RoseyPage::new(content, &self.separator, &self.tag);
-        page.prepare();
+        page.prepare(&self.locales);
         page.prepare_head(self.locales.len());
 
         //If the file is already in a locale folder, then output it only for that locale
@@ -181,36 +181,40 @@ impl RoseyPage {
         }
     }
 
-    pub fn prepare(&mut self) {
+    pub fn prepare(&mut self, locales: &BTreeMap<String, RoseyLocale>) {
         let dom = self.dom.clone();
         self.process_node(&dom, None, None);
         self.process_image_tags();
         self.process_assets();
-        self.process_anchors();
+        self.process_anchors(locales);
     }
 
-    pub fn process_anchors(&mut self) {
+    pub fn process_anchors(&mut self, locales: &BTreeMap<String, RoseyLocale>) {
         for element in self.dom.select("a[href]").unwrap() {
             let attributes = element.attributes.borrow();
             let src = attributes.get("href").unwrap();
 
-            self.anchor_tags
-                .push((src.to_string(), element.as_node().clone()));
+            let src_path = Path::new(src);
+            let ext = src_path.extension().map(|ext| ext.to_str().unwrap());
+
+            if src_path.is_absolute()
+                && matches!(ext, Some("html") | Some("htm") | None)
+                && !locales
+                    .keys()
+                    .any(|key| src.starts_with(&format!("/{key}")))
+            {
+                self.anchor_tags
+                    .push((src.to_string(), element.as_node().clone()));
+            }
         }
     }
 
     pub fn rewrite_anchors(&mut self, locale: &str) {
         for (original, node) in &self.anchor_tags {
-            let original_path = Path::new(original);
-            let ext = original_path.extension().map(|ext| ext.to_str().unwrap());
-
-            if original_path.is_absolute() && matches!(ext, Some("html") | Some("htm") | None) {
-                let element = node.as_element().unwrap();
-                let mut attributes = element.attributes.borrow_mut();
-
-                attributes.remove("href");
-                attributes.insert("href", format!("/{locale}{original}"));
-            }
+            let element = node.as_element().unwrap();
+            let mut attributes = element.attributes.borrow_mut();
+            attributes.remove("href");
+            attributes.insert("href", format!("/{locale}{original}"));
         }
     }
 
