@@ -33,3 +33,25 @@ Feature: Rosey Links
     Then I should see a selector 'h5>a' in "dist/translated_site/blank/index.html" with the attributes:
       | href      | posts/hello-world/   |
       | innerText | Hello World Relative |
+
+  Scenario: Rosey doesn't update links already pointing to a locale
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <h1><a href="/blink/hello">Hello</a></h1>
+      <h2><a href="/blank/hello">Hello</a></h2>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/blank.json" file with the content:
+      """
+      {}
+      """
+    When I run Rosey build
+    Then I should see a selector 'h1>a' in "dist/translated_site/blank/index.html" with the attributes:
+      | href      | /blank/blink/hello |
+      | innerText | Hello              |
+    Then I should see a selector 'h2>a' in "dist/translated_site/blank/index.html" with the attributes:
+      | href      | /blank/hello |
+      | innerText | Hello        |
