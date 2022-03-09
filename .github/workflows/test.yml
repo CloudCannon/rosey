@@ -20,11 +20,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - build: windows
-            os: windows-latest
-            rust: stable
-            target: x86_64-pc-windows-msvc
-            cross: false
           - build: linux
             os: ubuntu-latest
             rust: stable
@@ -35,6 +30,11 @@ jobs:
             rust: stable
             target: x86_64-apple-darwin
             cross: false
+          # - build: windows
+          #   os: windows-latest
+          #   rust: stable
+          #   target: x86_64-pc-windows-msvc
+          #   cross: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
