@@ -370,7 +370,7 @@ impl RoseyPage {
         &mut self,
         locale: &str,
         relative_path: &Path,
-        locales: &HashMap<String, RoseyLocale>,
+        locales: &BTreeMap<String, RoseyLocale>,
         default_language: &str,
     ) {
         let path = relative_path.display().to_string();

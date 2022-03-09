@@ -3,7 +3,7 @@ mod json;
 mod redirect_page;
 
 use std::{
-    collections::HashMap,
+    collections::BTreeMap,
     fs::{copy, create_dir_all, read_to_string, File},
     io::{BufWriter, Write},
     path::{Path, PathBuf},
@@ -24,7 +24,7 @@ pub struct RoseyBuilder {
     pub tag: String,
     pub separator: String,
     pub default_language: String,
-    pub locales: HashMap<String, RoseyLocale>,
+    pub locales: BTreeMap<String, RoseyLocale>,
     pub redirect_page: Option<PathBuf>,
     pub exclusions: String,
     pub images_source: Option<PathBuf>,
@@ -39,7 +39,7 @@ impl From<RoseyOptions> for RoseyBuilder {
             dest: runner.dest.unwrap(),
             tag: runner.tag.unwrap(),
             default_language: runner.default_language.unwrap(),
-            locales: HashMap::default(),
+            locales: BTreeMap::default(),
             separator: runner.separator.unwrap(),
             redirect_page: runner.redirect_page,
             exclusions: runner.exclusions.unwrap(),
