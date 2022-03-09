@@ -10,11 +10,6 @@ const fsExists = util.promisify(fs.exists);
 const mkdir = util.promisify(fs.mkdir);
 const exec = util.promisify(child_process.exec);
 
-const forceInstall = process.argv.includes('--force');
-if (forceInstall) {
-    console.log('--force, ignoring caches');
-}
-
 const VERSION = `v${require('../package.json').version}`;
 const BIN_PATH = path.join(__dirname, '../bin');
 
@@ -60,10 +55,6 @@ async function getTarget() {
 
 async function main() {
     const binExists = await fsExists(BIN_PATH);
-    if (!forceInstall && binExists) {
-        console.log('bin/ folder already exists, exiting');
-        process.exit(0);
-    }
 
     if (!binExists) {
         await mkdir(BIN_PATH);
@@ -72,8 +63,7 @@ async function main() {
     const opts = {
         version: VERSION,
         target: await getTarget(),
-        destDir: BIN_PATH,
-        force: forceInstall
+        destDir: BIN_PATH
     };
     try {
         await download(opts);

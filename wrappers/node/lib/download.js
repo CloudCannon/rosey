@@ -9,7 +9,8 @@ const child_process = require('child_process');
 const proxy_from_env = require('proxy-from-env');
 
 const packageVersion = require('../package.json').version;
-const tmpDir = path.join(os.tmpdir(), `rosey-cache-${packageVersion}`);
+const cacheDir = path.join(__dirname, `../cache`);
+const tmpDir = path.join(cacheDir, packageVersion);
 
 const fsUnlink = util.promisify(fs.unlink);
 const fsExists = util.promisify(fs.exists);
@@ -161,7 +162,7 @@ async function getAssetFromGithubApi(opts, assetName, downloadFolder) {
     const assetDownloadPath = path.join(downloadFolder, assetName);
 
     // We can just use the cached binary
-    if (!opts.force && await fsExists(assetDownloadPath)) {
+    if (await fsExists(assetDownloadPath)) {
         console.log('Using cached download: ' + assetDownloadPath);
         return assetDownloadPath;
     }
@@ -221,10 +222,19 @@ function untar(zipPath, destinationDir) {
     });
 }
 
-async function unzipRipgrep(zipPath, destinationDir) {
+async function unzipRosey(zipPath, destinationDir) {
+    const expectedName = path.join(destinationDir, 'rosey');
+
+    if (await fsExists(expectedName)) {
+        await fsUnlink(expectedName);
+    }
+
+    if (await fsExists(expectedName + '.exe')) {
+        await fsUnlink(expectedName + '.exe');
+    }
+
     await untar(zipPath, destinationDir);
 
-    const expectedName = path.join(destinationDir, 'rosey');
     if (await fsExists(expectedName)) {
         return expectedName;
     }
@@ -234,6 +244,14 @@ async function unzipRipgrep(zipPath, destinationDir) {
     }
 
     throw new Error(`Expecting rosey or rosey.exe unzipped into ${destinationDir}, didn't find one.`);
+}
+
+async function cleanCache(){
+    return Promise.all(fs.readdirSync(cacheDir).map((dir) => {
+        if(dir != packageVersion){
+            return fs.promises.rm(path.join(cacheDir, dir), {recursive: true})
+        }
+    }))
 }
 
 module.exports = async opts => {
@@ -248,7 +266,7 @@ module.exports = async opts => {
     const assetName = ['rosey', opts.version, opts.target].join('-') + '.tar.gz';
 
     if (!await fsExists(tmpDir)) {
-        await fsMkdir(tmpDir);
+        await fsMkdir(tmpDir, {recursive: true});
     }
 
     const assetDownloadPath = path.join(tmpDir, assetName);
@@ -265,7 +283,7 @@ module.exports = async opts => {
 
     console.log(`Unzipping to ${opts.destDir}`);
     try {
-        const destinationPath = await unzipRipgrep(assetDownloadPath, opts.destDir);
+        const destinationPath = await unzipRosey(assetDownloadPath, opts.destDir);
         if (!isWindows) {
             await util.promisify(fs.chmod)(destinationPath, '755');
         }
@@ -278,4 +296,6 @@ module.exports = async opts => {
 
         throw e;
     }
+
+    await cleanCache()
 };
