@@ -4,7 +4,7 @@ mod redirect_page;
 
 use std::{
     collections::BTreeMap,
-    fs::{copy, create_dir_all, read_to_string, File},
+    fs::{copy, create_dir_all, read_to_string, remove_dir_all, File},
     io::{BufWriter, Write},
     path::{Path, PathBuf},
     str::FromStr,
@@ -50,9 +50,17 @@ impl From<RoseyOptions> for RoseyBuilder {
 
 impl RoseyBuilder {
     pub fn run(&mut self) {
+        self.clean_output_dir();
         self.read_locales();
         self.process_assets();
         self.process_files();
+    }
+
+    pub fn clean_output_dir(&self) {
+        let dest_folder = self.working_directory.join(&self.dest);
+        if dest_folder.exists() {
+            remove_dir_all(dest_folder).expect("Failed to clean destination folder");
+        }
     }
 
     pub fn process_assets(&mut self) {
