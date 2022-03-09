@@ -1,23 +1,19 @@
-use super::redirect_page;
-use super::RoseyBuilder;
+use super::{redirect_page, RoseyBuilder};
 
-use std::fs::File;
-use std::fs::OpenOptions;
-use std::io::BufWriter;
-use std::io::Write;
-use std::path::MAIN_SEPARATOR;
 use std::{
     collections::{BTreeMap, HashMap},
     fs::{create_dir_all, read_to_string},
-    path::{Path, PathBuf},
+    fs::{File, OpenOptions},
+    io::{BufWriter, Write},
+    path::{Path, PathBuf, MAIN_SEPARATOR},
 };
 
 use base64::{encode_config, CharacterSet, Config};
-use html5ever::serialize::HtmlSerializer;
-use html5ever::serialize::Serialize;
-use html5ever::serialize::SerializeOpts;
-use html5ever::serialize::Serializer;
-use html5ever::{local_name, namespace_url, ns, QualName};
+use html5ever::{
+    local_name, namespace_url, ns,
+    serialize::{HtmlSerializer, Serialize, SerializeOpts, Serializer},
+    QualName,
+};
 use kuchiki::{traits::TendrilSink, Attribute, ExpandedName, NodeRef};
 use sha2::{Digest, Sha256};
 
