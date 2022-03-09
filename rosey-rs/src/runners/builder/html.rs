@@ -35,7 +35,7 @@ impl RoseyBuilder {
         let content = read_to_string(file).unwrap();
 
         let mut page = RoseyPage::new(content, &self.separator, &self.tag);
-        page.prepare(&self.locales);
+        page.prepare(&self.locales, &self.default_language);
         page.prepare_head(self.locales.len());
 
         //If the file is already in a locale folder, then output it only for that locale
@@ -181,15 +181,19 @@ impl RoseyPage {
         }
     }
 
-    pub fn prepare(&mut self, locales: &BTreeMap<String, RoseyLocale>) {
+    pub fn prepare(&mut self, locales: &BTreeMap<String, RoseyLocale>, default_language: &str) {
         let dom = self.dom.clone();
         self.process_node(&dom, None, None);
         self.process_image_tags();
         self.process_assets();
-        self.process_anchors(locales);
+        self.process_anchors(locales, default_language);
     }
 
-    pub fn process_anchors(&mut self, locales: &BTreeMap<String, RoseyLocale>) {
+    pub fn process_anchors(
+        &mut self,
+        locales: &BTreeMap<String, RoseyLocale>,
+        default_language: &str,
+    ) {
         for element in self.dom.select("a[href]").unwrap() {
             let attributes = element.attributes.borrow();
             let src = attributes.get("href").unwrap();
@@ -201,6 +205,7 @@ impl RoseyPage {
                 && matches!(ext, Some("html") | Some("htm") | None)
                 && !locales
                     .keys()
+                    .chain(std::iter::once(&default_language.to_string()))
                     .any(|key| src.starts_with(&format!("/{key}")))
             {
                 self.anchor_tags
