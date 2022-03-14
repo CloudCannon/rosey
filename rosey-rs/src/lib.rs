@@ -4,7 +4,7 @@ use crate::runners::generator::RoseyGenerator;
 use clap::ArgMatches;
 use runners::builder::RoseyBuilder;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, env, path::PathBuf, str::FromStr};
+use std::{collections::BTreeMap, env, path::PathBuf, str::FromStr};
 
 pub enum RoseyCommand {
     Generate,
@@ -96,7 +96,7 @@ impl RoseyOptions {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RoseyTranslation {
     pub original: String,
-    pub pages: HashMap<String, u32>,
+    pub pages: BTreeMap<String, u32>,
     pub total: u32,
 }
 
@@ -104,7 +104,7 @@ impl RoseyTranslation {
     pub fn new(original: String) -> RoseyTranslation {
         RoseyTranslation {
             original,
-            pages: HashMap::default(),
+            pages: BTreeMap::default(),
             total: 0,
         }
     }
@@ -113,14 +113,14 @@ impl RoseyTranslation {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RoseyLocale {
     pub version: u8,
-    pub keys: HashMap<String, RoseyTranslation>,
+    pub keys: BTreeMap<String, RoseyTranslation>,
 }
 
 impl Default for RoseyLocale {
     fn default() -> Self {
         RoseyLocale {
             version: 2,
-            keys: HashMap::default(),
+            keys: BTreeMap::default(),
         }
     }
 }
@@ -133,7 +133,7 @@ impl FromStr for RoseyLocale {
             return Ok(result);
         }
 
-        if let Ok(map) = serde_json::from_str::<HashMap<String, String>>(s) {
+        if let Ok(map) = serde_json::from_str::<BTreeMap<String, String>>(s) {
             let mut result = RoseyLocale {
                 version: 1,
                 ..Default::default()
@@ -179,7 +179,7 @@ impl RoseyLocale {
     }
 
     pub fn output_v1(&mut self) -> String {
-        let mut originals: HashMap<String, String> = HashMap::default();
+        let mut originals: BTreeMap<String, String> = BTreeMap::default();
         for (key, translation) in self.keys.iter() {
             originals.insert(key.clone(), translation.original.clone());
         }

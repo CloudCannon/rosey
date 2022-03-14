@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs::read_to_string, path::Path};
+use std::{collections::BTreeMap, fs::read_to_string, path::Path};
 
 use base64::{encode_config, CharacterSet, Config};
 use kuchiki::{traits::TendrilSink, NodeRef};
@@ -68,7 +68,7 @@ impl RoseyGenerator {
             }
 
             if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
-                let attrs_map: HashMap<String, String> = serde_json::from_str(attrs_map).unwrap();
+                let attrs_map: BTreeMap<String, String> = serde_json::from_str(attrs_map).unwrap();
                 for (attr, key) in attrs_map.iter() {
                     if let Some(value) = attributes.get(attr.as_str()) {
                         self.locale.insert(

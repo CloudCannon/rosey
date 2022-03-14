@@ -1,7 +1,7 @@
 use super::{redirect_page, RoseyBuilder};
 
 use std::{
-    collections::{BTreeMap, HashMap},
+    collections::BTreeMap,
     fs::{create_dir_all, read_to_string},
     fs::{File, OpenOptions},
     io::{BufWriter, Write},
@@ -520,7 +520,7 @@ impl RoseyPage {
             }
 
             if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
-                let attrs_map: HashMap<String, String> = serde_json::from_str(attrs_map).unwrap();
+                let attrs_map: BTreeMap<String, String> = serde_json::from_str(attrs_map).unwrap();
                 for (attr, key) in attrs_map.iter() {
                     self.edits.push(RoseyEdit::Attribute(
                         format!("{}{}", prefix, key),
