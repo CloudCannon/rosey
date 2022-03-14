@@ -7,6 +7,7 @@ const url = require('url');
 const URL = url.URL;
 const child_process = require('child_process');
 const proxy_from_env = require('proxy-from-env');
+const { createHash } = require('crypto');
 
 const packageVersion = require('../package.json').version;
 const cacheDir = path.join(__dirname, `../cache`);
@@ -254,6 +255,21 @@ async function cleanCache(){
     }))
 }
 
+function verifyChecksum(assetName, downloadFolder){
+    const checksumPath = path.join(__dirname, '../checksums', `${assetName}.sha256`);
+    const releaseSum = fs.readFileSync(checksumPath, 'utf8').split(" ")[0];
+    
+    const assetDownloadPath = path.join(downloadFolder, assetName);
+    const assetBuffer = fs.readFileSync(assetDownloadPath);
+    const hash = createHash('sha256');
+    hash.update(assetBuffer);
+    const assetSum = hash.digest("hex");
+
+    if(assetSum !== releaseSum){
+        throw new Error("Integrity check failed.")
+    }
+}
+
 module.exports = async opts => {
     if (!opts.version) {
         return Promise.reject(new Error('Missing version'));
@@ -272,10 +288,20 @@ module.exports = async opts => {
     const assetDownloadPath = path.join(tmpDir, assetName);
     try {
         await getAssetFromGithubApi(opts, assetName, tmpDir)
+        await verifyChecksum(assetName, tmpDir);
     } catch (e) {
         console.log('Deleting invalid download cache');
         try {
             await fsUnlink(assetDownloadPath);
+            const expectedName = path.join(opts.destDir, 'rosey');
+
+            if (await fsExists(expectedName)) {
+                await fsUnlink(expectedName);
+            }
+        
+            if (await fsExists(expectedName + '.exe')) {
+                await fsUnlink(expectedName + '.exe');
+            }
         } catch (e) { }
 
         throw e;

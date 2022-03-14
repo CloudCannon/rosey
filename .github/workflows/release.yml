@@ -51,10 +51,16 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v2
-      - name: Set Version
+      - name: Prepare package
         run: |
           RELEASE_VERSION=${GITHUB_REF#refs/tags/}
           npm version $(echo $RELEASE_VERSION | cut -c1-)
+          mkdir checksums
+          for TARGET in x86_64-unknown-linux-musl x86_64-apple-darwin
+          do
+            ASSET_NAME="rosey-$RELEASE_VERSION-$TARGET.tar.gz.sha256"
+            curl -L https://github.com/CloudCannon/rosey/releases/download/$RELEASE_VERSION/$ASSET_NAME -o checksums/$ASSET_NAME
+          done
       - name: Publish
         run: npm publish
         env:
