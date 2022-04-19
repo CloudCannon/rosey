@@ -151,3 +151,55 @@ Feature: Rosey Build Complex
       | innerText | Kiss From A Rose |
     But I should not see a selector 'div>div>div' in "dist/translated_site/ohno/index.html"
     And I should not see a selector 'div>div>div:nth-of-type(2)' in "dist/translated_site/ohno/index.html"
+
+  Scenario: Rosey build translates images inside HTML translations
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <div data-rosey="seal"><p>Kiss From A Rose</p></div>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/jp.json" file with the content:
+      """
+      {
+        "seal": "これは絵です <img src=\"/image.png\"/>"
+      }
+      """
+    And I have a "dist/site/image.png" file with the content:
+      """
+      Pretend that I'm a png
+      """
+    And I have a "dist/site/image.jp.png" file with the content:
+      """
+      私は絵です
+      """
+    When I run Rosey build
+    Then I should see a selector 'div > p' in "dist/translated_site/en/index.html" with the attributes:
+      | innerText | Kiss From A Rose |
+    And I should see a selector 'img' in "dist/translated_site/jp/index.html" with the attributes:
+      | src | /image.jp.png |
+    But I should not see a selector 'img' in "dist/translated_site/en/index.html":
+
+  Scenario: Rosey build translates links inside HTML translations
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <div data-rosey="seal"><p>Kiss From A Rose</p></div>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/jp.json" file with the content:
+      """
+      {
+        "seal": "これはリンクです <a href=\"/other.html\"/>"
+      }
+      """
+    When I run Rosey build
+    Then I should see a selector 'div > p' in "dist/translated_site/en/index.html" with the attributes:
+      | innerText | Kiss From A Rose |
+    And I should see a selector 'a' in "dist/translated_site/jp/index.html" with the attributes:
+      | src | /jp/other.html |
+    But I should not see a selector 'img' in "dist/translated_site/en/index.html":
