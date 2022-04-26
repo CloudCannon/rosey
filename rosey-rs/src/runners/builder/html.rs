@@ -30,34 +30,36 @@ impl RoseyBuilder {
 
         let content = read_to_string(file).unwrap();
 
-        let mut page = RoseyPage::new(content, &self.separator, &self.tag);
-        page.prepare(&self.locales, &self.default_language);
-        page.prepare_head(self.locales.len());
+        let mut page = RoseyPage::new(
+            content,
+            &self.separator,
+            &self.tag,
+            images_source,
+            &self.default_language,
+            &self.locales,
+        );
+        page.prepare();
 
         //If the file is already in a locale folder, then output it only for that locale
-        if let Some((key, locale)) = self
+        if let Some(key) = self
             .locales
-            .iter()
-            .find(|(key, _)| relative_path.starts_with(key))
+            .keys()
+            .find(|key| relative_path.starts_with(key))
         {
-            page.rewrite_html(locale);
-            page.rewrite_meta_tags(key, relative_path, &self.locales, &self.default_language);
-            page.rewrite_image_tags(&images_source, key);
-            page.rewrite_assets(&images_source, key);
-            page.rewrite_anchors(key);
+            page.set_locale_key(key);
+            page.rewrite_html();
+            page.rewrite_meta_tags(relative_path);
+            page.rewrite_image_tags();
+            page.rewrite_assets();
+            page.rewrite_anchors();
 
             let output_path = dest_folder.join(&relative_path);
             page.output_file(&output_path, true);
             return;
         }
 
-        page.rewrite_meta_tags(
-            &self.default_language,
-            relative_path,
-            &self.locales,
-            &self.default_language,
-        );
-        page.rewrite_anchors(&self.default_language);
+        page.rewrite_meta_tags(relative_path);
+        page.rewrite_anchors();
 
         let output_path = dest_folder
             .join(&self.default_language)
@@ -65,12 +67,13 @@ impl RoseyBuilder {
         page.output_file(&output_path, false);
         self.output_redirect_file(&self.default_language, relative_path);
 
-        self.locales.iter().for_each(|(key, locale)| {
-            page.rewrite_html(locale);
-            page.rewrite_meta_tags(key, relative_path, &self.locales, &self.default_language);
-            page.rewrite_image_tags(&images_source, key);
-            page.rewrite_assets(&images_source, key);
-            page.rewrite_anchors(key);
+        self.locales.keys().for_each(|key| {
+            page.set_locale_key(key);
+            page.rewrite_html();
+            page.rewrite_meta_tags(relative_path);
+            page.rewrite_image_tags();
+            page.rewrite_assets();
+            page.rewrite_anchors();
 
             let output_path = dest_folder.join(key).join(&relative_path);
             page.output_file(&output_path, false);
@@ -148,7 +151,7 @@ enum RoseyEdit {
     Attribute(String, String, Option<String>, NodeRef),
 }
 
-struct RoseyPage {
+struct RoseyPage<'a> {
     dom: NodeRef,
     edits: Vec<RoseyEdit>,
     meta_tag: Option<NodeRef>,
@@ -156,12 +159,23 @@ struct RoseyPage {
     image_tags: Vec<(Option<String>, Option<String>, NodeRef)>,
     anchor_tags: Vec<(String, NodeRef)>,
     assets: Vec<(String, String, NodeRef)>,
+    locale_key: Option<&'a str>,
     pub tag: String,
     pub separator: String,
+    pub images_source: PathBuf,
+    pub default_language: String,
+    pub locales: &'a BTreeMap<String, RoseyLocale>,
 }
 
-impl RoseyPage {
-    pub fn new(content: String, separator: &str, tag: &str) -> Self {
+impl<'a> RoseyPage<'a> {
+    pub fn new(
+        content: String,
+        separator: &str,
+        tag: &str,
+        images_source: PathBuf,
+        default_language: &str,
+        locales: &'a BTreeMap<String, RoseyLocale>,
+    ) -> Self {
         let dom = kuchiki::parse_html().one(content);
 
         RoseyPage {
@@ -174,22 +188,32 @@ impl RoseyPage {
             separator: separator.to_string(),
             tag: tag.to_string(),
             meta_tag: None,
+            images_source,
+            default_language: default_language.to_string(),
+            locales,
+            locale_key: None,
         }
     }
 
-    pub fn prepare(&mut self, locales: &BTreeMap<String, RoseyLocale>, default_language: &str) {
+    pub fn set_locale_key(&mut self, locale_key: &'a str) {
+        self.locale_key = Some(locale_key);
+    }
+
+    fn get_locale_key(&self) -> &str {
+        self.locale_key.unwrap_or(&self.default_language)
+    }
+
+    pub fn prepare(&mut self) {
         let dom = self.dom.clone();
         self.process_node(&dom, None, None);
         self.process_image_tags();
         self.process_assets();
-        self.process_anchors(locales, default_language);
+        self.process_anchors();
+
+        self.prepare_head();
     }
 
-    pub fn process_anchors(
-        &mut self,
-        locales: &BTreeMap<String, RoseyLocale>,
-        default_language: &str,
-    ) {
+    pub fn process_anchors(&mut self) {
         for element in self.dom.select("a[href]").unwrap() {
             let attributes = element.attributes.borrow();
             let src = attributes.get("href").unwrap();
@@ -199,9 +223,10 @@ impl RoseyPage {
 
             if src_path.is_absolute()
                 && matches!(ext, Some("html") | Some("htm") | None)
-                && !locales
+                && !self
+                    .locales
                     .keys()
-                    .chain(std::iter::once(&default_language.to_string()))
+                    .chain(std::iter::once(&self.default_language))
                     .any(|key| src.starts_with(&format!("/{key}")))
             {
                 self.anchor_tags
@@ -210,16 +235,26 @@ impl RoseyPage {
         }
     }
 
-    pub fn rewrite_anchors(&mut self, locale: &str) {
+    pub fn rewrite_anchors(&mut self) {
+        let locale_key = self.get_locale_key();
         for (original, node) in &self.anchor_tags {
             let element = node.as_element().unwrap();
             let mut attributes = element.attributes.borrow_mut();
             attributes.remove("href");
-            attributes.insert("href", format!("/{locale}{original}"));
+            attributes.insert("href", format!("/{locale_key}{original}"));
         }
     }
 
-    pub fn rewrite_html(&mut self, locale: &RoseyLocale) {
+    pub fn rewrite_html(&mut self) {
+        let locale_key = self.get_locale_key();
+        let locale = if let Some(locale) = self.locales.get(locale_key) {
+            locale
+        } else {
+            eprintln!(
+                "Error: failed to load locale with key {locale_key}. Skipping rewriting HTML."
+            );
+            return;
+        };
         for edit in self.edits.iter() {
             match edit {
                 RoseyEdit::Content(key, original, node) => {
@@ -250,11 +285,10 @@ impl RoseyPage {
         }
     }
 
-    pub fn rewrite_assets(&mut self, assets_source: &Path, locale: &str) {
+    pub fn rewrite_assets(&mut self) {
         for (attr, original, node) in self.assets.iter() {
             let mut attributes = node.as_element().unwrap().attributes.borrow_mut();
-            if let Some(translated_asset) =
-                self.get_translated_asset(original, assets_source, locale)
+            if let Some(translated_asset) = self.get_translated_asset(original, &self.images_source)
             {
                 attributes.insert(attr.as_str(), format!("/{translated_asset}"));
             } else {
@@ -263,12 +297,12 @@ impl RoseyPage {
         }
     }
 
-    pub fn rewrite_image_tags(&mut self, images_source: &Path, locale: &str) {
+    pub fn rewrite_image_tags(&mut self) {
         for (original_src, original_srcset, img) in self.image_tags.iter() {
             let mut attributes = img.as_element().unwrap().attributes.borrow_mut();
             if let Some(original) = original_src {
                 if let Some(translated_asset) =
-                    self.get_translated_asset(original, images_source, locale)
+                    self.get_translated_asset(original, &self.images_source)
                 {
                     attributes.insert("src", format!("/{translated_asset}"));
                 } else {
@@ -286,7 +320,7 @@ impl RoseyPage {
                     .map(|(src, width, original)| {
                         if let (Some(src), Some(width)) = (src, width) {
                             if let Some(translated_src) =
-                                self.get_translated_asset(src, images_source, locale)
+                                self.get_translated_asset(src, &self.images_source)
                             {
                                 return format!("/{} {}", translated_src, width);
                             }
@@ -305,11 +339,12 @@ impl RoseyPage {
         }
     }
 
-    fn get_translated_asset(&self, original: &str, source: &Path, locale: &str) -> Option<String> {
+    fn get_translated_asset(&self, original: &str, source: &Path) -> Option<String> {
+        let locale_key = self.get_locale_key();
         let original_path = Path::new(original);
         if let Some(ext) = original_path.extension() {
             let mut translated_asset = PathBuf::from(original_path);
-            translated_asset.set_extension(format!("{locale}.{}", ext.to_str().unwrap()));
+            translated_asset.set_extension(format!("{locale_key}.{}", ext.to_str().unwrap()));
             if let Ok(stripped_path) = translated_asset.strip_prefix(MAIN_SEPARATOR.to_string()) {
                 translated_asset = stripped_path.to_path_buf();
             }
@@ -324,7 +359,7 @@ impl RoseyPage {
         None
     }
 
-    pub fn prepare_head(&mut self, locales_count: usize) {
+    fn prepare_head(&mut self) {
         let head = if let Ok(head) = self.dom.select_first("head") {
             head
         } else {
@@ -353,7 +388,7 @@ impl RoseyPage {
         self.meta_tag = Some(node.clone());
         head.append(node);
 
-        for _i in 0..locales_count {
+        for _i in 0..self.locales.len() {
             let mut attributes = BTreeMap::new();
             attributes.insert(
                 ExpandedName::new("", "rel"),
@@ -371,13 +406,9 @@ impl RoseyPage {
         }
     }
 
-    pub fn rewrite_meta_tags(
-        &mut self,
-        locale: &str,
-        relative_path: &Path,
-        locales: &BTreeMap<String, RoseyLocale>,
-        default_language: &str,
-    ) {
+    pub fn rewrite_meta_tags(&mut self, relative_path: &Path) {
+        let locale_key = self.get_locale_key();
+
         let path = relative_path.display().to_string();
         let path = path.trim_end_matches("index.html");
 
@@ -385,13 +416,14 @@ impl RoseyPage {
         let mut attributes = meta_tag.as_element().unwrap().attributes.borrow_mut();
 
         attributes.remove("content");
-        attributes.insert("content", locale.to_string());
+        attributes.insert("content", locale_key.to_string());
 
-        for (i, key) in locales
+        for (i, key) in self
+            .locales
             .iter()
             .map(|(key, _)| key.as_str())
-            .chain(std::iter::once(default_language))
-            .filter(|key| *key != locale)
+            .chain(std::iter::once(&self.default_language[..]))
+            .filter(|key| *key != locale_key)
             .enumerate()
         {
             let mut attributes = self.link_tags[i]
