@@ -1,3 +1,7 @@
+mod utils;
+
+use self::utils::{RoseySerializer, TranslationRewriter};
+
 use super::{redirect_page, RoseyBuilder};
 
 use std::{
@@ -6,12 +10,16 @@ use std::{
     fs::{File, OpenOptions},
     io::{BufWriter, Write},
     path::{Path, PathBuf, MAIN_SEPARATOR},
+    str::FromStr,
 };
 
 use base64::{encode_config, CharacterSet, Config};
 use html5ever::{
+    buffer_queue::BufferQueue,
     local_name, namespace_url, ns,
-    serialize::{HtmlSerializer, Serialize, SerializeOpts, Serializer},
+    serialize::Serialize,
+    tendril::StrTendril,
+    tokenizer::{Tokenizer, TokenizerOpts},
     QualName,
 };
 use kuchiki::{traits::TendrilSink, Attribute, ExpandedName, NodeRef};
@@ -263,6 +271,24 @@ impl<'a> RoseyPage<'a> {
                     });
 
                     if let Some(content) = locale.get(key) {
+                        let content = if content.contains('<') {
+                            let mut rewriter = TranslationRewriter::new(
+                                &self.images_source,
+                                locale_key,
+                                &self.default_language,
+                                self.locales,
+                                &self.tag,
+                            );
+                            let mut tokenizer =
+                                Tokenizer::new(&mut rewriter, TokenizerOpts::default());
+                            let mut buffer = BufferQueue::new();
+                            buffer.push_back(StrTendril::from_str(content).unwrap());
+                            let _ = tokenizer.feed(&mut buffer);
+                            tokenizer.end();
+                            rewriter.finish()
+                        } else {
+                            content.clone()
+                        };
                         node.append(NodeRef::new_text(content));
                     } else {
                         node.append(NodeRef::new_text(original));
@@ -286,9 +312,11 @@ impl<'a> RoseyPage<'a> {
     }
 
     pub fn rewrite_assets(&mut self) {
+        let locale_key = self.get_locale_key();
         for (attr, original, node) in self.assets.iter() {
             let mut attributes = node.as_element().unwrap().attributes.borrow_mut();
-            if let Some(translated_asset) = self.get_translated_asset(original, &self.images_source)
+            if let Some(translated_asset) =
+                get_translated_asset(original, &self.images_source, locale_key)
             {
                 attributes.insert(attr.as_str(), format!("/{translated_asset}"));
             } else {
@@ -298,11 +326,12 @@ impl<'a> RoseyPage<'a> {
     }
 
     pub fn rewrite_image_tags(&mut self) {
+        let locale_key = self.get_locale_key();
         for (original_src, original_srcset, img) in self.image_tags.iter() {
             let mut attributes = img.as_element().unwrap().attributes.borrow_mut();
             if let Some(original) = original_src {
                 if let Some(translated_asset) =
-                    self.get_translated_asset(original, &self.images_source)
+                    get_translated_asset(original, &self.images_source, locale_key)
                 {
                     attributes.insert("src", format!("/{translated_asset}"));
                 } else {
@@ -320,7 +349,7 @@ impl<'a> RoseyPage<'a> {
                     .map(|(src, width, original)| {
                         if let (Some(src), Some(width)) = (src, width) {
                             if let Some(translated_src) =
-                                self.get_translated_asset(src, &self.images_source)
+                                get_translated_asset(src, &self.images_source, locale_key)
                             {
                                 return format!("/{} {}", translated_src, width);
                             }
@@ -337,26 +366,6 @@ impl<'a> RoseyPage<'a> {
                 attributes.insert("srcset", srcset);
             }
         }
-    }
-
-    fn get_translated_asset(&self, original: &str, source: &Path) -> Option<String> {
-        let locale_key = self.get_locale_key();
-        let original_path = Path::new(original);
-        if let Some(ext) = original_path.extension() {
-            let mut translated_asset = PathBuf::from(original_path);
-            translated_asset.set_extension(format!("{locale_key}.{}", ext.to_str().unwrap()));
-            if let Ok(stripped_path) = translated_asset.strip_prefix(MAIN_SEPARATOR.to_string()) {
-                translated_asset = stripped_path.to_path_buf();
-            }
-
-            let translated_path = source.join(&translated_asset);
-
-            if translated_path.exists() {
-                let src = translated_asset.to_str().unwrap().replace('\\', "/");
-                return Some(src);
-            }
-        }
-        None
     }
 
     fn prepare_head(&mut self) {
@@ -431,10 +440,18 @@ impl<'a> RoseyPage<'a> {
                 .unwrap()
                 .attributes
                 .borrow_mut();
-            attributes.remove("hreflang");
-            attributes.remove("href");
-            attributes.insert("hreflang", String::from(key));
-            attributes.insert("href", format!("/{key}/{path}"));
+
+            if let Some(hreflang) = attributes.get_mut("hreflang") {
+                *hreflang = String::from(key);
+            } else {
+                attributes.insert("hreflang", String::from(key));
+            }
+
+            if let Some(href) = attributes.get_mut("href") {
+                *href = format!("/{key}/{path}");
+            } else {
+                attributes.insert("href", format!("/{key}/{path}"));
+            }
         }
     }
 
@@ -615,49 +632,21 @@ impl<'a> RoseyPage<'a> {
     }
 }
 
-struct RoseySerializer<Wr: Write> {
-    serializer: HtmlSerializer<Wr>,
-}
+pub fn get_translated_asset(original: &str, source: &Path, locale_key: &str) -> Option<String> {
+    let original_path = Path::new(original);
+    if let Some(ext) = original_path.extension() {
+        let mut translated_asset = PathBuf::from(original_path);
+        translated_asset.set_extension(format!("{locale_key}.{}", ext.to_str().unwrap()));
+        if let Ok(stripped_path) = translated_asset.strip_prefix(MAIN_SEPARATOR.to_string()) {
+            translated_asset = stripped_path.to_path_buf();
+        }
 
-impl<Wr: Write> RoseySerializer<Wr> {
-    pub fn new(writer: Wr) -> Self {
-        RoseySerializer {
-            serializer: HtmlSerializer::new(
-                writer,
-                SerializeOpts {
-                    traversal_scope: html5ever::serialize::TraversalScope::IncludeNode,
-                    ..Default::default()
-                },
-            ),
+        let translated_path = source.join(&translated_asset);
+
+        if translated_path.exists() {
+            let src = translated_asset.to_str().unwrap().replace('\\', "/");
+            return Some(src);
         }
     }
-}
-
-impl<Wr: Write> Serializer for RoseySerializer<Wr> {
-    fn start_elem<'a, AttrIter>(&mut self, name: QualName, attrs: AttrIter) -> std::io::Result<()>
-    where
-        AttrIter: Iterator<Item = html5ever::serialize::AttrRef<'a>>,
-    {
-        self.serializer.start_elem(name, attrs)
-    }
-
-    fn end_elem(&mut self, name: QualName) -> std::io::Result<()> {
-        self.serializer.end_elem(name)
-    }
-
-    fn write_text(&mut self, text: &str) -> std::io::Result<()> {
-        self.serializer.writer.write_all(text.as_bytes())
-    }
-
-    fn write_comment(&mut self, text: &str) -> std::io::Result<()> {
-        self.serializer.write_comment(text)
-    }
-
-    fn write_doctype(&mut self, name: &str) -> std::io::Result<()> {
-        self.serializer.write_doctype(name)
-    }
-
-    fn write_processing_instruction(&mut self, target: &str, data: &str) -> std::io::Result<()> {
-        self.serializer.write_processing_instruction(target, data)
-    }
+    None
 }
