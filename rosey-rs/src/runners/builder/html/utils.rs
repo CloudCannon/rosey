@@ -164,8 +164,18 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                 }
             }
             html5ever::tokenizer::Token::CharacterTokens(tendril) => self.result.push_str(&tendril),
-            html5ever::tokenizer::Token::EOFToken => {}
-            _ => self.result.push_str(&format!("{token:?}")),
+						html5ever::tokenizer::Token::CommentToken(tendril) => {
+							self.result.push_str("<!--");
+							self.result.push_str(&tendril);
+							self.result.push_str("-->");
+						},
+            html5ever::tokenizer::Token::DoctypeToken(html5ever::tokenizer::Doctype{ name: Some(name), ..}) => {
+							self.result.push_str("<!DOCTYPE ");
+							self.result.push_str(&name);
+							self.result.push('>');
+						},
+						html5ever::tokenizer::Token::EOFToken => {},
+            token => eprintln!("WARNING: Found unsupported token in translation. This token will be skipped in the output: {token:?}"),
         }
         TokenSinkResult::Continue
     }
