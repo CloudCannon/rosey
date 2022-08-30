@@ -121,7 +121,6 @@ impl RoseyWorld {
             },
             Ok("rs") => {
                 let command = RoseyCommand::from_str(&command).unwrap();
-                
                 let options = RoseyOptions{
                     working_directory: self.tmp_dir(),
                     ..options
@@ -198,7 +197,7 @@ fn build_rosey_options(step_table: &Table) -> RoseyOptions {
             source_delimiter: None,
             redirect_page: None,
             verbose: false,
-        }
+        },
     };
     for row in &step_table.rows {
         match row[0].as_ref() {
@@ -212,8 +211,7 @@ fn build_rosey_options(step_table: &Table) -> RoseyOptions {
             "locale-dest" => options.locale_dest = Some(PathBuf::from(row[1].clone())),
             "locale-source" => options.locale_source = Some(PathBuf::from(row[1].clone())),
             "languages" => {
-                options.languages =
-                    Some(row[1].clone().split(',').map(|s| s.to_string()).collect())
+                options.languages = Some(row[1].clone().split(',').map(|s| s.to_string()).collect())
             }
             "credentials" => options.credentials = Some(row[1].clone()),
             "exclusions" => options.exclusions = Some(row[1].clone()),
@@ -259,14 +257,24 @@ fn build_rosey_command(command: &str, binary: &str, options: RoseyOptions) -> St
     );
     command.try_add(options.credentials, |s| format!("--credentials \"{}\"", s));
     command.try_add(options.exclusions, |s| format!("--exclusions \"{}\"", s));
-    command.try_add(options.images_source.map(|p| p.to_str().unwrap().to_string()), |s| format!("--images-source {}", s));
+    command.try_add(
+        options
+            .images_source
+            .map(|p| p.to_str().unwrap().to_string()),
+        |s| format!("--images-source {}", s),
+    );
     command.try_add(options.default_language, |s| {
         format!("--default-language \"{}\"", s)
     });
     command.try_add(options.source_delimiter, |s| {
         format!("--source-delimiter \"{}\"", s)
     });
-    command.try_add(options.redirect_page.map(|p| p.to_str().unwrap().to_string()), |s| format!("--redirect-page {}", s));
+    command.try_add(
+        options
+            .redirect_page
+            .map(|p| p.to_str().unwrap().to_string()),
+        |s| format!("--redirect-page {}", s),
+    );
 
     command.add_flag(options.verbose, "--verbose".to_string());
 

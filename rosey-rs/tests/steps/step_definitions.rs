@@ -205,6 +205,7 @@ fn json_contains_values(world: &mut RoseyWorld, debug: StepDebug, step: &Step, f
     debug.log(&contents);
     let parsed_json = parse_json_file(&contents);
     let int_re = Regex::new(r"^int:(\d+)$").unwrap();
+    let bool_re = Regex::new(r"^bool:(true|false)$").unwrap();
 
     for row in &step
         .table
@@ -230,6 +231,23 @@ fn json_contains_values(world: &mut RoseyWorld, debug: StepDebug, step: &Step, f
                 .parse()
                 .expect("expected_int wasn't an int");
             assert_eq!(value, expected_int);
+        } else if let Some(expected_bool) = bool_re.captures(&expected_value) {
+            let value: bool = parsed_json
+                .dot_get(&row[0])
+                .unwrap_or_else(|_| panic!("JSON path {} lookup failed", &row[0]))
+                .unwrap_or_else(|| {
+                    panic!(
+                        "JSON path {} yielded none\nLooked at the structure {:#?}",
+                        &row[0], parsed_json
+                    )
+                });
+            let expected_bool: bool = expected_bool
+                .get(1)
+                .unwrap()
+                .as_str()
+                .parse()
+                .expect("expected_bool wasn't an bool");
+            assert_eq!(value, expected_bool);
         } else {
             let value: String = parsed_json
                 .dot_get(&row[0])

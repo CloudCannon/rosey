@@ -2,13 +2,14 @@ mod runners;
 
 use crate::runners::generator::RoseyGenerator;
 use clap::ArgMatches;
-use runners::builder::RoseyBuilder;
+use runners::{builder::RoseyBuilder, checker::RoseyChecker};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, env, path::PathBuf, str::FromStr};
 
 pub enum RoseyCommand {
     Generate,
     Build,
+    Check,
 }
 
 impl FromStr for RoseyCommand {
@@ -18,6 +19,7 @@ impl FromStr for RoseyCommand {
         match s {
             "generate" => Ok(RoseyCommand::Generate),
             "build" => Ok(RoseyCommand::Build),
+            "check" => Ok(RoseyCommand::Check),
             _ => Err(()),
         }
     }
@@ -89,23 +91,26 @@ impl RoseyOptions {
         match command {
             RoseyCommand::Generate => RoseyGenerator::from(self).run(),
             RoseyCommand::Build => RoseyBuilder::from(self).run(),
+            RoseyCommand::Check => RoseyChecker::from(self).run(),
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RoseyTranslation {
-    pub original: String,
-    pub pages: BTreeMap<String, u32>,
-    pub total: u32,
+    pub original: Option<String>,
+    pub value: Option<String>,
+    pub pages: Option<BTreeMap<String, u32>>,
+    pub total: Option<u32>,
 }
 
 impl RoseyTranslation {
     pub fn new(original: String) -> RoseyTranslation {
         RoseyTranslation {
-            original,
-            pages: BTreeMap::default(),
-            total: 0,
+            original: Some(original),
+            pages: Some(BTreeMap::default()),
+            total: Some(0),
+            value: None,
         }
     }
 }
@@ -154,20 +159,28 @@ impl FromStr for RoseyLocale {
 
 impl RoseyLocale {
     pub fn insert(&mut self, key: String, value: String, page: &str) {
-        let mut translation = self
+        let translation = self
             .keys
             .entry(key)
             .or_insert_with(|| RoseyTranslation::new(value));
-        translation.total += 1;
-        let page = translation
-            .pages
-            .entry(page.replace('\\', "/"))
-            .or_insert(0);
-        *page += 1;
+
+        if let RoseyTranslation {
+            total: Some(total),
+            pages: Some(pages),
+            ..
+        } = translation
+        {
+            *total += 1;
+            let page = pages.entry(page.replace('\\', "/")).or_insert(0);
+            *page += 1;
+        }
     }
 
     pub fn get(&self, key: &str) -> Option<&String> {
-        return self.keys.get(key).map(|entry| &entry.original);
+        if let Some(RoseyTranslation { original, .. }) = self.keys.get(key) {
+            return original.as_ref();
+        }
+        None
     }
 
     pub fn output(&mut self, version: u8) -> String {
@@ -181,7 +194,9 @@ impl RoseyLocale {
     pub fn output_v1(&mut self) -> String {
         let mut originals: BTreeMap<String, String> = BTreeMap::default();
         for (key, translation) in self.keys.iter() {
-            originals.insert(key.clone(), translation.original.clone());
+            if let Some(original) = &translation.original {
+                originals.insert(key.clone(), original.clone());
+            }
         }
         serde_json::to_string(&originals).unwrap()
     }

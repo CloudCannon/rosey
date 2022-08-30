@@ -336,3 +336,8 @@ mfractor/
 .nyc_output
 coverage
 *.lcov
+source
+dest
+rosey
+
+cache

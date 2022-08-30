@@ -104,7 +104,21 @@ fn main() {
                         .takes_value(true),
                 ),
         )
-        .subcommand(App::new("check"))
+        .subcommand(
+            App::new("check")
+                .arg(
+                    Arg::with_name("locale-source")
+                        .short("l")
+                        .long("locale-source")
+                        .default_value("rosey/locales/"),
+                )
+                .arg(
+                    Arg::with_name("locale-dest")
+                        .short("d")
+                        .long("locale-dest")
+                        .default_value("rosey/source.json"),
+                ),
+        )
         .subcommand(App::new("convert"))
         .subcommand(App::new("watch"))
         .subcommand(App::new("clean"))
