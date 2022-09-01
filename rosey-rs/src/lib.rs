@@ -96,17 +96,17 @@ impl RoseyOptions {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct RoseyTranslation {
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct RoseyTranslationEntry {
     pub original: Option<String>,
     pub value: Option<String>,
     pub pages: Option<BTreeMap<String, u32>>,
     pub total: Option<u32>,
 }
 
-impl RoseyTranslation {
-    pub fn new(original: String) -> RoseyTranslation {
-        RoseyTranslation {
+impl RoseyTranslationEntry {
+    pub fn new(original: String) -> RoseyTranslationEntry {
+        RoseyTranslationEntry {
             original: Some(original),
             pages: Some(BTreeMap::default()),
             total: Some(0),
@@ -116,16 +116,99 @@ impl RoseyTranslation {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum RoseyTranslation {
+    V1(BTreeMap<String, String>),
+    V2(BTreeMap<String, RoseyTranslationEntry>),
+}
+
+impl RoseyTranslation {
+    pub fn insert(&mut self, key: String, value: String, page: &str) {
+        match self {
+            RoseyTranslation::V1(keys) => {
+                keys.insert(key, value);
+            }
+            RoseyTranslation::V2(keys) => {
+                let translation = keys
+                    .entry(key)
+                    .or_insert_with(|| RoseyTranslationEntry::new(value));
+
+                if let RoseyTranslationEntry {
+                    total: Some(total),
+                    pages: Some(pages),
+                    ..
+                } = translation
+                {
+                    *total += 1;
+                    let page = pages.entry(page.replace('\\', "/")).or_insert(0);
+                    *page += 1;
+                }
+            }
+        }
+    }
+
+    pub fn get(&self, key: &str) -> Option<&String> {
+        match self {
+            RoseyTranslation::V1(keys) => keys.get(key),
+            RoseyTranslation::V2(keys) => {
+                if let Some(RoseyTranslationEntry { value, .. }) = keys.get(key) {
+                    return value.as_ref();
+                }
+                None
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        match self {
+            RoseyTranslation::V1(keys) => keys.len(),
+            RoseyTranslation::V2(keys) => keys.len(),
+        }
+    }
+
+    pub fn remove(&mut self, key: &str) {
+        match self {
+            RoseyTranslation::V1(keys) => {
+                keys.remove(key);
+            }
+            RoseyTranslation::V2(keys) => {
+                keys.remove(key);
+            }
+        };
+    }
+
+    pub fn normalize(&self) -> BTreeMap<String, RoseyTranslationEntry> {
+        match self {
+            RoseyTranslation::V1(keys) => keys
+                .iter()
+                .map(|(key, value)| {
+                    (
+                        key.clone(),
+                        RoseyTranslationEntry {
+                            value: Some(value.clone()),
+                            original: None,
+                            total: None,
+                            pages: None,
+                        },
+                    )
+                })
+                .collect(),
+            RoseyTranslation::V2(keys) => keys.clone(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RoseyLocale {
     pub version: u8,
-    pub keys: BTreeMap<String, RoseyTranslation>,
+    pub keys: RoseyTranslation,
 }
 
 impl Default for RoseyLocale {
     fn default() -> Self {
         RoseyLocale {
             version: 2,
-            keys: BTreeMap::default(),
+            keys: RoseyTranslation::V2(BTreeMap::default()),
         }
     }
 }
@@ -138,19 +221,8 @@ impl FromStr for RoseyLocale {
             return Ok(result);
         }
 
-        if let Ok(map) = serde_json::from_str::<BTreeMap<String, String>>(s) {
-            let mut result = RoseyLocale {
-                version: 1,
-                ..Default::default()
-            };
-
-            map.iter().for_each(|(key, value)| {
-                result
-                    .keys
-                    .insert(key.clone(), RoseyTranslation::new(value.clone()));
-            });
-
-            return Ok(result);
+        if let Ok(keys) = serde_json::from_str(s) {
+            return Ok(RoseyLocale { version: 1, keys });
         }
 
         Err(())
@@ -158,46 +230,26 @@ impl FromStr for RoseyLocale {
 }
 
 impl RoseyLocale {
-    pub fn insert(&mut self, key: String, value: String, page: &str) {
-        let translation = self
-            .keys
-            .entry(key)
-            .or_insert_with(|| RoseyTranslation::new(value));
-
-        if let RoseyTranslation {
-            total: Some(total),
-            pages: Some(pages),
-            ..
-        } = translation
-        {
-            *total += 1;
-            let page = pages.entry(page.replace('\\', "/")).or_insert(0);
-            *page += 1;
+    pub fn new(version: u8) -> RoseyLocale {
+        RoseyLocale {
+            version,
+            keys: match version {
+                2 => RoseyTranslation::V2(BTreeMap::default()),
+                1 => RoseyTranslation::V1(BTreeMap::default()),
+                _ => unreachable!("Unsupported version"),
+            },
         }
     }
 
-    pub fn get(&self, key: &str) -> Option<&String> {
-        if let Some(RoseyTranslation { original, .. }) = self.keys.get(key) {
-            return original.as_ref();
-        }
-        None
+    pub fn insert(&mut self, key: String, value: String, page: &str) {
+        self.keys.insert(key, value, page);
     }
 
     pub fn output(&mut self, version: u8) -> String {
         match version {
             2 => serde_json::to_string(self).unwrap(),
-            1 => self.output_v1(),
+            1 => serde_json::to_string(&self.keys).unwrap(),
             _ => unreachable!(),
         }
-    }
-
-    pub fn output_v1(&mut self) -> String {
-        let mut originals: BTreeMap<String, String> = BTreeMap::default();
-        for (key, translation) in self.keys.iter() {
-            if let Some(original) = &translation.original {
-                originals.insert(key.clone(), original.clone());
-            }
-        }
-        serde_json::to_string(&originals).unwrap()
     }
 }

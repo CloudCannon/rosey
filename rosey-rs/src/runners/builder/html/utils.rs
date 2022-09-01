@@ -6,7 +6,7 @@ use html5ever::{
     QualName,
 };
 
-use crate::RoseyLocale;
+use crate::RoseyTranslation;
 
 use super::get_translated_asset;
 
@@ -15,7 +15,7 @@ pub struct TranslationRewriter<'a> {
     images_source: &'a Path,
     locale_key: &'a str,
     default_language: &'a str,
-    locales: &'a BTreeMap<String, RoseyLocale>,
+    translations: &'a BTreeMap<String, RoseyTranslation>,
     tag: &'a str,
 }
 
@@ -24,7 +24,7 @@ impl<'a> TranslationRewriter<'a> {
         images_source: &'a Path,
         locale_key: &'a str,
         default_language: &'a str,
-        locales: &'a BTreeMap<String, RoseyLocale>,
+        translations: &'a BTreeMap<String, RoseyTranslation>,
         tag: &'a str,
     ) -> Self {
         TranslationRewriter {
@@ -32,7 +32,7 @@ impl<'a> TranslationRewriter<'a> {
             images_source,
             locale_key,
             default_language,
-            locales,
+            translations,
             tag,
         }
     }
@@ -111,7 +111,7 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                             if !href_path.is_absolute()
                                 || !matches!(ext, Some("html") | Some("htm") | None)
                                 || self
-                                    .locales
+                                    .translations
                                     .keys()
                                     .chain(std::iter::once(&self.default_language.to_string()))
                                     .any(|key| attr.value.starts_with(&format!("/{key}")))

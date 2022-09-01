@@ -1,4 +1,4 @@
-use crate::RoseyLocale;
+use crate::RoseyTranslation;
 
 use super::RoseyBuilder;
 
@@ -41,9 +41,9 @@ impl RoseyBuilder {
 
         self.output_file(&self.default_language, relative_path, content);
 
-        self.locales.par_iter().for_each(|(key, locale)| {
+        self.translations.par_iter().for_each(|(key, translation)| {
             let mut source = source.clone();
-            self.process_json_node(&mut source, &schema, None, locale);
+            self.process_json_node(&mut source, &schema, None, translation);
 
             let content = serde_json::to_string(&source).unwrap();
             self.output_file(key, relative_path, content);
@@ -55,7 +55,7 @@ impl RoseyBuilder {
         source: &mut Value,
         schema: &Value,
         namespace: Option<String>,
-        locale: &RoseyLocale,
+        translation: &RoseyTranslation,
     ) {
         if discriminant(source) != discriminant(schema) {
             eprintln!("Schema mismatch");
@@ -82,7 +82,7 @@ impl RoseyBuilder {
 
                         let locale_key = format!("{}{}", namespace, key.unwrap());
 
-                        if let Some(value) = locale.get(&locale_key) {
+                        if let Some(value) = translation.get(&locale_key) {
                             *source_value = value.clone();
                         }
                     } else if let (Some(source_value), Some(schema_value)) =
@@ -92,7 +92,7 @@ impl RoseyBuilder {
                             source_value,
                             schema_value,
                             Some(namespace.clone()),
-                            locale,
+                            translation,
                         )
                     }
                 })
@@ -121,7 +121,7 @@ impl RoseyBuilder {
                                 }
                                 locale_key.push_str(key.as_ref().unwrap());
 
-                                if let Some(value) = locale.get(&locale_key) {
+                                if let Some(value) = translation.get(&locale_key) {
                                     *source_value = value.clone();
                                 }
                             } else {
@@ -130,7 +130,7 @@ impl RoseyBuilder {
                         })
                     }
                     Some(schema_value) => source_array.iter_mut().for_each(|source_value| {
-                        self.process_json_node(source_value, schema_value, None, locale)
+                        self.process_json_node(source_value, schema_value, None, translation)
                     }),
                     _ => eprintln!("Schema mismatch in array: Expected String|Object"),
                 }

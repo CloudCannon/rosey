@@ -7,14 +7,13 @@ use std::{
     fs::{copy, create_dir_all, read_to_string, remove_dir_all, File},
     io::{BufWriter, Write},
     path::{Path, PathBuf},
-    str::FromStr,
 };
 
 use globwalk::DirEntry;
 use rayon::prelude::*;
 use regex::Regex;
 
-use crate::{RoseyLocale, RoseyOptions};
+use crate::{RoseyOptions, RoseyTranslation};
 
 pub struct RoseyBuilder {
     pub working_directory: PathBuf,
@@ -24,7 +23,7 @@ pub struct RoseyBuilder {
     pub tag: String,
     pub separator: String,
     pub default_language: String,
-    pub locales: BTreeMap<String, RoseyLocale>,
+    pub translations: BTreeMap<String, RoseyTranslation>,
     pub redirect_page: Option<PathBuf>,
     pub exclusions: String,
     pub images_source: Option<PathBuf>,
@@ -39,7 +38,7 @@ impl From<RoseyOptions> for RoseyBuilder {
             dest: runner.dest.unwrap(),
             tag: runner.tag.unwrap(),
             default_language: runner.default_language.unwrap(),
-            locales: BTreeMap::default(),
+            translations: BTreeMap::default(),
             separator: runner.separator.unwrap(),
             redirect_page: runner.redirect_page,
             exclusions: runner.exclusions.unwrap(),
@@ -51,7 +50,7 @@ impl From<RoseyOptions> for RoseyBuilder {
 impl RoseyBuilder {
     pub fn run(&mut self) {
         self.clean_output_dir();
-        self.read_locales();
+        self.read_translations();
         self.process_assets();
         self.process_files();
     }
@@ -107,7 +106,7 @@ impl RoseyBuilder {
             .for_each(|file| self.process_file(file));
     }
 
-    pub fn read_locales(&mut self) {
+    pub fn read_translations(&mut self) {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(
             self.working_directory.join(&self.locale_source),
             &["**/*.json"],
@@ -125,9 +124,9 @@ impl RoseyBuilder {
                 .to_string_lossy()
                 .to_string();
             let value = read_to_string(file.path()).expect("Failed to read locale file");
-            let value = RoseyLocale::from_str(&value);
+            let value = serde_json::from_str(&value);
             if let Ok(value) = value {
-                self.locales.insert(locale, value);
+                self.translations.insert(locale, value);
             }
         });
     }

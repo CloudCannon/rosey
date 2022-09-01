@@ -25,7 +25,7 @@ use html5ever::{
 use kuchiki::{traits::TendrilSink, Attribute, ExpandedName, NodeRef};
 use sha2::{Digest, Sha256};
 
-use crate::RoseyLocale;
+use crate::RoseyTranslation;
 
 impl RoseyBuilder {
     pub fn process_html_file(&self, file: &Path) {
@@ -44,13 +44,13 @@ impl RoseyBuilder {
             &self.tag,
             images_source,
             &self.default_language,
-            &self.locales,
+            &self.translations,
         );
         page.prepare();
 
         //If the file is already in a locale folder, then output it only for that locale
         if let Some(key) = self
-            .locales
+            .translations
             .keys()
             .find(|key| relative_path.starts_with(key))
         {
@@ -75,7 +75,7 @@ impl RoseyBuilder {
         page.output_file(&output_path, false);
         self.output_redirect_file(&self.default_language, relative_path);
 
-        self.locales.keys().for_each(|key| {
+        self.translations.keys().for_each(|key| {
             page.set_locale_key(key);
             page.rewrite_html();
             page.rewrite_meta_tags(relative_path);
@@ -106,7 +106,7 @@ impl RoseyBuilder {
         };
 
         let mut alternates = String::default();
-        for key in (&self.locales)
+        for key in (&self.translations)
             .iter()
             .map(|(key, _)| key)
             .chain(std::iter::once(&self.default_language))
@@ -118,7 +118,7 @@ impl RoseyBuilder {
         }
 
         let mut lookup: BTreeMap<String, &str> = BTreeMap::default();
-        for key in (&self.locales)
+        for key in (&self.translations)
             .iter()
             .map(|(key, _)| key)
             .chain(std::iter::once(&self.default_language))
@@ -172,7 +172,7 @@ struct RoseyPage<'a> {
     pub separator: String,
     pub images_source: PathBuf,
     pub default_language: String,
-    pub locales: &'a BTreeMap<String, RoseyLocale>,
+    pub translations: &'a BTreeMap<String, RoseyTranslation>,
 }
 
 impl<'a> RoseyPage<'a> {
@@ -182,7 +182,7 @@ impl<'a> RoseyPage<'a> {
         tag: &str,
         images_source: PathBuf,
         default_language: &str,
-        locales: &'a BTreeMap<String, RoseyLocale>,
+        translations: &'a BTreeMap<String, RoseyTranslation>,
     ) -> Self {
         let dom = kuchiki::parse_html().one(content);
 
@@ -198,7 +198,7 @@ impl<'a> RoseyPage<'a> {
             meta_tag: None,
             images_source,
             default_language: default_language.to_string(),
-            locales,
+            translations,
             locale_key: None,
         }
     }
@@ -232,7 +232,7 @@ impl<'a> RoseyPage<'a> {
             if src_path.is_absolute()
                 && matches!(ext, Some("html") | Some("htm") | None)
                 && !self
-                    .locales
+                    .translations
                     .keys()
                     .chain(std::iter::once(&self.default_language))
                     .any(|key| src.starts_with(&format!("/{key}")))
@@ -255,8 +255,8 @@ impl<'a> RoseyPage<'a> {
 
     pub fn rewrite_html(&mut self) {
         let locale_key = self.get_locale_key();
-        let locale = if let Some(locale) = self.locales.get(locale_key) {
-            locale
+        let translation = if let Some(translation) = self.translations.get(locale_key) {
+            translation
         } else {
             eprintln!(
                 "Error: failed to load locale with key {locale_key}. Skipping rewriting HTML."
@@ -270,13 +270,13 @@ impl<'a> RoseyPage<'a> {
                         child.detach();
                     });
 
-                    if let Some(content) = locale.get(key) {
+                    if let Some(content) = translation.get(key) {
                         let content = if content.contains('<') {
                             let mut rewriter = TranslationRewriter::new(
                                 &self.images_source,
                                 locale_key,
                                 &self.default_language,
-                                self.locales,
+                                self.translations,
                                 &self.tag,
                             );
                             let mut tokenizer =
@@ -297,7 +297,7 @@ impl<'a> RoseyPage<'a> {
                 RoseyEdit::Attribute(key, attr, original, node) => {
                     let mut attributes = node.as_element().unwrap().attributes.borrow_mut();
 
-                    if let Some(value) = locale.get(key) {
+                    if let Some(value) = translation.get(key) {
                         attributes.remove(attr.as_str());
                         attributes.insert(attr.as_str(), value.clone());
                     } else {
@@ -397,7 +397,7 @@ impl<'a> RoseyPage<'a> {
         self.meta_tag = Some(node.clone());
         head.append(node);
 
-        for _i in 0..self.locales.len() {
+        for _i in 0..self.translations.len() {
             let mut attributes = BTreeMap::new();
             attributes.insert(
                 ExpandedName::new("", "rel"),
@@ -428,7 +428,7 @@ impl<'a> RoseyPage<'a> {
         attributes.insert("content", locale_key.to_string());
 
         for (i, key) in self
-            .locales
+            .translations
             .iter()
             .map(|(key, _)| key.as_str())
             .chain(std::iter::once(&self.default_language[..]))

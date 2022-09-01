@@ -93,14 +93,14 @@ impl RoseyChecker {
             .to_string_lossy()
             .to_string();
         let value = read_to_string(file.path()).expect("Failed to read locale file");
-        let value = serde_json::from_str::<BTreeMap<String, RoseyTranslation>>(&value);
-        if let Ok(mut value) = value {
-            let locale_check = self.check_locale(&mut value);
-            self.check.insert(locale, locale_check);
+        let value = serde_json::from_str::<RoseyTranslation>(&value);
+        if let Ok(mut translation) = value {
+            let check = self.check_translation(&mut translation);
+            self.check.insert(locale, check);
         }
     }
 
-    fn check_locale(&mut self, target_keys: &mut BTreeMap<String, RoseyTranslation>) -> RoseyCheck {
+    fn check_translation(&mut self, target_keys: &mut RoseyTranslation) -> RoseyCheck {
         let mut check = RoseyCheck {
             current: true,
             source_total: self.base_locale.keys.len() as i32,
@@ -113,32 +113,38 @@ impl RoseyChecker {
         check.states.insert(RoseyCheckStates::Missing, 0);
         check.states.insert(RoseyCheckStates::Unused, 0);
 
-        self.base_locale.keys.iter().for_each(|(key, translation)| {
-            if let Some(target_key) = target_keys.get(key) {
-                if translation.original != target_key.original {
-                    check.current = false;
-                    let outdated = check.states.entry(RoseyCheckStates::Outdated).or_insert(0);
-                    *outdated += 1;
-                    check
-                        .keys
-                        .insert(key.to_string(), RoseyCheckStates::Outdated);
+        let mut target_keys = target_keys.normalize();
+
+        self.base_locale
+            .keys
+            .normalize()
+            .iter()
+            .for_each(|(key, translation)| {
+                if let Some(target_key) = target_keys.get(key) {
+                    if translation.original != target_key.original {
+                        check.current = false;
+                        let outdated = check.states.entry(RoseyCheckStates::Outdated).or_insert(0);
+                        *outdated += 1;
+                        check
+                            .keys
+                            .insert(key.to_string(), RoseyCheckStates::Outdated);
+                    } else {
+                        let current = check.states.entry(RoseyCheckStates::Current).or_insert(0);
+                        *current += 1;
+                        check
+                            .keys
+                            .insert(key.to_string(), RoseyCheckStates::Current);
+                    }
                 } else {
-                    let current = check.states.entry(RoseyCheckStates::Current).or_insert(0);
-                    *current += 1;
+                    check.current = false;
+                    let missing = check.states.entry(RoseyCheckStates::Missing).or_insert(0);
+                    *missing += 1;
                     check
                         .keys
-                        .insert(key.to_string(), RoseyCheckStates::Current);
+                        .insert(key.to_string(), RoseyCheckStates::Missing);
                 }
-            } else {
-                check.current = false;
-                let missing = check.states.entry(RoseyCheckStates::Missing).or_insert(0);
-                *missing += 1;
-                check
-                    .keys
-                    .insert(key.to_string(), RoseyCheckStates::Missing);
-            }
-            target_keys.remove(key);
-        });
+                target_keys.remove(key);
+            });
 
         target_keys.iter().for_each(|(key, _translation)| {
             check.current = false;

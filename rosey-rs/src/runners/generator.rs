@@ -24,14 +24,15 @@ pub struct RoseyGenerator {
 
 impl From<RoseyOptions> for RoseyGenerator {
     fn from(runner: RoseyOptions) -> Self {
+        let version = runner.version.unwrap();
         RoseyGenerator {
             working_directory: runner.working_directory,
             source: runner.source.unwrap(),
-            version: runner.version.unwrap(),
+            version,
             tag: runner.tag.unwrap(),
             separator: runner.separator.unwrap(),
             locale_dest: runner.locale_dest.unwrap(),
-            locale: RoseyLocale::default(),
+            locale: RoseyLocale::new(version),
             current_file: String::default(),
         }
     }
