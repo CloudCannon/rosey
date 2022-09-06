@@ -93,7 +93,7 @@ impl RoseyWorld {
         self.tmp_file_path(filename).exists()
     }
 
-    fn run_rosey(&mut self, command: String, options: RoseyOptions) {
+    async fn run_rosey(&mut self, command: String, options: RoseyOptions) {
         match std::env::var("ROSEY_IMPL").as_deref() {
             Ok("js") => {
                 let js_cli = build_rosey_command(&command, "../rosey-js/index.js", options);
@@ -125,7 +125,7 @@ impl RoseyWorld {
                     working_directory: self.tmp_dir(),
                     ..options
                 };
-                options.run(command);
+                options.run(command).await;
             },
             Ok(other) => panic!("{} is not a valid ROSEY_IMPL. Valid impls are 'js' or 'rs'", other),
             Err(_) => panic!("\n---\nNeed an implementation to test. Please use:\nROSEY_IMPL=js cargo test\nor\nROSEY_IMPL=rs cargo test\n---\n"),
@@ -197,6 +197,7 @@ fn build_rosey_options(step_table: &Table) -> RoseyOptions {
             source_delimiter: None,
             redirect_page: None,
             verbose: false,
+            serve: false,
         },
     };
     for row in &step_table.rows {

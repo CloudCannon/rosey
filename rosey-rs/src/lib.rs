@@ -41,6 +41,7 @@ pub struct RoseyOptions {
     pub default_language: Option<String>,
     pub source_delimiter: Option<String>,
     pub redirect_page: Option<PathBuf>,
+    pub serve: bool,
     pub verbose: bool,
 }
 
@@ -63,6 +64,7 @@ impl Default for RoseyOptions {
             source_delimiter: None,
             redirect_page: None,
             verbose: false,
+            serve: false,
         }
     }
 }
@@ -81,16 +83,17 @@ impl From<&ArgMatches<'_>> for RoseyOptions {
             redirect_page: matches.value_of("redirect-page").map(PathBuf::from),
             exclusions: matches.value_of("exclusions").map(String::from),
             images_source: matches.value_of("images-source").map(PathBuf::from),
+            serve: matches.is_present("serve"),
             ..Default::default()
         }
     }
 }
 
 impl RoseyOptions {
-    pub fn run(self, command: RoseyCommand) {
+    pub async fn run(self, command: RoseyCommand) {
         match command {
             RoseyCommand::Generate => RoseyGenerator::from(self).run(),
-            RoseyCommand::Build => RoseyBuilder::from(self).run(),
+            RoseyCommand::Build => RoseyBuilder::from(self).run().await,
             RoseyCommand::Check => RoseyChecker::from(self).run(),
         }
     }
@@ -164,6 +167,10 @@ impl RoseyTranslation {
             RoseyTranslation::V1(keys) => keys.len(),
             RoseyTranslation::V2(keys) => keys.len(),
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn remove(&mut self, key: &str) {

@@ -6,8 +6,9 @@ use super::{redirect_page, RoseyBuilder};
 
 use std::{
     collections::BTreeMap,
+    fmt::Write as FmtWrite,
+    fs::File,
     fs::{create_dir_all, read_to_string},
-    fs::{File, OpenOptions},
     io::{BufWriter, Write},
     path::{Path, PathBuf, MAIN_SEPARATOR},
     str::FromStr,
@@ -49,11 +50,7 @@ impl RoseyBuilder {
         page.prepare();
 
         //If the file is already in a locale folder, then output it only for that locale
-        if let Some(key) = self
-            .translations
-            .keys()
-            .find(|key| relative_path.starts_with(key))
-        {
+        if let Some(key) = self.find_locale_overwrite(file) {
             page.set_locale_key(key);
             page.rewrite_html();
             page.rewrite_meta_tags(relative_path);
@@ -62,7 +59,7 @@ impl RoseyBuilder {
             page.rewrite_anchors();
 
             let output_path = dest_folder.join(&relative_path);
-            page.output_file(&output_path, true);
+            page.output_file(&output_path);
             return;
         }
 
@@ -72,7 +69,7 @@ impl RoseyBuilder {
         let output_path = dest_folder
             .join(&self.default_language)
             .join(&relative_path);
-        page.output_file(&output_path, false);
+        page.output_file(&output_path);
         self.output_redirect_file(&self.default_language, relative_path);
 
         self.translations.keys().for_each(|key| {
@@ -84,7 +81,7 @@ impl RoseyBuilder {
             page.rewrite_anchors();
 
             let output_path = dest_folder.join(key).join(&relative_path);
-            page.output_file(&output_path, false);
+            page.output_file(&output_path);
         });
     }
 
@@ -112,9 +109,11 @@ impl RoseyBuilder {
             .chain(std::iter::once(&self.default_language))
             .filter(|key| *key != locale)
         {
-            alternates.push_str(&format!(
+            write!(
+                alternates,
                 r#"<link rel="alternate" href="/{key}/{path}" hreflang="{key}">"#
-            ))
+            )
+            .expect("Failed to output redirect - alternate link");
         }
 
         let mut lookup: BTreeMap<String, &str> = BTreeMap::default();
@@ -604,19 +603,12 @@ impl<'a> RoseyPage<'a> {
         }
     }
 
-    pub fn output_file(&self, output_path: &Path, overwrite: bool) {
+    pub fn output_file(&self, output_path: &Path) {
         if let Some(parent) = output_path.parent() {
             create_dir_all(parent).unwrap();
         }
 
-        let mut open_options = OpenOptions::new();
-        let open_options = open_options
-            .write(true)
-            .create(true)
-            .truncate(true)
-            .create_new(!overwrite);
-
-        if let Ok(file) = open_options.open(&output_path) {
+        if let Ok(file) = File::create(&output_path) {
             let writer = BufWriter::new(file);
             let mut serializer = RoseySerializer::new(writer);
             if Serialize::serialize(

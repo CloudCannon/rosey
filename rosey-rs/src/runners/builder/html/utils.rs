@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, io::Write, path::Path};
+use std::{collections::BTreeMap, fmt::Write as FmtWrite, io::Write, path::Path};
 
 use html5ever::{
     serialize::{HtmlSerializer, SerializeOpts, Serializer},
@@ -83,7 +83,7 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                 self.images_source,
                                 self.locale_key,
                             ) {
-                                self.result.push_str(&format!("/{translated_asset}"));
+                                write!(self.result, "/{translated_asset}").expect("Failed to rewrite content - custom asset attribute");
                             }
                         }
                         ("img" | "video" | "audio" | "source", "src", _) => {
@@ -92,7 +92,7 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                 self.images_source,
                                 self.locale_key,
                             ) {
-                                self.result.push_str(&format!("/{translated_asset}"));
+                                write!(self.result, "/{translated_asset}").expect("Failed to rewrite content - asset attribute");
                             }
                         }
                         ("a", "href", _) if has_download => {
@@ -101,7 +101,7 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                 self.images_source,
                                 self.locale_key,
                             ) {
-                                self.result.push_str(&format!("/{translated_asset}"));
+                                write!(self.result, "/{translated_asset}").expect("Failed to rewrite content - download link");
                             }
                         }
                         ("a", "href", _) if !has_download => {
@@ -118,8 +118,7 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                             {
                                 self.result.push_str(&attr.value);
                             } else {
-                                self.result
-                                    .push_str(&format!("/{}{}", self.locale_key, &attr.value));
+                                write!(self.result, "/{}{}", self.locale_key, &attr.value).expect("Failed to rewrite content - link");
                             }
                         }
                         ("img", "srcset", _) => {

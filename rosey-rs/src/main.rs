@@ -3,7 +3,8 @@ use rosey::{RoseyCommand, RoseyOptions};
 use std::str::FromStr;
 use std::time::Instant;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let start = Instant::now();
 
     // TODO: Implement the rest of the flags
@@ -102,7 +103,8 @@ fn main() {
                     Arg::with_name("redirect-page")
                         .long("redirect-page")
                         .takes_value(true),
-                ),
+                )
+                .arg(Arg::with_name("serve").long("serve").takes_value(false)),
         )
         .subcommand(
             App::new("check")
@@ -117,6 +119,13 @@ fn main() {
                         .short("d")
                         .long("locale-dest")
                         .default_value("rosey/source.json"),
+                )
+                .arg(
+                    Arg::with_name("version")
+                        .short("v")
+                        .long("version")
+                        .possible_values(&["1", "2"])
+                        .default_value("2"),
                 ),
         )
         .subcommand(App::new("convert"))
@@ -130,7 +139,9 @@ fn main() {
     let matches = matches.unwrap();
 
     let options = RoseyOptions::from(matches);
-    options.run(RoseyCommand::from_str(subcommand).unwrap());
+    options
+        .run(RoseyCommand::from_str(subcommand).unwrap())
+        .await;
 
     let duration = start.elapsed();
     println!(

@@ -42,7 +42,7 @@ fn new_templated_file(world: &mut RoseyWorld, step: &Step, filename: String) {
 // WHENS
 
 #[when(regex = "^I run Rosey ([a-z]+)$")]
-fn run_rosey(world: &mut RoseyWorld, command: String) {
+async fn run_rosey(world: &mut RoseyWorld, command: String) {
     let options = match std::env::var("ROSEY_IMPL").as_deref() {
         Ok("rs") => RoseyOptions::default(),
         _ => RoseyOptions {
@@ -62,17 +62,18 @@ fn run_rosey(world: &mut RoseyWorld, command: String) {
             source_delimiter: None,
             redirect_page: None,
             verbose: false,
+            serve: false,
         },
     };
-    world.run_rosey(command, options);
+    world.run_rosey(command, options).await;
 }
 
 #[when(regex = "^I run Rosey ([a-z]+) with options:$")]
-fn run_rosey_with_options(world: &mut RoseyWorld, step: &Step, command: String) {
+async fn run_rosey_with_options(world: &mut RoseyWorld, step: &Step, command: String) {
     match &step.table {
         Some(table) => {
             let options = build_rosey_options(table);
-            world.run_rosey(command, options);
+            world.run_rosey(command, options).await;
         }
         None => panic!("`{}` step expected a docstring", step.value),
     }
