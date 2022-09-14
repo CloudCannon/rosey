@@ -34,7 +34,8 @@ Feature: Rosey Build Combinatorial
         "footer": "nine"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector '[data-rosey]' in "dist/translated_site/test/index.html" with the attributes:
       | data-rosey | title |
       | innerText  | one   |

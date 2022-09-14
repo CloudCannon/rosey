@@ -17,7 +17,8 @@ Feature: Rosey Links
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'h1>a' in "dist/translated_site/blank/index.html" with the attributes:
       | href      | /blank/ |
       | innerText | Home    |
@@ -48,7 +49,8 @@ Feature: Rosey Links
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'h1>a' in "dist/translated_site/blank/index.html" with the attributes:
       | href      | /blank/blink/hello |
       | innerText | Hello              |

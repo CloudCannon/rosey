@@ -15,7 +15,8 @@ Feature: Rosey Build
         "seal": "👄🌹"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'title' in "dist/translated_site/index.html" with the attributes:
       | innerText | Redirecting... |
     And I should see a selector 'a' in "dist/translated_site/index.html" with the attributes:
@@ -45,7 +46,8 @@ Feature: Rosey Build
         "title.alt": "〽️"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'h1' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey       | title             |
       | data-rosey-attrs | content,alt       |
@@ -75,7 +77,8 @@ Feature: Rosey Build
         "alt-tag": "⚗️"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'h1' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey-attrs-explicit | {"content":"content-tag","alt":"alt-tag"} |
       | content                   | Content attribute                         |
@@ -130,7 +133,8 @@ Feature: Rosey Build
         "about:benefits:row-1:col-0:title": "5107 [4]"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey | title  |
       | innerText  | Slot A |
@@ -174,7 +178,8 @@ Feature: Rosey Build
         "footer": "b4a8eccc-4408-4d18-82aa-9d52ece1e113"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'p' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey | contact-us      |
       | innerText  | Contact content |

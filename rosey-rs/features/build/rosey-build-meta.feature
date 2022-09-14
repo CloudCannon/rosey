@@ -19,7 +19,8 @@ Feature: Rosey Build Meta
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should not see a selector 'link' in "dist/translated_site/about.html" with the attributes:
       | rel      | alternate      |
       | href     | /en/about.html |
@@ -81,7 +82,8 @@ Feature: Rosey Build Meta
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'meta' in "dist/translated_site/en/index.html" with the attributes:
       | http-equiv | content-language |
       | content    | en               |

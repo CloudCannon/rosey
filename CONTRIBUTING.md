@@ -1,4 +1,4 @@
 ## Tests
 
-- `ROSEY_IMPL=<js/rs> cargo test`
-- `ROSEY_IMPL=<js/rs> cargo test --test cucumber -- --name "<test>"`
+- `cd rosey-rs && ./test.sh`
+- `cd rosey-rs && ./test.sh "<test name>"`

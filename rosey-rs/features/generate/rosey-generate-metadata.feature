@@ -19,7 +19,8 @@ Feature: Rosey Generate Metadata
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                           | int:2 |
       | keys.seal.pages.index\.html       | int:1 |

@@ -26,7 +26,8 @@ Feature: Rosey Build JSON
         "mushroom.t": "Hm pg ttl"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see "dist/translated_site/en/titles.json" containing the values:
       | mushroom.name  | Home Page       |
       | mushroom.title | Home page title |
@@ -67,7 +68,8 @@ Feature: Rosey Build JSON
         "home.sub": "Hll"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see "dist/translated_site/en/titles.json" containing the values:
       | mushroom.name            | Home            |
       | mushroom.title           | Home page title |
@@ -109,7 +111,8 @@ Feature: Rosey Build JSON
         "home.homepagetitle.food": "Sndwch"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see "dist/translated_site/en/titles.json" containing the values:
       | mushroom.name   | Home          |
       | mushroom.meow   | Woof          |
@@ -171,7 +174,8 @@ Feature: Rosey Build JSON
         "mark.top.value": "tp"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see "dist/translated_site/en/titles.json" containing the values:
       | myCollection.0.name   | John   |
       | myCollection.0.tags.0 | cool   |
@@ -215,7 +219,8 @@ Feature: Rosey Build JSON
         "mushroom.n": "Hm Pg"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see "dist/translated_site/en/titles.json" containing the values:
       | mushroom.name  | Home Page       |
       | mushroom.title | Home page title |

@@ -17,7 +17,8 @@ Feature: Rosey Build Complex
         "seal": "\n  \n  Kiss  From  A  Rose\n"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'p' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey | seal                 |
       | innerText  | \nKiss From A Rose\n |
@@ -40,7 +41,8 @@ Feature: Rosey Build Complex
         "seal": "<p>Kiss From A <span class='rose'>Rose</span></p>"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div > p' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | Kiss From A Rose |
     And I should see a selector 'div > p > span' in "dist/translated_site/airy/index.html" with the attributes:
@@ -64,7 +66,8 @@ Feature: Rosey Build Complex
         "seal": "c̬̟h͡a̫̻̯͘o̫̟̖͍̙̝͉s̗̦̲"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'p' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey | seal |
       | innerText  | 🦭   |
@@ -97,7 +100,8 @@ Feature: Rosey Build Complex
       """
     # 👆 This whole line is RTL, it's likely rendering as
     # { "value" :"key" ,"value" :"key" }
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'p' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey | 🦭   |
       | innerText  | seal |
@@ -124,7 +128,8 @@ Feature: Rosey Build Complex
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div' in "dist/translated_site/ohno/index.html" with the attributes:
       | data-rosey | seal             |
       | innerText  | Kiss From A Rose |
@@ -143,7 +148,8 @@ Feature: Rosey Build Complex
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div' in "dist/translated_site/ohno/index.html" with the attributes:
       | data-rosey | seal             |
       | innerText  | Kiss From A Rose |
@@ -175,7 +181,8 @@ Feature: Rosey Build Complex
       """
       私は絵です
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div > p' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | Kiss From A Rose |
     And I should see a selector 'img' in "dist/translated_site/jp/index.html" with the attributes:
@@ -197,7 +204,8 @@ Feature: Rosey Build Complex
         "seal": "これはリンクです <a href=\"/other.html\"/>"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div > p' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | Kiss From A Rose |
     And I should see a selector 'a' in "dist/translated_site/jp/index.html" with the attributes:
@@ -243,7 +251,8 @@ Feature: Rosey Build Complex
         "meow": "<img srcset=\"/image-64w.png 64w,/image-640w.png 640w\" src=\"/image.png\">"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
       | src    | /image.fr.png                                 |
       | srcset | /image-64w.fr.png 64w,/image-640w.fr.png 640w |
@@ -272,7 +281,8 @@ Feature: Rosey Build Complex
         "video": "<source src=\"/video.mp4\" type=\"video/mp4\">"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'source' in "dist/translated_site/fr/index.html" with the attributes:
       | src  | /video.fr.mp4 |
       | type | video/mp4     |
@@ -300,7 +310,8 @@ Feature: Rosey Build Complex
         "audio": "<audio src=\"/pod.wav\"></audio>"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'audio' in "dist/translated_site/fr/index.html" with the attributes:
       | src | /pod.fr.wav |
 
@@ -327,7 +338,8 @@ Feature: Rosey Build Complex
         "download": "<a href=\"/rtfm.pdf\" download=\"Manual\"></a><a href=\"/rtfm.pdf\"/></a>"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'a:nth-of-type(1)' in "dist/translated_site/fr/index.html" with the attributes:
       | href     | /rtfm.fr.pdf |
       | download | Manual       |
@@ -358,7 +370,8 @@ Feature: Rosey Build Complex
         "something": "<i j=\"/something.extension\" data-rosey-asset-attrs=\"j\"></i>"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'i' in "dist/translated_site/fr/index.html" with the attributes:
       | j                      | /something.fr.extension |
       | data-rosey-asset-attrs | j                       |

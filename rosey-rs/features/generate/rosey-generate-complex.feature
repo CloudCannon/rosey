@@ -11,7 +11,8 @@ Feature: Rosey Generate Complex
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version            | int:2                |
       | keys.seal.original | \nKiss From A Rose\n |
@@ -25,7 +26,8 @@ Feature: Rosey Generate Complex
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version            | int:2                   |
       | keys.seal.original | <p>Kiss From A Rose</p> |
@@ -40,7 +42,8 @@ Feature: Rosey Generate Complex
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version            | int:2      |
       | keys.seal.original | 🦭         |
@@ -56,7 +59,8 @@ Feature: Rosey Generate Complex
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                  | int:2 |
       | keys.🦭.original         | seal  |

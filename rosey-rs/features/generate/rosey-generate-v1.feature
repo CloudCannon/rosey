@@ -9,8 +9,9 @@ Feature: Rosey Generate v1
       </body>
       </html>
       """
-    When I run Rosey generate with options:
-      | version | 1 |
+    When I run my program with the flags:
+      | generate    |
+      | --version 1 |
     Then I should see "rosey/source.json" containing the values:
       | seal | Kiss From A Rose |
 
@@ -23,8 +24,9 @@ Feature: Rosey Generate v1
       </body>
       </html>
       """
-    When I run Rosey generate with options:
-      | version | 1 |
+    When I run my program with the flags:
+      | generate    |
+      | --version 1 |
     Then I should see "rosey/source.json" containing the values:
       | title          | Home page title   |
       | title\.content | Content attribute |
@@ -39,8 +41,9 @@ Feature: Rosey Generate v1
       </body>
       </html>
       """
-    When I run Rosey generate with options:
-      | version | 1 |
+    When I run my program with the flags:
+      | generate    |
+      | --version 1 |
     Then I should see "rosey/source.json" containing the values:
       | content-tag | Content attribute |
       | alt-tag     | alt attribute     |
@@ -79,8 +82,9 @@ Feature: Rosey Generate v1
       </body>
       </html>
       """
-    When I run Rosey generate with options:
-      | version | 1 |
+    When I run my program with the flags:
+      | generate    |
+      | --version 1 |
     Then I should see "rosey/source.json" containing the values:
       | about:faq:row-0:col-0:title      | Slot A |
       | about:faq:row-1:col-0:title      | Slot B |
@@ -105,8 +109,9 @@ Feature: Rosey Generate v1
       </body>
       </html>
       """
-    When I run Rosey generate with options:
-      | version | 1 |
+    When I run my program with the flags:
+      | generate    |
+      | --version 1 |
     Then I should see "rosey/source.json" containing the values:
       | home:meta:title         | Home header title |
       | home:content:title      | Home page title   |

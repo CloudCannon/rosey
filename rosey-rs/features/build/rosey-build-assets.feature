@@ -14,7 +14,8 @@ Feature: Rosey Build Assets
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see "Pretend that I'm a png" in "dist/translated_site/assets/image.png"
 
   Scenario: Rosey build doesn't copy a default set of assets
@@ -31,7 +32,8 @@ Feature: Rosey Build Assets
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should not see the file "dist/translated_site/about.htm"
     And I should not see the file "dist/translated_site/about.json"
 
@@ -44,8 +46,9 @@ Feature: Rosey Build Assets
       """
       {}
       """
-    When I run Rosey build with options:
-      | exclusions | \.[png]{3} |
+    When I run my program with the flags:
+      | build                     |
+      | --exclusions "\.[png]{3}" |
     Then I should not see the file "dist/translated_site/image.png"
 
   Scenario: Rosey build exclusion overrides default
@@ -64,7 +67,8 @@ Feature: Rosey Build Assets
       """
       {}
       """
-    When I run Rosey build with options:
-      | exclusions | \.[png]{3} |
+    When I run my program with the flags:
+      | build                     |
+      | --exclusions "\.[png]{3}" |
     Then I should see the file "dist/translated_site/about.htm"
     And I should see "true" in "dist/translated_site/about.json"

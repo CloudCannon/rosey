@@ -2,12 +2,13 @@ name: Test
 
 on:
   push:
-    branches: [ rust ]
+    branches: [rust]
   pull_request:
-    branches: [ rust ]
+    branches: [rust]
 
 env:
   CARGO_TERM_COLOR: always
+  HUMANE_VERSION: "0.3.9"
 
 jobs:
   test:
@@ -55,8 +56,15 @@ jobs:
         run: |
           rustup install ${{ matrix.rust }}
 
-      - name: Test Internal
-        run: ROSEY_IMPL=rs cargo test
+      - name: Install humane
+        uses: supplypike/setup-bin@v1
+        with:
+          uri: "https://github.com/CloudCannon/humane/releases/download/v${{env.HUMANE_VERSION}}/humane-v${{env.HUMANE_VERSION}}-${{matrix.target}}.tar.gz"
+          name: "humane"
+          version: ${{env.HUMANE_VERSION}}
+
+      - name: Build
+        run: cargo build --release
 
       - name: Test CLI
-        run: ROSEY_IMPL=rs-cli cargo test
+        run: TEST_BINARY=./target/release/rosey humane

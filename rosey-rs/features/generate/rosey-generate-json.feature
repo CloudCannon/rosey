@@ -19,7 +19,8 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                       | int:2           |
       | keys.mushroom\.name.original  | Home Page       |
@@ -44,7 +45,8 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                                 | int:2 |
       | keys.mushroom\.name.pages.titles\.json  | int:1 |
@@ -69,8 +71,9 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    When I run Rosey generate with options:
-      | version | 1 |
+    When I run my program with the flags:
+      | generate    |
+      | --version 1 |
     Then I should see "rosey/source.json" containing the values:
       | mushroom\.name  | Home Page       |
       | mushroom\.title | Home page title |
@@ -100,7 +103,8 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                   | int:2           |
       | keys.home\.name.original  | Home            |
@@ -130,7 +134,8 @@ Feature: Rosey Generate JSON
         }
       }
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                                  | int:2         |
       | keys.home\.name.original                 | Home          |
@@ -175,7 +180,8 @@ Feature: Rosey Generate JSON
         ]
       }
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                           | int:2  |
       | keys.john\.name.original          | John   |

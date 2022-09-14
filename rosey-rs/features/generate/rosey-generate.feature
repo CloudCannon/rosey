@@ -9,7 +9,8 @@ Feature: Rosey Generate v2
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version            | int:2            |
       | keys.seal.original | Kiss From A Rose |
@@ -23,7 +24,8 @@ Feature: Rosey Generate v2
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                      | int:2             |
       | keys.title.original          | Home page title   |
@@ -39,7 +41,8 @@ Feature: Rosey Generate v2
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                   | int:2             |
       | keys.content-tag.original | Content attribute |
@@ -79,7 +82,8 @@ Feature: Rosey Generate v2
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                                        | int:2  |
       | keys.about:faq:row-0:col-0:title.original      | Slot A |
@@ -105,7 +109,8 @@ Feature: Rosey Generate v2
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                               | int:2             |
       | keys.home:meta:title.original         | Home header title |

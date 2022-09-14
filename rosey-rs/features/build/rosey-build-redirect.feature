@@ -20,7 +20,8 @@ Feature: Rosey Build Redirect
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'a' in "dist/translated_site/index.html" with the attributes:
       | href      | /en/                                  |
       | innerText | Click here if you are not redirected. |
@@ -41,7 +42,8 @@ Feature: Rosey Build Redirect
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'link' in "dist/translated_site/about.html" with the attributes:
       | rel      | canonical      |
       | href     | /en/about.html |
@@ -57,8 +59,9 @@ Feature: Rosey Build Redirect
       """
       {}
       """
-    When I run Rosey build with options:
-      | default-language | blank |
+    When I run my program with the flags:
+      | build                      |
+      | --default-language "blank" |
     Then I should see a selector 'link' in "dist/translated_site/about.html" with the attributes:
       | rel      | canonical         |
       | href     | /blank/about.html |
@@ -74,8 +77,9 @@ Feature: Rosey Build Redirect
       """
       {}
       """
-    When I run Rosey build with options:
-      | default-language | blank |
+    When I run my program with the flags:
+      | build                      |
+      | --default-language "blank" |
     Then I should see a selector 'meta' in "dist/translated_site/about.html" with the attributes:
       | http-equiv | refresh                 |
       | content    | 1;url=/blank/about.html |
@@ -98,8 +102,9 @@ Feature: Rosey Build Redirect
       """
       {}
       """
-    When I run Rosey build with options:
-      | redirect-page | helpers/redirect.html |
+    When I run my program with the flags:
+      | build                                   |
+      | --redirect-page "helpers/redirect.html" |
     Then I should see a selector 'h1' in "dist/translated_site/index.html" with the attributes:
       | innerText | REDIRECT!!! |
 
@@ -131,9 +136,10 @@ Feature: Rosey Build Redirect
       """
       {}
       """
-    When I run Rosey build with options:
-      | redirect-page    | helpers/redirect.html |
-      | default-language | blank-nada            |
+    When I run my program with the flags:
+      | build                                      |
+      | --redirect-page    "helpers/redirect.html" |
+      | --default-language "blank-nada"            |
     Then I should see a selector 'link' in "dist/translated_site/test.html" with the attributes:
       | rel      | canonical             |
       | href     | /blank-nada/test.html |

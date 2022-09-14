@@ -20,7 +20,8 @@ Feature: Rosey check v2
 				}
 			}
 			"""
-		When I run Rosey check
+		When I run my program with the flags:
+			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:true |
 			| em.sourceTotal     | int:1     |
@@ -51,7 +52,8 @@ Feature: Rosey check v2
 				}
 			}
 			"""
-		When I run Rosey check
+		When I run my program with the flags:
+			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:false |
 			| em.sourceTotal     | int:1      |
@@ -78,7 +80,8 @@ Feature: Rosey check v2
 			"""
 			{}
 			"""
-		When I run Rosey check
+		When I run my program with the flags:
+			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:false |
 			| em.sourceTotal     | int:1      |
@@ -105,7 +108,8 @@ Feature: Rosey check v2
 				}
 			}
 			"""
-		When I run Rosey check
+		When I run my program with the flags:
+			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:false |
 			| em.sourceTotal     | int:0      |
@@ -148,7 +152,8 @@ Feature: Rosey check v2
 				}
 			}
 			"""
-		When I run Rosey check
+		When I run my program with the flags:
+			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current     | bool:false |
 			| em.sourceTotal | int:4      |

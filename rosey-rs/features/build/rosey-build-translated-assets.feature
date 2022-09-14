@@ -29,7 +29,8 @@ Feature: Rosey Build Translated Assets
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'img' in "dist/translated_site/en/index.html" with the attributes:
       | src | /image.png |
     And I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
@@ -58,9 +59,10 @@ Feature: Rosey Build Translated Assets
       """
       {}
       """
-    When I run Rosey build with options:
-      | source        | translated |
-      | images-source | dist/site  |
+    When I run my program with the flags:
+      | build                        |
+      | --source        "translated" |
+      | --images-source "dist/site"  |
     Then I should see a selector 'img' in "dist/translated_site/en/index.html" with the attributes:
       | src | /image.png |
     And I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
@@ -103,7 +105,8 @@ Feature: Rosey Build Translated Assets
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'img' in "dist/translated_site/en/index.html" with the attributes:
       | src    | /image.png                              |
       | srcset | /image-64w.png 64w,/image-640w.png 640w |
@@ -134,7 +137,8 @@ Feature: Rosey Build Translated Assets
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'source' in "dist/translated_site/en/index.html" with the attributes:
       | src  | /video.mp4 |
       | type | video/mp4  |
@@ -163,7 +167,8 @@ Feature: Rosey Build Translated Assets
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'audio' in "dist/translated_site/en/index.html" with the attributes:
       | src | /pod.wav |
     And I should see a selector 'audio' in "dist/translated_site/fr/index.html" with the attributes:
@@ -191,7 +196,8 @@ Feature: Rosey Build Translated Assets
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'a:nth-of-type(1)' in "dist/translated_site/en/index.html" with the attributes:
       | href     | /rtfm.pdf |
       | download | Manual    |
@@ -223,7 +229,8 @@ Feature: Rosey Build Translated Assets
       """
       {}
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'i' in "dist/translated_site/en/index.html" with the attributes:
       | j                      | /something.extension |
       | data-rosey-asset-attrs | j                    |

@@ -16,7 +16,8 @@ Feature: Rosey Build V2
 				}
 			}
 			"""
-		When I run Rosey build
+		When I run my program with the flags:
+			| build |
 		Then I should see a selector 'title' in "dist/translated_site/index.html" with the attributes:
 			| innerText | Redirecting... |
 		And I should see a selector 'a' in "dist/translated_site/index.html" with the attributes:

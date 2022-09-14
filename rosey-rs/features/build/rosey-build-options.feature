@@ -15,9 +15,10 @@ Feature: Rosey Build Options
         "seal": "👄🌹"
       }
       """
-    When I run Rosey build with options:
-      | source | happy |
-      | dest   | sad   |
+    When I run my program with the flags:
+      | build            |
+      | --source "happy" |
+      | --dest   "sad"   |
     Then I should see a selector 'title' in "sad/index.html" with the attributes:
       | innerText | Redirecting... |
     And I should see a selector 'a' in "sad/index.html" with the attributes:
@@ -57,8 +58,9 @@ Feature: Rosey Build Options
         "footer": "🦶"
       }
       """
-    When I run Rosey build with options:
-      | separator | ~ |
+    When I run my program with the flags:
+      | build           |
+      | --separator "~" |
     Then I should see a selector 'title' in "dist/translated_site/cc/index.html" with the attributes:
       | data-rosey | title |
       | innerText  | 🥩    |
@@ -99,8 +101,9 @@ Feature: Rosey Build Options
         "footer": "🦶"
       }
       """
-    When I run Rosey build with options:
-      | tag | something-else |
+    When I run my program with the flags:
+      | build                  |
+      | --tag "something-else" |
     Then I should see a selector 'title' in "dist/translated_site/s-e/index.html" with the attributes:
       | something-else | title |
       | innerText      | 🥩    |
@@ -129,8 +132,9 @@ Feature: Rosey Build Options
         "seal": "👄🌹"
       }
       """
-    When I run Rosey build with options:
-      | locale-source | cloud |
+    When I run my program with the flags:
+      | build                   |
+      | --locale-source "cloud" |
     Then I should see a selector 'title' in "dist/translated_site/index.html" with the attributes:
       | innerText | Redirecting... |
     And I should see a selector 'a' in "dist/translated_site/index.html" with the attributes:
@@ -158,8 +162,9 @@ Feature: Rosey Build Options
         "goose": "👹"
       }
       """
-    When I run Rosey build with options:
-      | default-language | poultry |
+    When I run my program with the flags:
+      | build                        |
+      | --default-language "poultry" |
     Then I should see a selector 'title' in "dist/translated_site/index.html" with the attributes:
       | innerText | Redirecting... |
     And I should see a selector 'a' in "dist/translated_site/index.html" with the attributes:

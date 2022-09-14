@@ -9,6 +9,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  HUMANE_VERSION: "0.3.9"
 
 jobs:
   # publish-crate:
@@ -129,8 +130,19 @@ jobs:
           rustup install ${{ matrix.rust }}
           rustup target add ${{ matrix.target }}
           rustup show
+
+      - name: Install humane
+        uses: supplypike/setup-bin@v1
+        with:
+          uri: "https://github.com/CloudCannon/humane/releases/download/v${{env.HUMANE_VERSION}}/humane-v${{env.HUMANE_VERSION}}-${{matrix.target}}.tar.gz"
+          name: "humane"
+          version: ${{env.HUMANE_VERSION}}
+
       - name: Build
         run: RELEASE_VERSION=${GITHUB_REF#refs/tags/} cargo build --release --target ${{ matrix.target }}
+
+      - name: Test CLI
+        run: TEST_BINARY=./target/${{ matrix.target }}/release/rosey humane
 
       - name: Package Artifacts
         run: |

@@ -33,7 +33,8 @@ Feature: Rosey Build Existing Locale Pages
         "seal": "🅺🅸🆂🆂 🅵🆁🅾🅼 🅰 🆁🅾🆂🅴"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'p' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey     | seal              |
       | data-page-type | Standard Homepage |
@@ -79,7 +80,8 @@ Feature: Rosey Build Existing Locale Pages
         "seal": "🅺🅸🆂🆂 🅵🆁🅾🅼 🅰 🆁🅾🆂🅴"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'p' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey     | seal              |
       | data-page-type | Standard Homepage |

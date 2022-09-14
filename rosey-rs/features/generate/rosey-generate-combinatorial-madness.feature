@@ -20,7 +20,8 @@ Feature: Rosey Generate Complex
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version                                      | int:2              |
       | keys.home:meta:title.original                | Home header title  |
@@ -43,7 +44,8 @@ Feature: Rosey Generate Complex
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version           | int:2 |
       | keys.b.original   | c     |
@@ -59,7 +61,8 @@ Feature: Rosey Generate Complex
       </body>
       </html>
       """
-    When I run Rosey generate
+    When I run my program with the flags:
+      | generate |
     Then I should see "rosey/source.json" containing the values:
       | version           | int:2 |
       | keys.2.original   | 3     |

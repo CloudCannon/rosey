@@ -18,8 +18,9 @@ Feature: Rosey Generate Options
       </body>
       </html>
       """
-    When I run Rosey generate with options:
-      | separator | ~ |
+    When I run my program with the flags:
+      | generate        |
+      | --separator "~" |
     Then I should see "rosey/source.json" containing the values:
       | version                               | int:2             |
       | keys.home:meta~title.original         | Home header title |
@@ -45,8 +46,9 @@ Feature: Rosey Generate Options
       </body>
       </html>
       """
-    When I run Rosey generate with options:
-      | tag | something-else |
+    When I run my program with the flags:
+      | generate               |
+      | --tag "something-else" |
     Then I should see "rosey/source.json" containing the values:
       | version                               | int:2             |
       | keys.home:meta:title.original         | Home header title |
@@ -63,8 +65,9 @@ Feature: Rosey Generate Options
       </body>
       </html>
       """
-    When I run Rosey generate with options:
-      | locale-dest | row-z/source.json |
+    When I run my program with the flags:
+      | generate                          |
+      | --locale-dest "row-z/source.json" |
     Then I should see "row-z/source.json" containing the values:
       | version            | int:2            |
       | keys.seal.original | Kiss From A Rose |

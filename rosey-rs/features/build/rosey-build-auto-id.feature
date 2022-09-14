@@ -15,7 +15,8 @@ Feature: Rosey Build AutoID
         "GtSzGc6Rr44nj796fYIRTDxQNRua2jzNIeF2qU3kpFI": "jack!"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'p' in "dist/translated_site/en/index.html" with the attributes:
       | data-rosey |       |
       | innerText  | rose! |
@@ -44,7 +45,8 @@ Feature: Rosey Build AutoID
         "9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg": "emptyish"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div > ul > li' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | 🦭 |
     And I should see a selector 'div' in "dist/translated_site/simple/index.html" with the attributes:
@@ -74,7 +76,8 @@ Feature: Rosey Build AutoID
         "root:9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg": "emptyish"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div > div > ul > li' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | 🦭 |
     And I should see a selector 'div > div' in "dist/translated_site/simple/index.html" with the attributes:
@@ -104,7 +107,8 @@ Feature: Rosey Build AutoID
         "namespace:9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg": "emptyish"
       }
       """
-    When I run Rosey build
+    When I run my program with the flags:
+      | build |
     Then I should see a selector 'div > div > ul > li' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | 🦭 |
     And I should see a selector 'div > div' in "dist/translated_site/simple/index.html" with the attributes:
