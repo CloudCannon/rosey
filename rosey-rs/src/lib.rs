@@ -35,43 +35,18 @@ pub struct RoseyOptions {
     pub locale_dest: Option<PathBuf>,
     pub locale_source: Option<PathBuf>,
     pub languages: Option<Vec<String>>,
-    pub credentials: Option<String>,
     pub exclusions: Option<String>,
     pub images_source: Option<PathBuf>,
     pub default_language: Option<String>,
-    pub source_delimiter: Option<String>,
     pub redirect_page: Option<PathBuf>,
     pub serve: bool,
     pub verbose: bool,
 }
 
-impl Default for RoseyOptions {
-    fn default() -> Self {
-        Self {
-            working_directory: env::current_dir().unwrap(),
-            source: Some(PathBuf::from("dist/site")),
-            dest: Some(PathBuf::from("dist/translated_site")),
-            version: Some(2),
-            tag: Some("data-rosey".to_string()),
-            separator: Some(":".to_string()),
-            locale_dest: Some(PathBuf::from("rosey/source.json")),
-            locale_source: Some(PathBuf::from("rosey/locales/")),
-            languages: None,
-            credentials: None,
-            exclusions: Some(String::from(r#"\.(html?|json)$"#)),
-            images_source: None,
-            default_language: Some("en".to_string()),
-            source_delimiter: None,
-            redirect_page: None,
-            verbose: false,
-            serve: false,
-        }
-    }
-}
-
 impl From<&ArgMatches<'_>> for RoseyOptions {
     fn from(matches: &ArgMatches) -> Self {
         RoseyOptions {
+            working_directory: env::current_dir().unwrap(),
             source: matches.value_of("source").map(PathBuf::from),
             dest: matches.value_of("dest").map(PathBuf::from),
             version: matches.value_of("version").map(|s| s.parse().unwrap()),
@@ -84,7 +59,8 @@ impl From<&ArgMatches<'_>> for RoseyOptions {
             exclusions: matches.value_of("exclusions").map(String::from),
             images_source: matches.value_of("images-source").map(PathBuf::from),
             serve: matches.is_present("serve"),
-            ..Default::default()
+            languages: None,
+            verbose: false,
         }
     }
 }
