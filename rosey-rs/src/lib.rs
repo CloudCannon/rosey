@@ -59,8 +59,8 @@ impl From<&ArgMatches<'_>> for RoseyOptions {
             exclusions: matches.value_of("exclusions").map(String::from),
             images_source: matches.value_of("images-source").map(PathBuf::from),
             serve: matches.is_present("serve"),
+            verbose: matches.is_present("verbose"),
             languages: None,
-            verbose: false,
         }
     }
 }

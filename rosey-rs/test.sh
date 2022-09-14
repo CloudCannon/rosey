@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-cargo build --release
+cargo build
 if [ -z "$1" ]; then
-    TEST_BINARY=./target/release/rosey npx -y humane@latest
+    TEST_BINARY=./target/debug/rosey npx -y humane@latest
 else
-    TEST_BINARY=./target/release/rosey npx -y humane@latest --name "$1"
+    TEST_BINARY=./target/debug/rosey npx -y humane@latest --name "$1"
 fi

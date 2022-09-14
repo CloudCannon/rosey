@@ -7,12 +7,18 @@ use std::time::Instant;
 async fn main() {
     let start = Instant::now();
 
-    // TODO: Implement the rest of the flags
     let matches = App::new("Rosey")
         .version(option_env!("RELEASE_VERSION").unwrap_or("Development"))
         .author("CloudCannon")
         .about("The CLI for the CloudCannon rosey package, an open-source tool for managing translations on static websites.")
         .setting(AppSettings::SubcommandRequiredElseHelp)
+        .arg(
+            Arg::with_name("verbose")
+                .short("v")
+                .long("verbose")
+                .help("Print verbose logs while running the Rosey CLI. Does not affect the output website")
+                .takes_value(false),
+        )
         .subcommand(
             App::new("generate")
                 .arg(
@@ -128,11 +134,6 @@ async fn main() {
                         .default_value("2"),
                 ),
         )
-        .subcommand(App::new("convert"))
-        .subcommand(App::new("watch"))
-        .subcommand(App::new("clean"))
-        .subcommand(App::new("base"))
-        .subcommand(App::new("translate"))
         .get_matches();
 
     let (subcommand, matches) = matches.subcommand();
