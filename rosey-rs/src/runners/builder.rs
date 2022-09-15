@@ -7,7 +7,7 @@ use std::{
     collections::BTreeMap,
     fs::{copy, create_dir_all, read_to_string, remove_dir_all, File},
     io::{BufWriter, Write},
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 use notify::{
@@ -20,35 +20,15 @@ use regex::Regex;
 use crate::{RoseyOptions, RoseyTranslation};
 
 pub struct RoseyBuilder {
-    pub working_directory: PathBuf,
-    pub source: PathBuf,
-    pub locale_source: PathBuf,
-    pub dest: PathBuf,
-    pub tag: String,
-    pub separator: String,
-    pub default_language: String,
+    options: RoseyOptions,
     pub translations: BTreeMap<String, RoseyTranslation>,
-    pub redirect_page: Option<PathBuf>,
-    pub exclusions: String,
-    pub images_source: Option<PathBuf>,
-    pub serve: bool,
 }
 
 impl From<RoseyOptions> for RoseyBuilder {
-    fn from(runner: RoseyOptions) -> Self {
+    fn from(options: RoseyOptions) -> Self {
         RoseyBuilder {
-            working_directory: runner.working_directory,
-            source: runner.source.unwrap(),
-            locale_source: runner.locale_source.unwrap(),
-            dest: runner.dest.unwrap(),
-            tag: runner.tag.unwrap(),
-            default_language: runner.default_language.unwrap(),
+            options,
             translations: BTreeMap::default(),
-            separator: runner.separator.unwrap(),
-            redirect_page: runner.redirect_page,
-            exclusions: runner.exclusions.unwrap(),
-            images_source: runner.images_source,
-            serve: runner.serve,
         }
     }
 }
@@ -60,15 +40,16 @@ impl RoseyBuilder {
         self.process_assets();
         self.process_files();
 
-        if self.serve {
+        if self.options.serve {
             self.serve().await;
         }
     }
 
     async fn serve(self) {
-        let source_dir = &self.working_directory.join(&self.source);
-        let dest_dir = self.working_directory.join(&self.dest);
-        let re = Regex::new(&self.exclusions).expect("Invalid regex");
+        let config = &self.options.config;
+        let source_dir = config.source.clone();
+        let dest_dir = config.dest.clone();
+        let re = Regex::new(&config.exclusions).expect("Invalid regex");
         let mut watcher = notify::recommended_watcher(move |res| match res {
             Ok(Event {
                 kind:
@@ -97,29 +78,31 @@ impl RoseyBuilder {
         })
         .unwrap();
 
-        watcher.watch(source_dir, RecursiveMode::Recursive).unwrap();
+        watcher
+            .watch(&source_dir, RecursiveMode::Recursive)
+            .unwrap();
 
-        serve::serve_dir(dest_dir).await;
+        serve::serve_dir(dest_dir.clone()).await;
     }
 
     pub fn clean_output_dir(&self) {
-        let dest_folder = self.working_directory.join(&self.dest);
+        let dest_folder = &self.options.config.dest;
         if dest_folder.exists() {
             remove_dir_all(dest_folder).expect("Failed to clean destination folder");
         }
     }
 
     pub fn process_assets(&self) {
-        let re = Regex::new(&self.exclusions).expect("Invalid regex");
-        let walker = globwalk::GlobWalkerBuilder::from_patterns(
-            self.working_directory.join(&self.source),
-            &["**/*"],
-        )
-        .build()
-        .unwrap()
-        .into_iter()
-        .filter_map(Result::ok)
-        .filter(|file| file.file_type().is_file() && !re.is_match(&file.path().to_string_lossy()));
+        let config = &self.options.config;
+        let re = Regex::new(&config.exclusions).expect("Invalid regex");
+        let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.source, &["**/*"])
+            .build()
+            .unwrap()
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter(|file| {
+                file.file_type().is_file() && !re.is_match(&file.path().to_string_lossy())
+            });
 
         walker
             .collect::<Vec<_>>()
@@ -128,10 +111,9 @@ impl RoseyBuilder {
     }
 
     pub fn process_asset(&self, path: &Path) {
-        let source_folder = self.working_directory.join(&self.source);
-        let dest_folder = self.working_directory.join(&self.dest);
-        let relative_path = path.strip_prefix(&source_folder).unwrap();
-        let dest_file = dest_folder.join(relative_path);
+        let config = &self.options.config;
+        let relative_path = path.strip_prefix(&config.source).unwrap();
+        let dest_file = &config.dest.join(relative_path);
 
         if let Some(parent) = dest_file.parent() {
             create_dir_all(parent).unwrap();
@@ -143,7 +125,8 @@ impl RoseyBuilder {
     }
 
     pub fn process_files(&self) {
-        let source_folder = self.working_directory.join(&self.source);
+        let config = &self.options.config;
+        let source_folder = &config.source;
         let walker: (Vec<_>, Vec<_>) =
             globwalk::GlobWalkerBuilder::from_patterns(&source_folder, &["**/*{.html,.json}"])
                 .build()
@@ -164,7 +147,8 @@ impl RoseyBuilder {
     }
 
     fn find_locale_overwrite(&self, path: &Path) -> Option<&String> {
-        let source_folder = self.working_directory.join(&self.source);
+        let config = &self.options.config;
+        let source_folder = &config.source;
         let relative_path = path.strip_prefix(&source_folder).unwrap();
         self.translations.keys().find(|key| {
             relative_path
@@ -175,14 +159,13 @@ impl RoseyBuilder {
     }
 
     pub fn read_translations(&mut self) {
-        let walker = globwalk::GlobWalkerBuilder::from_patterns(
-            self.working_directory.join(&self.locale_source),
-            &["**/*.json"],
-        )
-        .build()
-        .unwrap()
-        .into_iter()
-        .filter_map(Result::ok);
+        let config = &self.options.config;
+        let walker =
+            globwalk::GlobWalkerBuilder::from_patterns(&config.locale_source, &["**/*.json"])
+                .build()
+                .unwrap()
+                .into_iter()
+                .filter_map(Result::ok);
 
         walker.for_each(|file| {
             let locale = file
@@ -208,7 +191,8 @@ impl RoseyBuilder {
     }
 
     pub fn process_file_overrides(&self, path: &Path) {
-        let source_folder = self.working_directory.join(&self.source);
+        let config = &self.options.config;
+        let source_folder = &config.source;
         let relative_path = path.strip_prefix(&source_folder).unwrap();
         self.translations
             .par_iter()
@@ -219,7 +203,8 @@ impl RoseyBuilder {
     }
 
     pub fn output_file(&self, locale: &str, relative_path: &Path, content: String) {
-        let dest_folder = self.working_directory.join(&self.dest).join(locale);
+        let config = &self.options.config;
+        let dest_folder = &config.dest.join(locale);
         let dest_path = dest_folder.join(&relative_path);
         if let Some(parent) = dest_path.parent() {
             create_dir_all(parent).unwrap();

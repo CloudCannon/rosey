@@ -10,6 +10,7 @@ use serde_json::Value;
 
 impl RoseyGenerator {
     pub fn process_json_file(&mut self, file: &Path) {
+        let config = &self.options.config;
         let mut schema_path = PathBuf::from(file);
         schema_path.set_extension("rosey.json");
         if !schema_path.exists() {
@@ -29,12 +30,8 @@ impl RoseyGenerator {
             return;
         }
 
-        self.current_file = String::from(
-            file.strip_prefix(self.working_directory.join(&self.source))
-                .unwrap()
-                .to_str()
-                .unwrap(),
-        );
+        self.current_file =
+            String::from(file.strip_prefix(&config.source).unwrap().to_str().unwrap());
 
         self.process_json_node(&source.unwrap(), &schema.unwrap(), None)
     }

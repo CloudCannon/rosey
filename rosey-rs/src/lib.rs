@@ -1,7 +1,9 @@
+pub mod options;
 mod runners;
 
 use crate::runners::generator::RoseyGenerator;
 use clap::ArgMatches;
+pub use options::*;
 use runners::{builder::RoseyBuilder, checker::RoseyChecker};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, env, path::PathBuf, str::FromStr};
@@ -25,47 +27,101 @@ impl FromStr for RoseyCommand {
     }
 }
 
-pub struct RoseyOptions {
-    pub working_directory: PathBuf,
-    pub source: Option<PathBuf>,
-    pub dest: Option<PathBuf>,
-    pub version: Option<u8>,
-    pub tag: Option<String>,
-    pub separator: Option<String>,
-    pub locale_dest: Option<PathBuf>,
-    pub locale_source: Option<PathBuf>,
-    pub languages: Option<Vec<String>>,
-    pub exclusions: Option<String>,
-    pub images_source: Option<PathBuf>,
-    pub default_language: Option<String>,
-    pub redirect_page: Option<PathBuf>,
-    pub serve: bool,
-    pub verbose: bool,
+trait GetGeneric {
+    fn get<'a, T>(&'a self, flag: &str, fallback: T) -> T
+    where
+        T: std::convert::From<&'a str>;
+    fn get_opt<'a, T>(&'a self, flag: &str, fallback: Option<T>) -> Option<T>
+    where
+        T: std::convert::From<&'a str>;
 }
-
-impl From<&ArgMatches<'_>> for RoseyOptions {
-    fn from(matches: &ArgMatches) -> Self {
-        RoseyOptions {
-            working_directory: env::current_dir().unwrap(),
-            source: matches.value_of("source").map(PathBuf::from),
-            dest: matches.value_of("dest").map(PathBuf::from),
-            version: matches.value_of("version").map(|s| s.parse().unwrap()),
-            tag: matches.value_of("tag").map(String::from),
-            separator: matches.value_of("separator").map(String::from),
-            locale_source: matches.value_of("locale-source").map(PathBuf::from),
-            locale_dest: matches.value_of("locale-dest").map(PathBuf::from),
-            default_language: matches.value_of("default-language").map(String::from),
-            redirect_page: matches.value_of("redirect-page").map(PathBuf::from),
-            exclusions: matches.value_of("exclusions").map(String::from),
-            images_source: matches.value_of("images-source").map(PathBuf::from),
-            serve: matches.is_present("serve"),
-            verbose: matches.is_present("verbose"),
-            languages: None,
-        }
+impl GetGeneric for ArgMatches<'_> {
+    fn get<'a, T>(&'a self, flag: &str, fallback: T) -> T
+    where
+        T: std::convert::From<&'a str>,
+    {
+        self.value_of(flag).map(Into::into).unwrap_or(fallback)
+    }
+    fn get_opt<'a, T>(&'a self, flag: &str, fallback: Option<T>) -> Option<T>
+    where
+        T: std::convert::From<&'a str>,
+    {
+        self.value_of(flag).map(Into::into).or(fallback)
     }
 }
 
+pub struct RoseyOptions {
+    pub working_directory: PathBuf,
+    pub serve: bool,
+    pub config: RoseyPublicConfig,
+}
+
 impl RoseyOptions {
+    pub fn load_with_flags(matches: &ArgMatches) -> RoseyOptions {
+        let base = match options::load_config_files() {
+            Ok(config) => config,
+            Err(e) => {
+                eprintln!("Failed to load Rosey configuration: {e}");
+                std::process::exit(1);
+            }
+        };
+
+        let original_source = matches.get("source", base.source.clone());
+        let dest = matches.get("dest", base.dest);
+        let working_dir = env::current_dir().unwrap();
+
+        if original_source.to_string_lossy().is_empty() {
+            eprintln!(
+                "Rosey requires a source directory to process. Provide either: \n\
+                       • A `--source <PATH>` CLI flag \n\
+                       • A `source` key in a rosey.yml, rosey.toml, or rosey.json file \n\
+                       • A `ROSEY_SOURCE` environment variable"
+            );
+            std::process::exit(1);
+        }
+
+        let options = RoseyOptions {
+            working_directory: working_dir.clone(),
+            serve: matches.is_present("serve"),
+            config: RoseyPublicConfig {
+                source: working_dir.join(matches.get("source", base.source)),
+                dest: working_dir.join(match dest.to_string_lossy().len() {
+                    0 => {
+                        let source = original_source.to_string_lossy();
+                        let source = source.trim_end_matches(['/', '\\']);
+                        PathBuf::from(&format!("{source}_translated"))
+                    }
+                    _ => dest,
+                }),
+                version: match matches.value_of("version").map(|s| s.parse()) {
+                    Some(Ok(v)) => v,
+                    _ => base.version,
+                },
+                tag: matches.get("tag", base.tag),
+                separator: matches.get("separator", base.separator),
+                locale_source: working_dir.join(matches.get("locale-source", base.locale_source)),
+                locale_dest: working_dir.join(matches.get("locale-dest", base.locale_dest)),
+                default_language: matches.get("default-language", base.default_language),
+                redirect_page: matches
+                    .get_opt("redirect-page", base.redirect_page)
+                    .map(|p| working_dir.join(p)),
+                exclusions: matches.get("exclusions", base.exclusions),
+                images_source: matches
+                    .get_opt("images-source", base.images_source)
+                    .map(|p| working_dir.join(p)),
+                verbose: matches.is_present("verbose") || base.verbose,
+                languages: None, // TODO
+            },
+        };
+
+        if matches.is_present("config-dump") {
+            println!("{}", options.config);
+            std::process::exit(0);
+        }
+
+        options
+    }
+
     pub async fn run(self, command: RoseyCommand) {
         match command {
             RoseyCommand::Generate => RoseyGenerator::from(self).run(),

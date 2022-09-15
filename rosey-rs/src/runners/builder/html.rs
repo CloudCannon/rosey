@@ -30,21 +30,20 @@ use crate::RoseyTranslation;
 
 impl RoseyBuilder {
     pub fn process_html_file(&self, file: &Path) {
-        let source_folder = self.working_directory.join(&self.source);
+        let config = &self.options.config;
+        let source_folder = &config.source;
         let relative_path = file.strip_prefix(&source_folder).unwrap();
-        let dest_folder = self.working_directory.join(&self.dest);
-        let images_source = self
-            .working_directory
-            .join(self.images_source.as_ref().unwrap_or(&self.source));
+        let dest_folder = &config.dest;
+        let images_source = config.images_source.as_ref().unwrap_or(&config.source);
 
         let content = read_to_string(file).unwrap();
 
         let mut page = RoseyPage::new(
             content,
-            &self.separator,
-            &self.tag,
-            images_source,
-            &self.default_language,
+            &config.separator,
+            &config.tag,
+            images_source.to_owned(),
+            &config.default_language,
             &self.translations,
         );
         page.prepare();
@@ -67,10 +66,10 @@ impl RoseyBuilder {
         page.rewrite_anchors();
 
         let output_path = dest_folder
-            .join(&self.default_language)
+            .join(&config.default_language)
             .join(&relative_path);
         page.output_file(&output_path);
-        self.output_redirect_file(&self.default_language, relative_path);
+        self.output_redirect_file(&config.default_language, relative_path);
 
         self.translations.keys().for_each(|key| {
             page.set_locale_key(key);
@@ -86,7 +85,8 @@ impl RoseyBuilder {
     }
 
     pub fn output_redirect_file(&self, locale: &str, relative_path: &Path) {
-        let dest_folder = self.working_directory.join(&self.dest);
+        let config = &self.options.config;
+        let dest_folder = &config.dest;
         let dest_file = dest_folder.join(relative_path);
         let path = relative_path.display().to_string();
         let path = path.trim_end_matches("index.html").replace('\\', "/");
@@ -95,9 +95,8 @@ impl RoseyBuilder {
             create_dir_all(parent).unwrap();
         }
 
-        let output = if let Some(redirect_page) = &self.redirect_page {
-            read_to_string(self.working_directory.join(redirect_page))
-                .expect("Failed to load custom redirect page.")
+        let output = if let Some(redirect_page) = &config.redirect_page {
+            read_to_string(redirect_page).expect("Failed to load custom redirect page.")
         } else {
             redirect_page::DEFAULT.to_string()
         };
@@ -106,7 +105,7 @@ impl RoseyBuilder {
         for key in (&self.translations)
             .iter()
             .map(|(key, _)| key)
-            .chain(std::iter::once(&self.default_language))
+            .chain(std::iter::once(&config.default_language))
             .filter(|key| *key != locale)
         {
             write!(
@@ -120,7 +119,7 @@ impl RoseyBuilder {
         for key in (&self.translations)
             .iter()
             .map(|(key, _)| key)
-            .chain(std::iter::once(&self.default_language))
+            .chain(std::iter::once(&config.default_language))
         {
             let mut split = key.split('-');
             let language = split.next().unwrap();

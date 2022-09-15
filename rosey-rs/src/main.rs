@@ -7,6 +7,8 @@ use std::time::Instant;
 async fn main() {
     let start = Instant::now();
 
+    let example_defaults = rosey::options::RoseyPublicConfig::default();
+
     let matches = App::new("Rosey")
         .version(option_env!("RELEASE_VERSION").unwrap_or("Development"))
         .author("CloudCannon")
@@ -14,7 +16,6 @@ async fn main() {
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .arg(
             Arg::with_name("verbose")
-                .short("v")
                 .long("verbose")
                 .help("Print verbose logs while running the Rosey CLI. Does not affect the output website")
                 .takes_value(false),
@@ -25,32 +26,52 @@ async fn main() {
                     Arg::with_name("source")
                         .short("s")
                         .long("source")
-                        .default_value("dist/site"),
+                        .value_name("PATH")
+                        .help("The directory of your built static website (the output folder of your SSG build)\n ! Required either in a config file or via the CLI"),
                 )
                 .arg(
                     Arg::with_name("version")
                         .short("v")
                         .long("version")
                         .possible_values(&["1", "2"])
-                        .default_value("2"),
+                        .value_name("VERSION")
+                        .help(&format!(
+                            "The Rosey locale version to generate and build from. \n ─ Defaults to '{}'",
+                            example_defaults.version
+                        )),
                 )
                 .arg(
                     Arg::with_name("tag")
-                        .short("t")
                         .long("tag")
-                        .default_value("data-rosey"),
+                        .value_name("ATTRIBUTE")
+                        .help(&format!(
+                            "The HTML attribute that Rosey should read from. \n ─ Defaults to '{}'",
+                            example_defaults.tag
+                        )),
                 )
                 .arg(
                     Arg::with_name("locale-dest")
-                        .short("d")
                         .long("locale-dest")
-                        .default_value("rosey/source.json"),
+                        .value_name("PATH")
+                        .help(&format!(
+                            "The file to generate the Rosey source.json locale file to. \n ─ Defaults to '{}'",
+                            example_defaults.locale_dest.display()
+                        )),
                 )
                 .arg(
                     Arg::with_name("separator")
-                        .short("e")
                         .long("separator")
-                        .default_value(":"),
+                        .value_name("CHAR")
+                        .help(&format!(
+                            "The separator to use between Rosey namespaces when generating keys. \n ─ Defaults to '{}'",
+                            example_defaults.separator
+                        )),
+                )
+                .arg(
+                    Arg::with_name("config-dump")
+                        .long("config-dump")
+                        .help("Print all resolved configuration and exit without taking any action")
+                        .takes_value(false),
                 ),
         )
         .subcommand(
@@ -60,78 +81,122 @@ async fn main() {
                         .short("s")
                         .long("source")
                         .value_name("PATH")
-                        .help("Sets the source directory of the website to parse")
-                        .default_value("dist/site"),
+                        .help("The directory of your built static website (the output folder of your SSG build)\n ! Required either in a config file or via the CLI"),
                 )
                 .arg(
                     Arg::with_name("dest")
                         .short("d")
                         .long("dest")
                         .value_name("PATH")
-                        .help("Sets the output directory")
-                        .default_value("dist/translated_site"),
+                        .help("The directory to output the multilingual site to. \n ─ Defaults to your source directory suffixed with _translated"),
                 )
                 .arg(
                     Arg::with_name("tag")
-                        .short("t")
                         .long("tag")
-                        .default_value("data-rosey"),
+                        .value_name("ATTRIBUTE")
+                        .help(&format!(
+                            "The HTML attribute that Rosey should read from. \n ─ Defaults to '{}'",
+                            example_defaults.tag
+                        )),
                 )
                 .arg(
                     Arg::with_name("locale-source")
-                        .short("l")
                         .long("locale-source")
-                        .default_value("rosey/locales/"),
+                        .value_name("PATH")
+                        .help(&format!(
+                            "The directory to read translated Rosey locale files from. \n ─ Defaults to '{}'",
+                            example_defaults.locale_source.display()
+                        )),
                 )
                 .arg(
                     Arg::with_name("default-language")
-                        .short("a")
                         .long("default-language")
-                        .default_value("en"),
+                        .value_name("LANG")
+                        .help(&format!(
+                            "The default language for the site (i.e. the language of 'source.json'). \n ─ Defaults to '{}'",
+                            example_defaults.default_language
+                        )),
                 )
                 .arg(
                     Arg::with_name("exclusions")
                         .long("exclusions")
-                        .default_value(r#"\.(html?|json)$"#),
+                        .value_name("REGEX")
+                        .help(&format!(
+                            "A regular expression used to determine which files not to copy as assets. \n ─ Defaults to '{}'",
+                            example_defaults.exclusions
+                        )),
                 )
                 .arg(
                     Arg::with_name("separator")
-                        .short("e")
                         .long("separator")
-                        .default_value(":"),
+                        .value_name("CHAR")
+                        .help(&format!(
+                            "The separator to use between Rosey namespaces when generating keys. \n ─ Defaults to '{}'",
+                            example_defaults.separator
+                        )),
                 )
                 .arg(
                     Arg::with_name("images-source")
                         .long("images-source")
-                        .takes_value(true),
+                        .value_name("PATH")
+                        .takes_value(true)
+                        .help("The source folder that Rosey should look for translated images within. \n ─ Defaults to the source folder"),
                 )
                 .arg(
                     Arg::with_name("redirect-page")
                         .long("redirect-page")
-                        .takes_value(true),
+                        .value_name("PATH")
+                        .takes_value(true)
+                        .help("Path to a redirect template that Rosey should use instead of the default file"),
                 )
-                .arg(Arg::with_name("serve").long("serve").takes_value(false)),
+                .arg(Arg::with_name("serve")
+                        .long("serve")
+                        .takes_value(false)
+                        .help("Runs a local webserver on the dest folder after a successful build. Useful for local development")
+                )
+                .arg(
+                    Arg::with_name("config-dump")
+                        .long("config-dump")
+                        .help("Print all resolved configuration and exit without taking any action")
+                        .takes_value(false),
+                ),
         )
         .subcommand(
             App::new("check")
                 .arg(
                     Arg::with_name("locale-source")
-                        .short("l")
                         .long("locale-source")
-                        .default_value("rosey/locales/"),
+                        .value_name("PATH")
+                        .help(&format!(
+                            "The directory to read translated Rosey locale files from. \n ─ Defaults to '{}'",
+                            example_defaults.locale_source.display()
+                        )),
                 )
                 .arg(
                     Arg::with_name("locale-dest")
-                        .short("d")
                         .long("locale-dest")
-                        .default_value("rosey/source.json"),
+                        .value_name("PATH")
+                        .help(&format!(
+                            "The file to generate the Rosey source.json locale file to. \n ─ Defaults to '{}'",
+                            example_defaults.locale_dest.display()
+                        )),
                 )
                 .arg(
                     Arg::with_name("version")
                         .short("v")
                         .long("version")
+                        .value_name("VERSION")
                         .possible_values(&["1", "2"])
-                        .default_value("2"),
+                        .help(&format!(
+                            "The Rosey locale version to generate and build from. \n ─ Defaults to '{}'",
+                            example_defaults.version
+                        )),
+                )
+                .arg(
+                    Arg::with_name("config-dump")
+                        .long("config-dump")
+                        .help("Print all resolved configuration and exit without taking any action")
+                        .takes_value(false),
                 ),
         )
         .get_matches();
@@ -139,7 +204,7 @@ async fn main() {
     let (subcommand, matches) = matches.subcommand();
     let matches = matches.unwrap();
 
-    let options = RoseyOptions::from(matches);
+    let options = RoseyOptions::load_with_flags(matches);
     options
         .run(RoseyCommand::from_str(subcommand).unwrap())
         .await;

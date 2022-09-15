@@ -13,6 +13,7 @@ use serde_json::Value;
 
 impl RoseyBuilder {
     pub fn process_json_file(&self, file: &Path) {
+        let config = &self.options.config;
         let mut schema_path = PathBuf::from(file);
         schema_path.set_extension("rosey.json");
         if !schema_path.exists() {
@@ -36,10 +37,10 @@ impl RoseyBuilder {
         let source = source.unwrap();
         let schema = schema.unwrap();
 
-        let source_folder = self.working_directory.join(&self.source);
+        let source_folder = &config.source;
         let relative_path = file.strip_prefix(&source_folder).unwrap();
 
-        self.output_file(&self.default_language, relative_path, content);
+        self.output_file(&config.default_language, relative_path, content);
 
         self.translations.par_iter().for_each(|(key, translation)| {
             let mut source = source.clone();

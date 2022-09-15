@@ -3,7 +3,6 @@ use std::{
     collections::{BTreeMap, HashMap},
     fs::{create_dir_all, read_to_string, File},
     io::{BufWriter, Write},
-    path::PathBuf,
     str::FromStr,
 };
 
@@ -31,19 +30,15 @@ struct RoseyCheck {
 }
 
 pub struct RoseyChecker {
-    pub working_directory: PathBuf,
-    pub locale_dest: PathBuf,
-    pub locale_source: PathBuf,
+    options: RoseyOptions,
     check: BTreeMap<String, RoseyCheck>,
     base_locale: RoseyLocale,
 }
 
 impl From<RoseyOptions> for RoseyChecker {
-    fn from(runner: RoseyOptions) -> Self {
+    fn from(options: RoseyOptions) -> Self {
         RoseyChecker {
-            working_directory: runner.working_directory,
-            locale_dest: runner.locale_dest.unwrap(),
-            locale_source: runner.locale_source.unwrap(),
+            options,
             check: BTreeMap::default(),
             base_locale: RoseyLocale::default(),
         }
@@ -52,21 +47,20 @@ impl From<RoseyOptions> for RoseyChecker {
 
 impl RoseyChecker {
     pub fn run(&mut self) {
-        let locale_dest = self.working_directory.join(&self.locale_dest);
+        let config = &self.options.config;
+        let locale_dest = config.locale_dest.clone();
         let value = read_to_string(&locale_dest).expect("Failed to read locale file");
         let value = RoseyLocale::from_str(&value);
         if let Ok(locale) = value {
             self.base_locale = locale;
         }
 
-        let walker = globwalk::GlobWalkerBuilder::from_patterns(
-            self.working_directory.join(&self.locale_source),
-            &["**/*.json"],
-        )
-        .build()
-        .unwrap()
-        .into_iter()
-        .filter_map(Result::ok);
+        let walker =
+            globwalk::GlobWalkerBuilder::from_patterns(&config.locale_source, &["**/*.json"])
+                .build()
+                .unwrap()
+                .into_iter()
+                .filter_map(Result::ok);
 
         walker.for_each(|entry| self.process_file(entry));
 

@@ -8,13 +8,10 @@ use super::RoseyGenerator;
 
 impl RoseyGenerator {
     pub fn process_html_file(&mut self, file: &Path) {
+        let config = &self.options.config;
         let dom = kuchiki::parse_html().one(read_to_string(file).unwrap());
-        self.current_file = String::from(
-            file.strip_prefix(self.working_directory.join(&self.source))
-                .unwrap()
-                .to_str()
-                .unwrap(),
-        );
+        self.current_file =
+            String::from(file.strip_prefix(&config.source).unwrap().to_str().unwrap());
         self.process_html_node(dom, None, None);
     }
 
@@ -24,6 +21,7 @@ impl RoseyGenerator {
         root: Option<String>,
         namespace: Option<String>,
     ) {
+        let config = &self.options.config;
         let (root, namespace) = if let Some(element) = node.as_element() {
             let attributes = element.attributes.borrow();
             let prefix = match (&root, &namespace) {
@@ -31,14 +29,14 @@ impl RoseyGenerator {
                     if root.is_empty() {
                         String::default()
                     } else {
-                        format!("{}{}", root, self.separator)
+                        format!("{}{}", root, config.separator)
                     }
                 }
-                (None, Some(namespace)) => format!("{}{}", namespace, self.separator),
+                (None, Some(namespace)) => format!("{}{}", namespace, config.separator),
                 _ => String::default(),
             };
 
-            if let Some(key) = attributes.get(&self.tag[..]) {
+            if let Some(key) = attributes.get(&config.tag[..]) {
                 let key = if key.is_empty() {
                     let mut hasher = Sha256::new();
                     hasher.update(node.to_string());
@@ -51,7 +49,7 @@ impl RoseyGenerator {
                     format!("{}{}", &prefix, key)
                 };
 
-                if let Some(attrs) = attributes.get(format!("{}-attrs", self.tag)) {
+                if let Some(attrs) = attributes.get(format!("{}-attrs", config.tag)) {
                     for attr in attrs.split(',') {
                         if let Some(value) = attributes.get(attr) {
                             self.locale.insert(
@@ -67,7 +65,7 @@ impl RoseyGenerator {
                 self.locale.insert(key, inner_html, &self.current_file);
             }
 
-            if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
+            if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", config.tag)) {
                 let attrs_map: BTreeMap<String, String> = serde_json::from_str(attrs_map).unwrap();
                 for (attr, key) in attrs_map.iter() {
                     if let Some(value) = attributes.get(attr.as_str()) {
@@ -81,11 +79,11 @@ impl RoseyGenerator {
             }
 
             let new_root = attributes
-                .get(format!("{}-root", self.tag))
+                .get(format!("{}-root", config.tag))
                 .map(String::from)
                 .or(root);
 
-            let new_namespace = match (namespace, attributes.get(format!("{}-ns", self.tag))) {
+            let new_namespace = match (namespace, attributes.get(format!("{}-ns", config.tag))) {
                 (Some(namespace), Some(new_namespace)) => {
                     Some(format!("{}:{}", namespace, new_namespace))
                 }

@@ -4,7 +4,6 @@ mod json;
 use std::{
     fs::{create_dir_all, File},
     io::{BufWriter, Write},
-    path::PathBuf,
 };
 
 use globwalk::DirEntry;
@@ -12,26 +11,16 @@ use globwalk::DirEntry;
 use crate::{RoseyLocale, RoseyOptions};
 
 pub struct RoseyGenerator {
-    pub working_directory: PathBuf,
-    pub source: PathBuf,
-    pub version: u8,
-    pub tag: String,
-    pub separator: String,
-    pub locale_dest: PathBuf,
+    pub options: RoseyOptions,
     pub locale: RoseyLocale,
     pub current_file: String,
 }
 
 impl From<RoseyOptions> for RoseyGenerator {
-    fn from(runner: RoseyOptions) -> Self {
-        let version = runner.version.unwrap();
+    fn from(options: RoseyOptions) -> Self {
+        let version = options.config.version;
         RoseyGenerator {
-            working_directory: runner.working_directory,
-            source: runner.source.unwrap(),
-            version,
-            tag: runner.tag.unwrap(),
-            separator: runner.separator.unwrap(),
-            locale_dest: runner.locale_dest.unwrap(),
+            options,
             locale: RoseyLocale::new(version),
             current_file: String::default(),
         }
@@ -40,14 +29,13 @@ impl From<RoseyOptions> for RoseyGenerator {
 
 impl RoseyGenerator {
     pub fn run(&mut self) {
-        let walker = globwalk::GlobWalkerBuilder::from_patterns(
-            self.working_directory.join(&self.source),
-            &["**/*.{htm,html,json}"],
-        )
-        .build()
-        .unwrap()
-        .into_iter()
-        .filter_map(Result::ok);
+        let config = &self.options.config;
+        let walker =
+            globwalk::GlobWalkerBuilder::from_patterns(&config.source, &["**/*.{htm,html,json}"])
+                .build()
+                .unwrap()
+                .into_iter()
+                .filter_map(Result::ok);
 
         walker.for_each(|file| self.process_file(file));
 
@@ -55,10 +43,11 @@ impl RoseyGenerator {
     }
 
     fn output_locale(&mut self) {
-        let locale_dest = self.working_directory.join(&self.locale_dest);
+        let config = &self.options.config;
+        let locale_dest = &config.locale_dest;
         let locale_folder = locale_dest.parent().unwrap();
         create_dir_all(locale_folder).unwrap();
-        let output = self.locale.output(self.version);
+        let output = self.locale.output(config.version);
 
         if let Ok(file) = File::create(&locale_dest) {
             let mut writer = BufWriter::new(file);
