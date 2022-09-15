@@ -1,4 +1,8 @@
 Feature: Rosey Build Options
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey builds with custom source and dest
     Given I have a "happy/index.html" file with the content:

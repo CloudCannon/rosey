@@ -1,4 +1,8 @@
 Feature: Rosey Links
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey updates internal links
     Given I have a "dist/site/index.html" file with the content:

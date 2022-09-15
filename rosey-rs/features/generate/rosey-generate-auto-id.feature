@@ -1,4 +1,8 @@
 Feature: Rosey Generate AutoID
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey generate creates a hash id if none supplied
     Given I have a "dist/site/index.html" file with the content:

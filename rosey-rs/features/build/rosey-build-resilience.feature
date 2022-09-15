@@ -1,4 +1,8 @@
 Feature: Rosey Build Resilience
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey build ignores images without a src
     Given I have a "dist/site/index.html" file with the content:

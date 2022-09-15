@@ -1,4 +1,8 @@
 Feature: Rosey Generate v1
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey generates source.json files
     Given I have a "dist/site/index.html" file with the content:

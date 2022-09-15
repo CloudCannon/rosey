@@ -1,4 +1,8 @@
 Feature: Rosey Build Translated Assets
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey build uses translated images
     Given I have a "dist/site/image.png" file with the content:

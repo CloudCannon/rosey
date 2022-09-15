@@ -1,4 +1,8 @@
 Feature: Rosey Build
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey builds from locales
     Given I have a "dist/site/index.html" file with the content:

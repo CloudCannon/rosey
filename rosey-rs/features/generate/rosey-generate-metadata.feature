@@ -1,4 +1,8 @@
 Feature: Rosey Generate Metadata
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey includes translation counts
     Given I have a "dist/site/index.html" file with the content:

@@ -1,4 +1,8 @@
 Feature: Rosey Build Assets
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey build copies assets
     Given I have a "dist/site/assets/image.png" file with the content:

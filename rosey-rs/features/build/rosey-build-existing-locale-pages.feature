@@ -4,6 +4,11 @@ Feature: Rosey Build Existing Locale Pages
   Rosey will translate that file into its language,
   but won't translate it into any others.
 
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
+
   Scenario: Rosey uses existing locale pages if they exist
     Given I have a "dist/site/index.html" file with the content:
       """

@@ -1,4 +1,8 @@
 Feature: Rosey Base
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey build is working
     Given I have a "rosey/locales/stub" file

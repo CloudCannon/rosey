@@ -1,4 +1,8 @@
 Feature: Rosey Build AutoID
+  Background:
+    Given I have the environment variables:
+      | ROSEY_SOURCE | dist/site            |
+      | ROSEY_DEST   | dist/translated_site |
 
   Scenario: Rosey build re-pairs a hash id
     Given I have a "dist/site/index.html" file with the content:
