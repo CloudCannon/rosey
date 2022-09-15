@@ -1,6 +1,7 @@
 mod html;
 mod json;
 mod redirect_page;
+mod serve;
 
 use std::{
     collections::BTreeMap,
@@ -98,10 +99,7 @@ impl RoseyBuilder {
 
         watcher.watch(source_dir, RecursiveMode::Recursive).unwrap();
 
-        println!("Starting server on http://127.0.0.1:3030");
-        warp::serve(warp::fs::dir(dest_dir))
-            .run(([127, 0, 0, 1], 3030))
-            .await;
+        serve::serve_dir(dest_dir).await;
     }
 
     pub fn clean_output_dir(&self) {
