@@ -160,6 +160,7 @@ enum RoseyEdit {
 struct RoseyPage<'a> {
     dom: NodeRef,
     edits: Vec<RoseyEdit>,
+    html_tag: Option<NodeRef>,
     meta_tag: Option<NodeRef>,
     link_tags: Vec<NodeRef>,
     image_tags: Vec<(Option<String>, Option<String>, NodeRef)>,
@@ -193,6 +194,7 @@ impl<'a> RoseyPage<'a> {
             assets: Vec::new(),
             separator: separator.to_string(),
             tag: tag.to_string(),
+            html_tag: None,
             meta_tag: None,
             images_source,
             default_language: default_language.to_string(),
@@ -367,11 +369,23 @@ impl<'a> RoseyPage<'a> {
     }
 
     fn prepare_head(&mut self) {
+        let html = if let Ok(html) = self.dom.select_first("html") {
+            html
+        } else {
+            let html = NodeRef::new_element(
+                QualName::new(None, ns!(html), local_name!("html")),
+                BTreeMap::default(),
+            );
+            self.dom.prepend(html);
+            self.dom.select_first("html").unwrap()
+        };
+        self.html_tag = Some(html.as_node().clone());
+
         let head = if let Ok(head) = self.dom.select_first("head") {
             head
         } else {
             let head = NodeRef::new_element(
-                QualName::new(None, ns!(html), local_name!("input")),
+                QualName::new(None, ns!(html), local_name!("head")),
                 BTreeMap::default(),
             );
             self.dom.prepend(head);
@@ -418,6 +432,11 @@ impl<'a> RoseyPage<'a> {
 
         let path = relative_path.display().to_string();
         let path = path.trim_end_matches("index.html");
+
+        let html_tag = self.html_tag.as_ref().unwrap();
+        let mut attributes = html_tag.as_element().unwrap().attributes.borrow_mut();
+        attributes.remove("lang");
+        attributes.insert("lang", locale_key.to_string());
 
         let meta_tag = self.meta_tag.as_ref().unwrap();
         let mut attributes = meta_tag.as_element().unwrap().attributes.borrow_mut();
