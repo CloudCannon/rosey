@@ -46,7 +46,7 @@ impl RoseyBuilder {
             let mut source = source.clone();
             self.process_json_node(&mut source, &schema, None, translation);
 
-            let content = serde_json::to_string(&source).unwrap();
+            let content = serde_json::to_string_pretty(&source).unwrap();
             self.output_file(key, relative_path, content);
         });
     }

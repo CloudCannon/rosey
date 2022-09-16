@@ -286,8 +286,8 @@ impl RoseyLocale {
 
     pub fn output(&mut self, version: u8) -> String {
         match version {
-            2 => serde_json::to_string(self).unwrap(),
-            1 => serde_json::to_string(&self.keys).unwrap(),
+            2 => serde_json::to_string_pretty(self).unwrap(),
+            1 => serde_json::to_string_pretty(&self.keys).unwrap(),
             _ => unreachable!(),
         }
     }

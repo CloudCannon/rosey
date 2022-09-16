@@ -67,7 +67,7 @@ impl RoseyChecker {
         let locale_folder = locale_dest.parent().unwrap();
         let check_dest = locale_folder.join("checks.json");
         create_dir_all(locale_folder).unwrap();
-        let output = serde_json::to_string(&self.check).unwrap();
+        let output = serde_json::to_string_pretty(&self.check).unwrap();
 
         if let Ok(file) = File::create(&check_dest) {
             let mut writer = BufWriter::new(file);

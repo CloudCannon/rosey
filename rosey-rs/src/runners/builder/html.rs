@@ -402,12 +402,25 @@ impl<'a> RoseyPage<'a> {
             },
         );
 
-        let node = NodeRef::new_element(
+        let meta_node = NodeRef::new_element(
             QualName::new(None, ns!(html), local_name!("meta")),
             attributes,
         );
-        self.meta_tag = Some(node.clone());
-        head.append(node);
+        self.meta_tag = Some(meta_node.clone());
+
+        let indentation = if let Some(first_child) = head.children().next() {
+            if let Some(text) = first_child.as_text() {
+                first_child.insert_after(meta_node.clone());
+                text.borrow().clone()
+            } else {
+                head.append(meta_node.clone());
+                String::from("")
+            }
+        } else {
+            head.append(meta_node.clone());
+            String::from("")
+        };
+        meta_node.insert_after(NodeRef::new_text(&indentation));
 
         for _i in 0..self.translations.len() {
             let mut attributes = BTreeMap::new();
@@ -423,7 +436,8 @@ impl<'a> RoseyPage<'a> {
                 attributes,
             );
             self.link_tags.push(node.clone());
-            head.append(node.clone());
+            meta_node.insert_after(node.clone());
+            meta_node.insert_after(NodeRef::new_text(&indentation));
         }
     }
 
