@@ -5,16 +5,18 @@ nav_section: Root
 weight: 2
 ---
 
-The majority of Rosey configuration happens in your template files, and is read from your output static HTML by Rosey. These configuration values are usually in the form of `data-rosey*` attributes placed on your elements.
+The majority of Rosey configuration happens in your static HTML, which is read and transformed by Rosey. In most places, configuration values are in the form of `data-rosey*` attributes placed on your elements.
 
 ## Tagging your first layout
 
-To get started, let's look at an example where we want to translate the page title on an Eleventy site. In our default layout, we'll tag each instance of our title with a `data-rosey` attribute.
+For this guide we're going to look at an example where we want to translate the page title on the homepage of an Eleventy site — the concepts apply to any static site generator, so adjust the files you're editing to match your workflow.
+
+Our simple site has a single index page, which is configured to use a `home` layout. In our home layout, we'll tag each instance of our title with a `data-rosey` attribute.
 
 {{< diffcode >}}
 ```html
 ---
-# _includes/layouts/default.liquid
+# _includes/layouts/home.liquid
 ---
 
 <!doctype html>
@@ -34,7 +36,7 @@ To get started, let's look at an example where we want to translate the page tit
 ```
 {{< /diffcode >}}
 
-The `data-rosey` attribute expects to be passed a key for the given translation. In this case, both of these elements contain the same text, so we can key them both as the `title` translation.
+The `data-rosey` attribute expects to be passed a key for the given translation. In this case, both of these elements contain the same text, so we can share the `title` translation key.
 
 After building our site to a static directory, our homepage file might look like the following:
 
@@ -59,14 +61,14 @@ With our built static site on hand, we can now start running Rosey. The easiest 
 
 ## Generating the source translation file
 
-At a high level, Rosey offers two main commands: `generate` and `build`; The `generate` command is our starting point, which will generate our base translation file. For a simple site, we might now have the following directory structure after our build:
+At a high level, Rosey offers two main commands: `generate` and `build`; Rosey's `generate` command is our starting point, which will generate our base translation file. For our simple Eleventy site, we should now have the following directory structure after running a build:
 
 {{< tree >}}
 .eleventy.js
 package.json
 _includes/
 >> _layouts/
-   >> default.liquid
+   >> home.liquid
 +_site/
 +>> index.html
 index.liquid
@@ -78,14 +80,14 @@ With our built static files in the `_site` folder, we run the following command:
 npx rosey generate --source _site
 ```
 
-We will now see a new file in our project:
+This will read the static HTML and extract any elements that have been tagged for translation. We now see a new file in our project:
 
 {{< tree >}}
 .eleventy.js
 package.json
 _includes/
 >> _layouts/
-   >> default.liquid
+   >> home.liquid
 _site/
 >> index.html
 index.liquid
@@ -93,7 +95,7 @@ index.liquid
 +>> source.json
 {{< /tree >}}
 
-This `source.json` file contains all text that needs to be translated, based on the `data-rosey` attributes found on your site. For the layout we tagged above, this will look like the following:
+This `source.json` file contains all text that needs to be translated. For the layout we tagged above, this will look like the following:
 
 ```json
 {
@@ -110,16 +112,18 @@ This `source.json` file contains all text that needs to be translated, based on 
 }
 ```
 
+For now, all we need to look at is the `original` value of our key. The other values are useful to provide better context for integrations, but otherwise aren't important.
+
 ## Creating locale files
 
-The next step of the Rosey flow is building a multilingual website, but in order to do so we need translated content. Rosey looks for translated content in the `rosey/locales` folder, so to create a localized version of your site in Korean a file should be created at `rosey/locales/ko-kr.json`:
+The next step from Rosey's point of view is building a multilingual website, but in order to do so we need translated content. Rosey expects translated content to exist in the `rosey/locales` folder, so to create a localized version of your site in Korean a file should be created at `rosey/locales/ko-kr.json`:
 
 {{< tree >}}
 .eleventy.js
 package.json
 _includes/
 >> _layouts/
-   >> default.liquid
+   >> home.liquid
 _site/
 >> index.html
 index.liquid
@@ -135,7 +139,7 @@ This file should contain translation keys, each containing the original and tran
 {
     "title": {
         "original": "My Website",
-    	"value": "나의 웹 사이트"
+    	  "value": "나의 웹 사이트"
     }
 }
 ```
@@ -153,7 +157,7 @@ For our running example, we'll assume we have created translated locale files fo
 package.json
 _includes/
 >> _layouts/
-   >> default.liquid
+   >> home.liquid
 _site/
 >> index.html
 index.liquid
@@ -164,7 +168,7 @@ rosey/
 >> source.json
 {{< /tree >}}
 
-With these files in place, let's run the `build` subcommand:
+With these newly-created files in place, let's run the `build` subcommand:
 
 ```bash
 npx rosey build --source _site
@@ -177,7 +181,7 @@ We will now see a new translated copy of our static site alongside our original 
 package.json
 _includes/
 >> _layouts/
-   >> default.liquid
+   >> home.liquid
 _site/
 >> index.html
 +_site_translated/
