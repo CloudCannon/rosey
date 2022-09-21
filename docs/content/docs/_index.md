@@ -9,7 +9,7 @@ The majority of Rosey configuration happens in your static HTML, which is read a
 
 ## Tagging your first layout
 
-For this guide we're going to look at an example where we want to translate the page title on the homepage of an Eleventy site — the concepts apply to any static site generator, so adjust the files you're editing to match your workflow.
+For this guide we'll work through a single example: translating the page title on the homepage of an Eleventy site. The concepts apply to any static site generator, so adjust the files you're editing to match your workflow.
 
 Our simple site has a single index page, which is configured to use a `home` layout. In our home layout, we'll tag each instance of our title with a `data-rosey` attribute.
 
@@ -61,7 +61,7 @@ With our built static site on hand, we can now start running Rosey. The easiest 
 
 ## Generating the source translation file
 
-At a high level, Rosey offers two main commands: `generate` and `build`; Rosey's `generate` command is our starting point, which will generate our base translation file. For our simple Eleventy site, we should now have the following directory structure after running a build:
+Rosey's `generate` command is our starting point, which will generate our base translation file. For our simple Eleventy site, we should now have the following directory structure after running our site build:
 
 {{< tree >}}
 .eleventy.js
@@ -80,7 +80,7 @@ With our built static files in the `_site` folder, we run the following command:
 npx rosey generate --source _site
 ```
 
-This will read the static HTML and extract any elements that have been tagged for translation. We now see a new file in our project:
+Rosey will read the static HTML and extract any elements that have been tagged for translation. We now see a new file in our project:
 
 {{< tree >}}
 .eleventy.js
@@ -146,7 +146,7 @@ This file should contain translation keys, each containing the original and tran
 
 The `original` text here will be used to detect translations that are out of date, and the `value` text will be used to build our multilingual site.
 
-Creating these locale files is currently out of Rosey's scope. For smaller use-cases, these files can be written by hand. For larger sites, Rosey will usually be integrated with an existing translation workflow. In most cases this will involve building some middleware that uploads the strings from your `source.json` to a translation API (i.e. Smartling), and creates `rosey/locales/*.json` files with the translated response.
+Creating these locale files is currently out of Rosey's scope. For smaller use-cases, these files can be written by hand. For larger sites, Rosey will usually be integrated with an existing translation workflow. In most cases this will involve building some middleware that uploads the strings from your `source.json` to a translation API (e.g. Smartling), and creates `rosey/locales/*.json` files with the translated response.
 
 ## Building the multilingual site
 
