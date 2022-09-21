@@ -82,6 +82,38 @@ Feature: Rosey Generate JSON
       | mushroom\.name  | Home Page       |
       | mushroom\.title | Home page title |
 
+  Scenario: Rosey generates source.json files from JSON with untranslated namespaces
+    Given I have a "dist/site/titles.json" file with the content:
+      """
+      {
+        "mushroom": {
+          "name": "Home",
+          "title": "Home page title",
+          "nested": {
+            "subtitle": "Hello :)"
+          }
+        }
+      }
+      """
+    And I have a "dist/site/titles.rosey.json" file with the content:
+      """
+      {
+        "mushroom": {
+          "name": "rosey-ns",
+          "title": "rosey:title",
+          "nested": {
+            "subtitle": "rosey:sub"
+          }
+        }
+      }
+      """
+    When I run my program with the flags:
+      | generate |
+    Then I should see "rosey/source.json" containing the values:
+      | version                   | int:2           |
+      | keys.home\.title.original | Home page title |
+      | keys.home\.sub.original   | Hello :)        |
+
   Scenario: Rosey generates source.json files from JSON with namespaces
     Given I have a "dist/site/titles.json" file with the content:
       """
