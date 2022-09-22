@@ -214,11 +214,17 @@ async fn main() {
         .get_matches();
 
     let (subcommand, matches) = matches.subcommand();
-    let matches = matches.unwrap();
+    let matches = matches.unwrap_or_else(|| {
+        eprintln!("Failed to match any subcommand arguments");
+        std::process::exit(1);
+    });
 
     let options = RoseyOptions::load_with_flags(matches);
     options
-        .run(RoseyCommand::from_str(subcommand).unwrap())
+        .run(RoseyCommand::from_str(subcommand).unwrap_or_else(|e| {
+            eprintln!("Error running Rosey: {e}");
+            std::process::exit(1);
+        }))
         .await;
 
     let duration = start.elapsed();

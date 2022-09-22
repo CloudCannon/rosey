@@ -1,6 +1,6 @@
 use std::{fmt::Display, path::PathBuf};
 
-use anyhow::Error;
+use anyhow::{Context, Error};
 use figment::{
     providers::{Env, Format, Json, Serialized, Toml, Yaml},
     Figment,
@@ -56,7 +56,10 @@ pub fn load_config_files() -> Result<RoseyPublicConfig, Error> {
         .merge(Json::file("rosey.json"))
         .merge(Env::prefixed("ROSEY_"));
 
-    figment.extract().map_err(Into::into)
+    figment
+        .extract()
+        .context("Couldn't resolve configuration from files or environment variables")
+        .map_err(Into::into)
 }
 
 impl Display for RoseyPublicConfig {

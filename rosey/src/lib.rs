@@ -2,6 +2,7 @@ pub mod options;
 mod runners;
 
 use crate::runners::generator::RoseyGenerator;
+use anyhow::{bail, Error};
 use clap::ArgMatches;
 pub use options::*;
 use runners::{builder::RoseyBuilder, checker::RoseyChecker};
@@ -15,14 +16,14 @@ pub enum RoseyCommand {
 }
 
 impl FromStr for RoseyCommand {
-    type Err = ();
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "generate" => Ok(RoseyCommand::Generate),
             "build" => Ok(RoseyCommand::Build),
             "check" => Ok(RoseyCommand::Check),
-            _ => Err(()),
+            other => bail!("Unsupported subcommand: {other}"),
         }
     }
 }
@@ -68,7 +69,10 @@ impl RoseyOptions {
 
         let original_source = matches.get("source", base.source.clone());
         let dest = matches.get("dest", base.dest);
-        let working_dir = env::current_dir().unwrap();
+        let working_dir = env::current_dir().unwrap_or_else(|e| {
+            eprintln!("Couldn't access the current working directory: {e}");
+            std::process::exit(1);
+        });
 
         if original_source.to_string_lossy().is_empty() {
             eprintln!(
