@@ -152,14 +152,15 @@ async fn main() {
                 .arg(
                     Arg::with_name("wrap")
                         .long("wrap")
-                        .help("For languages without significant whitespace, add zero-width space characters between detected words")
+                        .help("For languages without significant whitespace, add spans around detected words to break lines cleanly")
                         .multiple(true)
                 )
                 .arg(
-                    Arg::with_name("wrap-spans")
-                        .long("wrap-spans")
-                        .help("When wrapping languages, use spans around words instead of zero-width space characters")
-                        .takes_value(false),
+                    Arg::with_name("wrap-class")
+                        .long("wrap-class")
+                        .value_name("CLASS")
+                        .takes_value(true)
+                        .help("When wrapping languages, use the given classname instead of inline styles")
                 )
                 .arg(Arg::with_name("serve")
                         .long("serve")

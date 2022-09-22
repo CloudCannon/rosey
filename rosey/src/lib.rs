@@ -117,7 +117,7 @@ impl RoseyOptions {
                     Some(langs) => Some(langs.map(|l| l.to_owned()).collect()),
                     _ => base.wrap,
                 },
-                wrap_spans: matches.is_present("wrap-spans") || base.wrap_spans,
+                wrap_class: matches.get_opt("wrap-class", base.wrap_class),
                 verbose: matches.is_present("verbose") || base.verbose,
                 languages: None, // TODO
             },

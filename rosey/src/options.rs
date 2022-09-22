@@ -22,7 +22,7 @@ pub struct RoseyPublicConfig {
     pub default_language: String,
     pub redirect_page: Option<PathBuf>,
     pub wrap: Option<Vec<String>>,
-    pub wrap_spans: bool,
+    pub wrap_class: Option<String>,
     pub verbose: bool,
 }
 
@@ -42,7 +42,7 @@ impl Default for RoseyPublicConfig {
             default_language: "en".into(),
             redirect_page: None,
             wrap: None,
-            wrap_spans: false,
+            wrap_class: None,
             verbose: false,
         }
     }
@@ -68,8 +68,8 @@ impl Display for RoseyPublicConfig {
         writeln!(f, "  Paths:")?;
         writeln!(f, "   - Source:              {}", self.source.display())?;
         writeln!(f, "   - Destination:         {}", self.dest.display())?;
-        writeln!(f, "   - Base locale file:       {}", self.base.display())?;
-        writeln!(f, "   - Locales firectory:  {}", self.locales.display())?;
+        writeln!(f, "   - Base locale file:    {}", self.base.display())?;
+        writeln!(f, "   - Locales directory:   {}", self.locales.display())?;
         match &self.images_source {
             Some(s) => writeln!(f, "   - Images source:       {}", s.display())?,
             None => writeln!(
@@ -99,14 +99,19 @@ impl Display for RoseyPublicConfig {
             )?,
         }
         match &self.wrap {
-            Some(langs) => writeln!(f, "   - Wrap languages:           {}", langs.join(", "))?,
+            Some(langs) => writeln!(f, "   - Wrap languages:      {}", langs.join(", "))?,
             None => writeln!(
                 f,
-                "   - Wrap languages:           * none passed, no text wrapping to be applied *"
+                "   - Wrap languages:      * none passed, no text wrapping to be applied *"
             )?,
         }
-        writeln!(f, "   - Wrap using spans:          {}", self.wrap_spans)?;
-
+        match &self.wrap_class {
+            Some(class) => writeln!(f, "   - Wrap classname:      {}", class)?,
+            None => writeln!(
+                f,
+                "   - Wrap classname:      * none set, wrapping with inline styles *"
+            )?,
+        }
         write!(f, "")
     }
 }
