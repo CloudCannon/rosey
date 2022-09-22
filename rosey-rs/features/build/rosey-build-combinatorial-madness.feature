@@ -4,7 +4,7 @@ Feature: Rosey Build Combinatorial
       | ROSEY_SOURCE | dist/site            |
       | ROSEY_DEST   | dist/translated_site |
 
-  Scenario: Rosey builds from source.json [ns, root, attr, explicit-attr]
+  Scenario: Rosey builds from locales [ns, root, attr, explicit-attr]
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>

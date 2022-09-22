@@ -48,19 +48,18 @@ impl From<RoseyOptions> for RoseyChecker {
 impl RoseyChecker {
     pub fn run(&mut self) {
         let config = &self.options.config;
-        let locale_dest = config.locale_dest.clone();
+        let locale_dest = config.base.clone();
         let value = read_to_string(&locale_dest).expect("Failed to read locale file");
         let value = RoseyLocale::from_str(&value);
         if let Ok(locale) = value {
             self.base_locale = locale;
         }
 
-        let walker =
-            globwalk::GlobWalkerBuilder::from_patterns(&config.locale_source, &["**/*.json"])
-                .build()
-                .unwrap()
-                .into_iter()
-                .filter_map(Result::ok);
+        let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.locales, &["**/*.json"])
+            .build()
+            .unwrap()
+            .into_iter()
+            .filter_map(Result::ok);
 
         walker.for_each(|entry| self.process_file(entry));
 

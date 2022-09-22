@@ -25,7 +25,7 @@ Feature: Rosey Generate Options
     When I run my program with the flags:
       | generate        |
       | --separator "~" |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                               | int:2             |
       | keys.home:meta~title.original         | Home header title |
       | keys.home:content~title.original      | Home page title   |
@@ -53,14 +53,14 @@ Feature: Rosey Generate Options
     When I run my program with the flags:
       | generate               |
       | --tag "something-else" |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                               | int:2             |
       | keys.home:meta:title.original         | Home header title |
       | keys.home:content:title.original      | Home page title   |
       | keys.home:contact:contact-us.original | Contact content   |
       | keys.footer.original                  | Footer content    |
 
-  Scenario: Rosey generates to a custom dest
+  Scenario: Rosey generates to a custom base file
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -70,8 +70,8 @@ Feature: Rosey Generate Options
       </html>
       """
     When I run my program with the flags:
-      | generate                          |
-      | --locale-dest "row-z/source.json" |
-    Then I should see "row-z/source.json" containing the values:
+      | generate                    |
+      | --base "row-z/zz-base.json" |
+    Then I should see "row-z/zz-base.json" containing the values:
       | version            | int:2            |
       | keys.seal.original | Kiss From A Rose |

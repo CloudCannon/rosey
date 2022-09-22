@@ -3,7 +3,7 @@ Feature: Rosey Build V2
 		Given I have the environment variables:
 			| ROSEY_SOURCE | dist/site            |
 			| ROSEY_DEST   | dist/translated_site |
-	Scenario: Rosey builds from  V2 locales
+	Scenario: Rosey builds from V2 locales
 		Given I have a "dist/site/index.html" file with the content:
 			"""
       <html>

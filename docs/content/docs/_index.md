@@ -74,7 +74,7 @@ _includes/
 index.liquid
 {{< /tree >}}
 
-With our built static files in the `_site` folder, we run the following command:
+With our built static files in the `_site` folder, we can run the generate command:
 
 ```bash
 npx rosey generate --source _site
@@ -92,10 +92,10 @@ _site/
 >> index.html
 index.liquid
 +rosey/
-+>> source.json
++>> base.json
 {{< /tree >}}
 
-This `source.json` file contains all text that needs to be translated. For the layout we tagged above, this will look like the following:
+This `base.json` file contains all text that needs to be translated. For the layout we tagged above, this will look like the following:
 
 ```json
 {
@@ -130,10 +130,10 @@ index.liquid
 rosey/
 +>> locales/
 +>  >> ko-kr.json
->> source.json
+>> base.json
 {{< /tree >}}
 
-This file should contain translation keys, each containing the original and translated text. For our `source.json` above, our `ko-kr.json` locale file will look like:
+This file should contain translation keys, each containing the original and translated text. For our `base.json` above, our `ko-kr.json` locale file will look like:
 
 ```json
 {
@@ -146,7 +146,7 @@ This file should contain translation keys, each containing the original and tran
 
 The `original` text here will be used to detect translations that are out of date, and the `value` text will be used to build our multilingual site.
 
-Creating these locale files is currently out of Rosey's scope. For smaller use-cases, these files can be written by hand. For larger sites, Rosey will usually be integrated with an existing translation workflow. In most cases this will involve building some middleware that uploads the strings from your `source.json` to a translation API (e.g. Smartling), and creates `rosey/locales/*.json` files with the translated response.
+Creating these locale files is currently out of Rosey's scope. For smaller use-cases, these files can be written by hand. For larger sites, Rosey will usually be integrated with an existing translation workflow. In most cases this will involve building some middleware that uploads the strings from your `base.json` to a translation API (e.g. Smartling), and creates `rosey/locales/*.json` files with the translated response.
 
 ## Building the multilingual site
 
@@ -165,7 +165,7 @@ rosey/
 +>> locales/
 +>  >> ko-kr.json
 +>  >> no.json
->> source.json
+>> base.json
 {{< /tree >}}
 
 With these newly-created files in place, let's run the `build` subcommand:
@@ -197,7 +197,7 @@ rosey/
 >> locales/
 >  >> ko-kr.json
 >  >> no.json
->> source.json
+>> base.json
 {{< /tree >}}
 
 At a glance we can see that Rosey has created a subdirectory for each of our languages. Peeking inside `_site_translated/ko-kr/index.html`:

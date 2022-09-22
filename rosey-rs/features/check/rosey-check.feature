@@ -5,7 +5,7 @@ Feature: Rosey check v2
 			| ROSEY_DEST   | dist/translated_site |
 
 	Scenario: Rosey check finds current translations
-		Given I have a "rosey/source.json" file with the content:
+		Given I have a "rosey/base.json" file with the content:
 			"""
 			{
 				"version": 2,
@@ -37,7 +37,7 @@ Feature: Rosey check v2
 			| em.keys.seal       | current   |
 
 	Scenario: Rosey check finds outdated translations
-		Given I have a "rosey/source.json" file with the content:
+		Given I have a "rosey/base.json" file with the content:
 			"""
 			{
 				"version": 2,
@@ -69,7 +69,7 @@ Feature: Rosey check v2
 			| em.keys.seal       | outdated   |
 
 	Scenario: Rosey check finds missing translations
-		Given I have a "rosey/source.json" file with the content:
+		Given I have a "rosey/base.json" file with the content:
 			"""
 			{
 				"version": 2,
@@ -97,7 +97,7 @@ Feature: Rosey check v2
 			| em.keys.seal       | missing    |
 
 	Scenario: Rosey check finds unused translations
-		Given I have a "rosey/source.json" file with the content:
+		Given I have a "rosey/base.json" file with the content:
 			"""
 			{
 				"version": 2,
@@ -125,7 +125,7 @@ Feature: Rosey check v2
 			| em.keys.spheal     | unused     |
 
 	Scenario: Rosey check counts total translations
-		Given I have a "rosey/source.json" file with the content:
+		Given I have a "rosey/base.json" file with the content:
 			"""
 			{
 				"version": 2,

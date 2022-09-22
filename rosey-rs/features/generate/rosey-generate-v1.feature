@@ -4,7 +4,7 @@ Feature: Rosey Generate v1
       | ROSEY_SOURCE | dist/site            |
       | ROSEY_DEST   | dist/translated_site |
 
-  Scenario: Rosey generates source.json files
+  Scenario: Rosey generates base.json files
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -16,10 +16,10 @@ Feature: Rosey Generate v1
     When I run my program with the flags:
       | generate    |
       | --version 1 |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | seal | Kiss From A Rose |
 
-  Scenario: Rosey generates source.json files with attrs
+  Scenario: Rosey generates base.json files with attrs
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -31,12 +31,12 @@ Feature: Rosey Generate v1
     When I run my program with the flags:
       | generate    |
       | --version 1 |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | title          | Home page title   |
       | title\.content | Content attribute |
       | title\.alt     | alt attribute     |
 
-  Scenario: Rosey generates source.json files with explicit attrs
+  Scenario: Rosey generates base.json files with explicit attrs
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -48,11 +48,11 @@ Feature: Rosey Generate v1
     When I run my program with the flags:
       | generate    |
       | --version 1 |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | content-tag | Content attribute |
       | alt-tag     | alt attribute     |
 
-  Scenario: Rosey generates source.json files with namespaces
+  Scenario: Rosey generates base.json files with namespaces
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -89,13 +89,13 @@ Feature: Rosey Generate v1
     When I run my program with the flags:
       | generate    |
       | --version 1 |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | about:faq:row-0:col-0:title      | Slot A |
       | about:faq:row-1:col-0:title      | Slot B |
       | about:benefits:row-0:col-0:title | Slot C |
       | about:benefits:row-1:col-0:title | Slot D |
 
-  Scenario: Rosey generates source.json files with roots
+  Scenario: Rosey generates base.json files with roots
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -116,7 +116,7 @@ Feature: Rosey Generate v1
     When I run my program with the flags:
       | generate    |
       | --version 1 |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | home:meta:title         | Home header title |
       | home:content:title      | Home page title   |
       | home:contact:contact-us | Contact content   |

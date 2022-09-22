@@ -25,7 +25,7 @@ Feature: Rosey Generate Metadata
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                           | int:2 |
       | keys.seal.pages.index\.html       | int:1 |
       | keys.seal.pages.about/index\.html | int:2 |

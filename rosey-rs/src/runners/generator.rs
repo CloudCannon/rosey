@@ -44,7 +44,7 @@ impl RoseyGenerator {
 
     fn output_locale(&mut self) {
         let config = &self.options.config;
-        let locale_dest = &config.locale_dest;
+        let locale_dest = &config.base;
         let locale_folder = locale_dest.parent().unwrap();
         create_dir_all(locale_folder).unwrap();
         let output = self.locale.output(config.version);

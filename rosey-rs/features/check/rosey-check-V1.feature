@@ -5,7 +5,7 @@ Feature: Rosey check v1
 			| ROSEY_DEST   | dist/translated_site |
 
 	Scenario: Rosey check finds current translations
-		Given I have a "rosey/source.json" file with the content:
+		Given I have a "rosey/base.json" file with the content:
 			"""
 			{
 				"seal": "Kiss From A Rose"
@@ -30,7 +30,7 @@ Feature: Rosey check v1
 			| em.keys.seal       | current   |
 
 	Scenario: Rosey check finds missing translations
-		Given I have a "rosey/source.json" file with the content:
+		Given I have a "rosey/base.json" file with the content:
 			"""
 			{
 				"seal": "Kiss From A Rose"
@@ -53,7 +53,7 @@ Feature: Rosey check v1
 			| em.keys.seal       | missing    |
 
 	Scenario: Rosey check finds unused translations
-		Given I have a "rosey/source.json" file with the content:
+		Given I have a "rosey/base.json" file with the content:
 			"""
 			{}
 			"""

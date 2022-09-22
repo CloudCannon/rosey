@@ -17,7 +17,7 @@ Feature: Rosey Generate Complex
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version            | int:2                |
       | keys.seal.original | \nKiss From A Rose\n |
 
@@ -32,7 +32,7 @@ Feature: Rosey Generate Complex
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version            | int:2                   |
       | keys.seal.original | <p>Kiss From A Rose</p> |
 
@@ -48,7 +48,7 @@ Feature: Rosey Generate Complex
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version            | int:2      |
       | keys.seal.original | 🦭         |
       | keys.e.original    | 𓀞𓂗𓃛𓄫𓋟 |
@@ -65,7 +65,7 @@ Feature: Rosey Generate Complex
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                  | int:2 |
       | keys.🦭.original         | seal  |
       | keys.𓀞𓂗𓃛𓄫𓋟.original | e     |

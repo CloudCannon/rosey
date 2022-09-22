@@ -50,12 +50,12 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("locale-dest")
-                        .long("locale-dest")
+                    Arg::with_name("base")
+                        .long("base")
                         .value_name("PATH")
                         .help(&format!(
-                            "The file to generate the Rosey source.json locale file to. \n ─ Defaults to '{}'",
-                            example_defaults.locale_dest.display()
+                            "The file to generate the Rosey base locale file to. \n ─ Defaults to '{}'",
+                            example_defaults.base.display()
                         )),
                 )
                 .arg(
@@ -100,12 +100,12 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("locale-source")
-                        .long("locale-source")
+                    Arg::with_name("locales")
+                        .long("locales")
                         .value_name("PATH")
                         .help(&format!(
                             "The directory to read translated Rosey locale files from. \n ─ Defaults to '{}'",
-                            example_defaults.locale_source.display()
+                            example_defaults.locales.display()
                         )),
                 )
                 .arg(
@@ -113,7 +113,7 @@ async fn main() {
                         .long("default-language")
                         .value_name("LANG")
                         .help(&format!(
-                            "The default language for the site (i.e. the language of 'source.json'). \n ─ Defaults to '{}'",
+                            "The default language for the site (i.e. the language of 'base.json'). \n ─ Defaults to '{}'",
                             example_defaults.default_language
                         )),
                 )
@@ -164,21 +164,21 @@ async fn main() {
         .subcommand(
             App::new("check")
                 .arg(
-                    Arg::with_name("locale-source")
-                        .long("locale-source")
+                    Arg::with_name("locales")
+                        .long("locales")
                         .value_name("PATH")
                         .help(&format!(
                             "The directory to read translated Rosey locale files from. \n ─ Defaults to '{}'",
-                            example_defaults.locale_source.display()
+                            example_defaults.locales.display()
                         )),
                 )
                 .arg(
-                    Arg::with_name("locale-dest")
-                        .long("locale-dest")
+                    Arg::with_name("base")
+                        .long("base")
                         .value_name("PATH")
                         .help(&format!(
-                            "The file to generate the Rosey source.json locale file to. \n ─ Defaults to '{}'",
-                            example_defaults.locale_dest.display()
+                            "The path to a Rosey base locale file. \n ─ Defaults to '{}'",
+                            example_defaults.base.display()
                         )),
                 )
                 .arg(

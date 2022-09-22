@@ -4,7 +4,7 @@ Feature: Rosey Generate JSON
       | ROSEY_SOURCE | dist/site            |
       | ROSEY_DEST   | dist/translated_site |
 
-  Scenario: Rosey generates source.json files from JSON
+  Scenario: Rosey generates base.json files from JSON
     Given I have a "dist/site/titles.json" file with the content:
       """
       {
@@ -25,7 +25,7 @@ Feature: Rosey Generate JSON
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                       | int:2           |
       | keys.mushroom\.name.original  | Home Page       |
       | keys.mushroom\.title.original | Home page title |
@@ -51,12 +51,12 @@ Feature: Rosey Generate JSON
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                                 | int:2 |
       | keys.mushroom\.name.pages.titles\.json  | int:1 |
       | keys.mushroom\.title.pages.titles\.json | int:1 |
 
-  Scenario: Rosey generates v1 source.json files from JSON
+  Scenario: Rosey generates v1 base.json files from JSON
     Given I have a "dist/site/titles.json" file with the content:
       """
       {
@@ -78,11 +78,11 @@ Feature: Rosey Generate JSON
     When I run my program with the flags:
       | generate    |
       | --version 1 |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | mushroom\.name  | Home Page       |
       | mushroom\.title | Home page title |
 
-  Scenario: Rosey generates source.json files from JSON with untranslated namespaces
+  Scenario: Rosey generates base.json files from JSON with untranslated namespaces
     Given I have a "dist/site/titles.json" file with the content:
       """
       {
@@ -109,12 +109,12 @@ Feature: Rosey Generate JSON
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                   | int:2           |
       | keys.home\.title.original | Home page title |
       | keys.home\.sub.original   | Hello :)        |
 
-  Scenario: Rosey generates source.json files from JSON with namespaces
+  Scenario: Rosey generates base.json files from JSON with namespaces
     Given I have a "dist/site/titles.json" file with the content:
       """
       {
@@ -141,7 +141,7 @@ Feature: Rosey Generate JSON
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                   | int:2           |
       | keys.home\.name.original  | Home            |
       | keys.home\.title.original | Home page title |
@@ -172,14 +172,14 @@ Feature: Rosey Generate JSON
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                                  | int:2         |
       | keys.home\.name.original                 | Home          |
       | keys.home\.animal.original               | Woof          |
       | keys.home\.homepagetitle\.title.original | Homepagetitle |
       | keys.home\.homepagetitle\.food.original  | Sandwich      |
 
-  Scenario: Rosey generates source.json files from JSON with array namespaces
+  Scenario: Rosey generates base.json files from JSON with array namespaces
     Given I have a "dist/site/titles.json" file with the content:
       """
       {
@@ -218,7 +218,7 @@ Feature: Rosey Generate JSON
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                           | int:2  |
       | keys.john\.name.original          | John   |
       | keys.john\.cool\.value.original   | cool   |

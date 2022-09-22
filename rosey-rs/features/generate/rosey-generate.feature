@@ -4,7 +4,7 @@ Feature: Rosey Generate v2
       | ROSEY_SOURCE | dist/site            |
       | ROSEY_DEST   | dist/translated_site |
 
-  Scenario: Rosey generates source.json files
+  Scenario: Rosey generates base.json files
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -15,11 +15,11 @@ Feature: Rosey Generate v2
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version            | int:2            |
       | keys.seal.original | Kiss From A Rose |
 
-  Scenario: Rosey generates source.json files with attrs
+  Scenario: Rosey generates base.json files with attrs
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -30,13 +30,13 @@ Feature: Rosey Generate v2
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                      | int:2             |
       | keys.title.original          | Home page title   |
       | keys.title\.content.original | Content attribute |
       | keys.title\.alt.original     | alt attribute     |
 
-  Scenario: Rosey generates source.json files with explicit attrs
+  Scenario: Rosey generates base.json files with explicit attrs
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -47,12 +47,12 @@ Feature: Rosey Generate v2
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                   | int:2             |
       | keys.content-tag.original | Content attribute |
       | keys.alt-tag.original     | alt attribute     |
 
-  Scenario: Rosey generates source.json files with namespaces
+  Scenario: Rosey generates base.json files with namespaces
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -88,14 +88,14 @@ Feature: Rosey Generate v2
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                                        | int:2  |
       | keys.about:faq:row-0:col-0:title.original      | Slot A |
       | keys.about:faq:row-1:col-0:title.original      | Slot B |
       | keys.about:benefits:row-0:col-0:title.original | Slot C |
       | keys.about:benefits:row-1:col-0:title.original | Slot D |
 
-  Scenario: Rosey generates source.json files with roots
+  Scenario: Rosey generates base.json files with roots
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -115,14 +115,14 @@ Feature: Rosey Generate v2
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                               | int:2             |
       | keys.home:meta:title.original         | Home header title |
       | keys.home:content:title.original      | Home page title   |
       | keys.home:contact:contact-us.original | Contact content   |
       | keys.footer.original                  | Footer content    |
 
-  Scenario: Rosey generates source.json files with mixed roots and namespaces
+  Scenario: Rosey generates base.json files with mixed roots and namespaces
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -139,7 +139,7 @@ Feature: Rosey Generate v2
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                            | int:2           |
       | keys.home:title.original           | Home page title |
       | keys.contact:contact-us.original   | Contact content |

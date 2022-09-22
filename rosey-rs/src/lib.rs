@@ -99,8 +99,8 @@ impl RoseyOptions {
                 },
                 tag: matches.get("tag", base.tag),
                 separator: matches.get("separator", base.separator),
-                locale_source: working_dir.join(matches.get("locale-source", base.locale_source)),
-                locale_dest: working_dir.join(matches.get("locale-dest", base.locale_dest)),
+                locales: working_dir.join(matches.get("locales", base.locales)),
+                base: working_dir.join(matches.get("base", base.base)),
                 default_language: matches.get("default-language", base.default_language),
                 redirect_page: matches
                     .get_opt("redirect-page", base.redirect_page)

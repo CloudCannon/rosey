@@ -15,7 +15,7 @@ Feature: Rosey Generate AutoID
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                                                   | int:2 |
       | keys.GtSzGc6Rr44nj796fYIRTDxQNRua2jzNIeF2qU3kpFI.original | rose! |
 
@@ -36,7 +36,7 @@ Feature: Rosey Generate AutoID
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                                                   | int:2                                                             |
       | keys.9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg.original | \n<ul>\n<li>rose!</li>\n<li>🦭</li>\n<li>𓀞𓂗𓃛𓄫𓋟</li>\n</ul>\n |
 
@@ -59,7 +59,7 @@ Feature: Rosey Generate AutoID
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                                                        | int:2                                                             |
       | keys.root:9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg.original | \n<ul>\n<li>rose!</li>\n<li>🦭</li>\n<li>𓀞𓂗𓃛𓄫𓋟</li>\n</ul>\n |
 
@@ -82,6 +82,6 @@ Feature: Rosey Generate AutoID
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                                                             | int:2                                                             |
       | keys.namespace:9s5+3OQ6KpQAUqk+khpX4zXwBHgihsHSQblgDfFZ7Bg.original | \n<ul>\n<li>rose!</li>\n<li>🦭</li>\n<li>𓀞𓂗𓃛𓄫𓋟</li>\n</ul>\n |

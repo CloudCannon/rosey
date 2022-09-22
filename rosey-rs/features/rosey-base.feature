@@ -30,4 +30,4 @@ Feature: Rosey Base
       """
     When I run my program with the flags:
       | generate |
-    Then I should see the file "rosey/source.json"
+    Then I should see the file "rosey/base.json"

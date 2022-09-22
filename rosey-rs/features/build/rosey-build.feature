@@ -33,7 +33,7 @@ Feature: Rosey Build
       | data-rosey | seal |
       | innerText  | 👄🌹 |
 
-  Scenario: Rosey build from source.json files with attrs
+  Scenario: Rosey build from locale files with attrs
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -65,7 +65,7 @@ Feature: Rosey Build
       | alt              | 〽️         |
       | innerText        | 🏡📃        |
 
-  Scenario: Rosey builds from source.json files with explicit attrs
+  Scenario: Rosey builds from locale files with explicit attrs
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -94,7 +94,7 @@ Feature: Rosey Build
       | alt                       | ⚗️                                        |
       | innerText                 | Home page title                           |
 
-  Scenario: Rosey builds from source.json files with namespaces
+  Scenario: Rosey builds from locale files with namespaces
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -155,7 +155,7 @@ Feature: Rosey Build
       | data-rosey | title    |
       | innerText  | 5107 [4] |
 
-  Scenario: Rosey builds from source.json files with roots
+  Scenario: Rosey builds from locale files with roots
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -200,7 +200,7 @@ Feature: Rosey Build
       | data-rosey | footer                               |
       | innerText  | b4a8eccc-4408-4d18-82aa-9d52ece1e113 |
 
-  Scenario: Rosey builds from source.json files with mixed roots and namespaces
+  Scenario: Rosey builds from locale files with mixed roots and namespaces
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>

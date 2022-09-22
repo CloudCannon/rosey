@@ -4,7 +4,7 @@ Feature: Rosey Generate Complex
       | ROSEY_SOURCE | dist/site            |
       | ROSEY_DEST   | dist/translated_site |
 
-  Scenario: Rosey generates source.json [ns, root, attr, explicit-attr]
+  Scenario: Rosey generates locales [ns, root, attr, explicit-attr]
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -26,7 +26,7 @@ Feature: Rosey Generate Complex
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version                                      | int:2              |
       | keys.home:meta:title.original                | Home header title  |
       | keys.home:content:title.original             | Home page title    |
@@ -50,7 +50,7 @@ Feature: Rosey Generate Complex
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version           | int:2 |
       | keys.b.original   | c     |
       | keys.two.original | three |
@@ -67,7 +67,7 @@ Feature: Rosey Generate Complex
       """
     When I run my program with the flags:
       | generate |
-    Then I should see "rosey/source.json" containing the values:
+    Then I should see "rosey/base.json" containing the values:
       | version           | int:2 |
       | keys.2.original   | 3     |
       | keys.two.original | three |

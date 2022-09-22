@@ -14,8 +14,8 @@ pub struct RoseyPublicConfig {
     pub version: u8,
     pub tag: String,
     pub separator: String,
-    pub locale_dest: PathBuf,
-    pub locale_source: PathBuf,
+    pub base: PathBuf,
+    pub locales: PathBuf,
     pub languages: Option<Vec<String>>,
     pub exclusions: String,
     pub images_source: Option<PathBuf>,
@@ -32,8 +32,8 @@ impl Default for RoseyPublicConfig {
             version: 2,
             tag: "data-rosey".into(),
             separator: ":".into(),
-            locale_dest: "rosey/source.json".into(),
-            locale_source: "rosey/locales".into(),
+            base: "rosey/base.json".into(),
+            locales: "rosey/locales".into(),
             languages: None,
             exclusions: r#"\.(html?|json)$"#.into(),
             images_source: None,
@@ -61,16 +61,8 @@ impl Display for RoseyPublicConfig {
         writeln!(f, "  Paths:")?;
         writeln!(f, "   - Source:              {}", self.source.display())?;
         writeln!(f, "   - Destination:         {}", self.dest.display())?;
-        writeln!(
-            f,
-            "   - Locale Source:       {}",
-            self.locale_source.display()
-        )?;
-        writeln!(
-            f,
-            "   - Locale Destination:  {}",
-            self.locale_dest.display()
-        )?;
+        writeln!(f, "   - Base Locale File:       {}", self.base.display())?;
+        writeln!(f, "   - Locales Directory:  {}", self.locales.display())?;
         match &self.images_source {
             Some(s) => writeln!(f, "   - Images Source:       {}", s.display())?,
             None => writeln!(

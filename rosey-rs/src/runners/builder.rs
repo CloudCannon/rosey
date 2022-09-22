@@ -160,12 +160,11 @@ impl RoseyBuilder {
 
     pub fn read_translations(&mut self) {
         let config = &self.options.config;
-        let walker =
-            globwalk::GlobWalkerBuilder::from_patterns(&config.locale_source, &["**/*.json"])
-                .build()
-                .unwrap()
-                .into_iter()
-                .filter_map(Result::ok);
+        let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.locales, &["**/*.json"])
+            .build()
+            .unwrap()
+            .into_iter()
+            .filter_map(Result::ok);
 
         walker.for_each(|file| {
             let locale = file
