@@ -38,9 +38,9 @@ In the above example, all text is tagged as `data-rosey="title"`. Due to the nam
 }
 ```
 
-## Defining a single namespace root
+## Defining a namespace root
 
-Use the `data-rosey-root` attribute to define a **single** namespace for all translation keys. The closest parent tagged with a `data-rosey-root` attribute will be used as the namespace.
+Use the `data-rosey-root` attribute to start a new namespace for all child elements.
 
 In this example we set a root namespace separately for our head and body elements, and unset the namespace within an inner div:
 
@@ -71,5 +71,23 @@ Output translation keys:
 }
 ```
 
-Any `data-rosey-root` attribute will take priority over `data-rosey-ns` attributes in parent or child elements.
+The `data-rosey-ns` attributes may be nested within a `data-rosey-root` attribute:
 
+```html
+<!DOCTYPE html>
+<html>
+  <body data-rosey-root="content">
+    <div data-rosey-ns="contact">
+      <p data-rosey="contact-us">...</p>
+    </div>
+  </body>
+</html>
+```
+
+Output translation keys:
+
+```json
+{
+    "content:contact:contact-us": "..."
+}
+```

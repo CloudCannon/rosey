@@ -121,3 +121,26 @@ Feature: Rosey Generate v2
       | keys.home:content:title.original      | Home page title   |
       | keys.home:contact:contact-us.original | Contact content   |
       | keys.footer.original                  | Footer content    |
+
+  Scenario: Rosey generates source.json files with mixed roots and namespaces
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+        <body data-rosey-ns='home'>
+          <h1 data-rosey="title">Home page title</h1>
+          <div data-rosey-root="contact">
+            <p data-rosey="contact-us">Contact content</p>
+            <div data-rosey-ns="inner">
+              <p data-rosey="author">CloudCannon</p>
+            </div>
+          </div>
+        </body>
+      </html>
+      """
+    When I run my program with the flags:
+      | generate |
+    Then I should see "rosey/source.json" containing the values:
+      | version                            | int:2           |
+      | keys.home:title.original           | Home page title |
+      | keys.contact:contact-us.original   | Contact content |
+      | keys.contact:inner:author.original | CloudCannon     |
