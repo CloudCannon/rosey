@@ -17,7 +17,7 @@ jobs:
   #   runs-on: ubuntu-20.04
   #   defaults:
   #     run:
-  #       working-directory: ./rosey-rs
+  #       working-directory: ./rosey
   #   steps:
   #   - name: Clone
   #     uses: actions/checkout@v2
@@ -73,7 +73,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./rosey-rs
+        working-directory: ./rosey
     strategy:
       matrix:
         include:

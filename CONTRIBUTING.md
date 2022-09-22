@@ -1,4 +1,7 @@
 ## Tests
 
-- `cd rosey-rs && ./test.sh`
-- `cd rosey-rs && ./test.sh "<test name>"`
+Run all tests:
+- `cd rosey && ./test.sh`
+
+Run a specific test by name:
+- `cd rosey && ./test.sh "<test name>"`
