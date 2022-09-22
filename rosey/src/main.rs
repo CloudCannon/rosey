@@ -149,6 +149,18 @@ async fn main() {
                         .takes_value(true)
                         .help("Path to a redirect template that Rosey should use instead of the default file"),
                 )
+                .arg(
+                    Arg::with_name("wrap")
+                        .long("wrap")
+                        .help("For languages without significant whitespace, add zero-width space characters between detected words")
+                        .multiple(true)
+                )
+                .arg(
+                    Arg::with_name("wrap-spans")
+                        .long("wrap-spans")
+                        .help("When wrapping languages, use spans around words instead of zero-width space characters")
+                        .takes_value(false),
+                )
                 .arg(Arg::with_name("serve")
                         .long("serve")
                         .takes_value(false)

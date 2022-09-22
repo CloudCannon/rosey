@@ -109,6 +109,11 @@ impl RoseyOptions {
                 images_source: matches
                     .get_opt("images-source", base.images_source)
                     .map(|p| working_dir.join(p)),
+                wrap: match matches.values_of("wrap") {
+                    Some(langs) => Some(langs.map(|l| l.to_owned()).collect()),
+                    _ => base.wrap,
+                },
+                wrap_spans: matches.is_present("wrap-spans") || base.wrap_spans,
                 verbose: matches.is_present("verbose") || base.verbose,
                 languages: None, // TODO
             },

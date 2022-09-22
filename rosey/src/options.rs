@@ -21,6 +21,8 @@ pub struct RoseyPublicConfig {
     pub images_source: Option<PathBuf>,
     pub default_language: String,
     pub redirect_page: Option<PathBuf>,
+    pub wrap: Option<Vec<String>>,
+    pub wrap_spans: bool,
     pub verbose: bool,
 }
 
@@ -39,6 +41,8 @@ impl Default for RoseyPublicConfig {
             images_source: None,
             default_language: "en".into(),
             redirect_page: None,
+            wrap: None,
+            wrap_spans: false,
             verbose: false,
         }
     }
@@ -61,26 +65,26 @@ impl Display for RoseyPublicConfig {
         writeln!(f, "  Paths:")?;
         writeln!(f, "   - Source:              {}", self.source.display())?;
         writeln!(f, "   - Destination:         {}", self.dest.display())?;
-        writeln!(f, "   - Base Locale File:       {}", self.base.display())?;
-        writeln!(f, "   - Locales Directory:  {}", self.locales.display())?;
+        writeln!(f, "   - Base locale file:       {}", self.base.display())?;
+        writeln!(f, "   - Locales firectory:  {}", self.locales.display())?;
         match &self.images_source {
-            Some(s) => writeln!(f, "   - Images Source:       {}", s.display())?,
+            Some(s) => writeln!(f, "   - Images source:       {}", s.display())?,
             None => writeln!(
                 f,
-                "   - Images Source:       * unset, using source directory *"
+                "   - Images source:       * unset, using source directory *"
             )?,
         }
         match &self.redirect_page {
-            Some(s) => writeln!(f, "   - Redirect Page:       {}", s.display())?,
+            Some(s) => writeln!(f, "   - Redirect page:       {}", s.display())?,
             None => writeln!(
                 f,
-                "   - Redirect Page:       * unset, using default redirect template *"
+                "   - Redirect page:       * unset, using default redirect template *"
             )?,
         }
 
         writeln!(f, "  Options:")?;
-        writeln!(f, "   - Default Language:    {}", self.default_language)?;
-        writeln!(f, "   - Locale Version:      {}", self.version)?;
+        writeln!(f, "   - Default language:    {}", self.default_language)?;
+        writeln!(f, "   - Locale version:      {}", self.version)?;
         writeln!(f, "   - Tag:                 {}", self.tag)?;
         writeln!(f, "   - Separator:           {}", self.separator)?;
         writeln!(f, "   - Exclusions:          {}", self.exclusions)?;
@@ -91,6 +95,14 @@ impl Display for RoseyPublicConfig {
                 "   - Languages:           * none passed, outputting all available languages *"
             )?,
         }
+        match &self.wrap {
+            Some(langs) => writeln!(f, "   - Wrap languages:           {}", langs.join(", "))?,
+            None => writeln!(
+                f,
+                "   - Wrap languages:           * none passed, no text wrapping to be applied *"
+            )?,
+        }
+        writeln!(f, "   - Wrap using spans:          {}", self.wrap_spans)?;
 
         write!(f, "")
     }
