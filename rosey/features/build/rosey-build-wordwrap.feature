@@ -169,3 +169,33 @@ Feature: Rosey Build Word Wrap
       | build       |
       | --wrap "fr" |
     Then I should see "Cannot wrap text for language 'fr'. Languages with supported text wrapping:" in stderr
+
+  Scenario: Rosey build can word wrap inner HTML
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+        <div data-rosey="p">
+          <p>Hello World</p>
+        </div>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/ja-jp.json" file with the content:
+      """
+      {
+        "p": {
+          "original": "<p>Hello World</p>",
+          "value": "<p>こんにちは世界</p>"
+        }
+      }
+      """
+    When I run my program with the flags:
+      | build          |
+      | --wrap "ja-jp" |
+    Then I should see a selector 'div > p > span:nth-of-type(1)' in "dist/translated_site/ja-jp/index.html" with the attributes:
+      | style     | whitespace: nowrap; |
+      | innerText | こんにちは          |
+    Then I should see a selector 'div > p > span:nth-of-type(2)' in "dist/translated_site/ja-jp/index.html" with the attributes:
+      | style     | whitespace: nowrap; |
+      | innerText | 世界                |
