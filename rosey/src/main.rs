@@ -152,6 +152,7 @@ async fn main() {
                 .arg(
                     Arg::with_name("wrap")
                         .long("wrap")
+                        .takes_value(true)
                         .help("For languages without significant whitespace, add spans around detected words to break lines cleanly")
                         .multiple(true)
                 )

@@ -62,11 +62,11 @@ Feature: Rosey Build Word Wrap
       | data-rosey | p              |
       | innerText  | こんにちは世界 |
     Then I should see a selector 'p > span:nth-of-type(1)' in "dist/translated_site/ja-jp/index.html" with the attributes:
-      | style     | whitespace: nowrap; |
-      | innerText | こんにちは          |
+      | style     | white-space: nowrap; |
+      | innerText | こんにちは           |
     Then I should see a selector 'p > span:nth-of-type(2)' in "dist/translated_site/ja-jp/index.html" with the attributes:
-      | style     | whitespace: nowrap; |
-      | innerText | 世界                |
+      | style     | white-space: nowrap; |
+      | innerText | 世界                 |
 
   Scenario: Rosey build can word wrap with classes instead of inline styles
     Given I have a "dist/site/index.html" file with the content:
@@ -127,7 +127,7 @@ Feature: Rosey Build Word Wrap
       {
         "p": {
           "original": "Hello World",
-          "value": "שלוםעולם"
+          "value": "שלום עולם"
         }
       }
       """
@@ -135,17 +135,17 @@ Feature: Rosey Build Word Wrap
       | build                    |
       | --wrap "zh-hans-tw" "he" |
     Then I should see a selector 'p > span:nth-of-type(1)' in "dist/translated_site/zh-hans-tw/index.html" with the attributes:
-      | style     | whitespace: nowrap; |
-      | innerText | 你好                |
+      | style     | white-space: nowrap; |
+      | innerText | 你好                 |
     Then I should see a selector 'p > span:nth-of-type(2)' in "dist/translated_site/zh-hans-tw/index.html" with the attributes:
-      | style     | whitespace: nowrap; |
-      | innerText | 世界                |
-    Then I should see a selector 'p > span:nth-of-type(1)' in "dist/translated_site/he/index.html" with the attributes:
-      | style     | whitespace: nowrap; |
-      | innerText | שלום                |
+      | style     | white-space: nowrap; |
+      | innerText | 世界                 |
+    Then DEBUG I should see a selector 'p > span:nth-of-type(1)' in "dist/translated_site/he/index.html" with the attributes:
+      | style     | white-space: nowrap; |
+      | innerText | שלום                 |
     Then I should see a selector 'p > span:nth-of-type(2)' in "dist/translated_site/he/index.html" with the attributes:
-      | style     | whitespace: nowrap; |
-      | innerText | עולם                |
+      | style     | white-space: nowrap; |
+      | innerText | עולם                 |
 
   Scenario: Rosey build doesn't wrap languages with whitespace
     Given I have a "dist/site/index.html" file with the content:
@@ -194,8 +194,8 @@ Feature: Rosey Build Word Wrap
       | build          |
       | --wrap "ja-jp" |
     Then I should see a selector 'div > p > span:nth-of-type(1)' in "dist/translated_site/ja-jp/index.html" with the attributes:
-      | style     | whitespace: nowrap; |
-      | innerText | こんにちは          |
+      | style     | white-space: nowrap; |
+      | innerText | こんにちは           |
     Then I should see a selector 'div > p > span:nth-of-type(2)' in "dist/translated_site/ja-jp/index.html" with the attributes:
-      | style     | whitespace: nowrap; |
-      | innerText | 世界                |
+      | style     | white-space: nowrap; |
+      | innerText | 世界                 |

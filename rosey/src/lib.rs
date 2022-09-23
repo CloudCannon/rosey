@@ -9,6 +9,8 @@ use runners::{builder::RoseyBuilder, checker::RoseyChecker};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, env, path::PathBuf, str::FromStr};
 
+const SUPPORTED_WRAP_LANGS: [&str; 3] = ["ja", "he", "zh"];
+
 pub enum RoseyCommand {
     Generate,
     Build,
@@ -114,7 +116,14 @@ impl RoseyOptions {
                     .get_opt("images-source", base.images_source)
                     .map(|p| working_dir.join(p)),
                 wrap: match matches.values_of("wrap") {
-                    Some(langs) => Some(langs.map(|l| l.to_owned()).collect()),
+                    Some(langs) => Some(langs.map(|l|{ 
+                        
+                        if !SUPPORTED_WRAP_LANGS.iter().any(|lang| l.starts_with(lang)) {
+                            eprintln!("Cannot wrap text for language '{l}'. Languages with supported text wrapping: {SUPPORTED_WRAP_LANGS:?}");
+                            std::process::exit(1);
+                        }
+                        l.to_owned()
+                    }).collect()),
                     _ => base.wrap,
                 },
                 wrap_class: matches.get_opt("wrap-class", base.wrap_class),

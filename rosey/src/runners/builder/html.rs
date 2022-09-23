@@ -15,6 +15,7 @@ use std::{
 };
 
 use base64::{encode_config, CharacterSet, Config};
+use charabia::Segment;
 use html5ever::{
     buffer_queue::BufferQueue,
     local_name, namespace_url, ns,
@@ -45,6 +46,8 @@ impl RoseyBuilder {
             images_source.to_owned(),
             &config.default_language,
             &self.translations,
+            &config.wrap,
+            &config.wrap_class,
         );
         page.prepare();
 
@@ -167,6 +170,9 @@ struct RoseyPage<'a> {
     anchor_tags: Vec<(String, NodeRef)>,
     assets: Vec<(String, String, NodeRef)>,
     locale_key: Option<&'a str>,
+    should_wrap: bool,
+    wrap: &'a Option<Vec<String>>,
+    wrap_class: &'a Option<String>,
     pub tag: String,
     pub separator: String,
     pub images_source: PathBuf,
@@ -182,6 +188,8 @@ impl<'a> RoseyPage<'a> {
         images_source: PathBuf,
         default_language: &str,
         translations: &'a BTreeMap<String, RoseyTranslation>,
+        wrap: &'a Option<Vec<String>>,
+        wrap_class: &'a Option<String>,
     ) -> Self {
         let dom = kuchiki::parse_html().one(content);
 
@@ -200,11 +208,18 @@ impl<'a> RoseyPage<'a> {
             default_language: default_language.to_string(),
             translations,
             locale_key: None,
+            should_wrap: false,
+            wrap,
+            wrap_class,
         }
     }
 
     pub fn set_locale_key(&mut self, locale_key: &'a str) {
         self.locale_key = Some(locale_key);
+        self.should_wrap = self
+            .wrap
+            .as_ref()
+            .map_or(false, |langs| langs.contains(&locale_key.to_string()));
     }
 
     fn get_locale_key(&self) -> &str {
@@ -278,6 +293,8 @@ impl<'a> RoseyPage<'a> {
                                 &self.default_language,
                                 self.translations,
                                 &self.tag,
+                                self.should_wrap,
+                                self.wrap_class,
                             );
                             let mut tokenizer =
                                 Tokenizer::new(&mut rewriter, TokenizerOpts::default());
@@ -286,6 +303,22 @@ impl<'a> RoseyPage<'a> {
                             let _ = tokenizer.feed(&mut buffer);
                             tokenizer.end();
                             rewriter.finish()
+                        } else if self.should_wrap {
+                            content
+                                .as_str()
+                                .segment_str()
+                                .map(|segment| {
+                                    if segment.trim().is_empty() {
+                                        segment.to_string()
+                                    } else if let Some(class) = self.wrap_class {
+                                        format!("<span class=\"{class}\">{segment}</span>")
+                                    } else {
+                                        format!(
+                                            "<span style=\"white-space: nowrap;\">{segment}</span>"
+                                        )
+                                    }
+                                })
+                                .collect()
                         } else {
                             content.clone()
                         };
