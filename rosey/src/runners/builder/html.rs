@@ -581,17 +581,19 @@ impl<'a> RoseyPage<'a> {
 
     fn process_node(&mut self, node: &NodeRef, root: Option<String>, namespace: Option<String>) {
         let (root, namespace) = if let Some(element) = node.as_element() {
-            let prefix = match (&root, &namespace) {
-                (Some(root), _) => {
-                    if root.is_empty() {
-                        String::default()
-                    } else {
-                        format!("{}{}", root, self.separator)
-                    }
+            let mut prefix = String::default();
+
+            if let Some(root) = &root {
+                if !root.is_empty() {
+                    write!(prefix, "{}{}", root, &self.separator)
+                        .expect("Failed to write root to prefix");
                 }
-                (None, Some(namespace)) => format!("{}{}", namespace, self.separator),
-                _ => String::default(),
-            };
+            }
+
+            if let Some(namespace) = &namespace {
+                write!(prefix, "{}{}", &namespace, &self.separator)
+                    .expect("Failed to write namespace to prefix");
+            }
 
             let attributes = element.attributes.borrow();
 
@@ -644,10 +646,12 @@ impl<'a> RoseyPage<'a> {
                 }
             }
 
-            let new_root = attributes
-                .get(format!("{}-root", self.tag))
-                .map(String::from)
-                .or(root);
+            let (new_root, namespace) =
+                if let Some(new_root) = attributes.get(format!("{}-root", self.tag)) {
+                    (Some(String::from(new_root)), None)
+                } else {
+                    (root, namespace)
+                };
 
             let new_namespace = match (namespace, attributes.get(format!("{}-ns", self.tag))) {
                 (Some(namespace), Some(new_namespace)) => {

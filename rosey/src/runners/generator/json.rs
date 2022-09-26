@@ -49,20 +49,22 @@ impl RoseyGenerator {
                     if let (Some(Value::String(source_value)), Some(Value::String(schema_value))) =
                         (source_map.get(key), schema_map.get(key))
                     {
-                        let mut key: Option<String> = None;
                         schema_value.trim().split('|').for_each(|part| {
                             if part == "rosey-ns" {
                                 namespace.push_str(&source_value.to_lowercase());
                                 namespace.push('.');
                             } else if part.starts_with("rosey:") {
-                                key = part.strip_prefix("rosey:").map(String::from);
+                                self.locale.insert(
+                                    format!(
+                                        "{}{}",
+                                        namespace,
+                                        part.strip_prefix("rosey:").unwrap()
+                                    ),
+                                    String::from(source_value),
+                                    &self.current_file,
+                                );
                             }
                         });
-                        self.locale.insert(
-                            format!("{}{}", namespace, key.unwrap()),
-                            String::from(source_value),
-                            &self.current_file,
-                        );
                     } else if let (Some(source_value), Some(schema_value)) =
                         (source_map.get(key), schema_map.get(key))
                     {

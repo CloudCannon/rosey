@@ -218,9 +218,9 @@ Feature: Rosey Build
     And I have a "rosey/locales/uuids.json" file with the content:
       """
       {
-        "keys.home:title.original": "13a534d8-6f32-4c61-bece-57fa891e2aff",
-        "keys.contact:contact-us.original": "1be5b79b-5b15-4348-b9de-e87ab2f8e304",
-        "keys.contact:inner:author.original": "43362cf1-9c20-4b06-995a-57f3b5062bc2"
+        "home:title": "13a534d8-6f32-4c61-bece-57fa891e2aff",
+        "contact:contact-us": "1be5b79b-5b15-4348-b9de-e87ab2f8e304",
+        "contact:inner:author": "43362cf1-9c20-4b06-995a-57f3b5062bc2"
       }
       """
     When I run my program with the flags:

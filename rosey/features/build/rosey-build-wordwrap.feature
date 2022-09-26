@@ -140,7 +140,7 @@ Feature: Rosey Build Word Wrap
     Then I should see a selector 'p > span:nth-of-type(2)' in "dist/translated_site/zh-hans-tw/index.html" with the attributes:
       | style     | white-space: nowrap; |
       | innerText | 世界                 |
-    Then DEBUG I should see a selector 'p > span:nth-of-type(1)' in "dist/translated_site/he/index.html" with the attributes:
+    Then I should see a selector 'p > span:nth-of-type(1)' in "dist/translated_site/he/index.html" with the attributes:
       | style     | white-space: nowrap; |
       | innerText | שלום                 |
     Then I should see a selector 'p > span:nth-of-type(2)' in "dist/translated_site/he/index.html" with the attributes:

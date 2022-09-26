@@ -1,8 +1,7 @@
-use std::{collections::BTreeMap, fs::read_to_string, path::Path};
-
 use base64::{encode_config, CharacterSet, Config};
 use kuchiki::{traits::TendrilSink, NodeRef};
 use sha2::{Digest, Sha256};
+use std::{collections::BTreeMap, fmt::Write, fs::read_to_string, path::Path};
 
 use super::RoseyGenerator;
 
@@ -24,17 +23,19 @@ impl RoseyGenerator {
         let config = &self.options.config;
         let (root, namespace) = if let Some(element) = node.as_element() {
             let attributes = element.attributes.borrow();
-            let prefix = match (&root, &namespace) {
-                (Some(root), _) => {
-                    if root.is_empty() {
-                        String::default()
-                    } else {
-                        format!("{}{}", root, config.separator)
-                    }
+            let mut prefix = String::default();
+
+            if let Some(root) = &root {
+                if !root.is_empty() {
+                    write!(prefix, "{}{}", root, &config.separator)
+                        .expect("Failed to write root to prefix");
                 }
-                (None, Some(namespace)) => format!("{}{}", namespace, config.separator),
-                _ => String::default(),
-            };
+            }
+
+            if let Some(namespace) = &namespace {
+                write!(prefix, "{}{}", &namespace, &config.separator)
+                    .expect("Failed to write namespace to prefix");
+            }
 
             if let Some(key) = attributes.get(&config.tag[..]) {
                 let key = if key.is_empty() {
@@ -78,10 +79,12 @@ impl RoseyGenerator {
                 }
             }
 
-            let new_root = attributes
-                .get(format!("{}-root", config.tag))
-                .map(String::from)
-                .or(root);
+            let (new_root, namespace) =
+                if let Some(new_root) = attributes.get(format!("{}-root", config.tag)) {
+                    (Some(String::from(new_root)), None)
+                } else {
+                    (root, namespace)
+                };
 
             let new_namespace = match (namespace, attributes.get(format!("{}-ns", config.tag))) {
                 (Some(namespace), Some(new_namespace)) => {
