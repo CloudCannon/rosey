@@ -17,7 +17,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./rosey
     strategy:
       matrix:
         include:
@@ -42,15 +41,16 @@ jobs:
         with:
           fetch-depth: 1
 
-      # - name: Cache
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       ~/.cargo/registry
-      #       ~/.cargo/git
-      #       ~/.rustup
-      #       target
-      #     key: ${{ runner.os }}-${{ matrix.rust }}
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.rustup
+            target
+            rosey/target
+          key: ${{ runner.os }}-${{ matrix.rust }}
 
       - name: Install Rust
         run: |
@@ -64,7 +64,9 @@ jobs:
           version: ${{env.HUMANE_VERSION}}
 
       - name: Build
+        working-directory: ./rosey
         run: cargo build --release
 
       - name: Test CLI
+        working-directory: ./rosey
         run: TEST_BINARY=./target/release/rosey humane
