@@ -51,8 +51,8 @@ Feature: Rosey Build Assets
       {}
       """
     When I run my program with the flags:
-      | build                     |
-      | --exclusions "\.[png]{3}" |
+      | build                    |
+      | --exclusions "[png]{3}$" |
     Then I should not see the file "dist/translated_site/image.png"
 
   Scenario: Rosey build exclusion overrides default
