@@ -38,7 +38,7 @@ Feature: Rosey Generate Complex
       | keys.home:contact:alt-tag.original           | alt attribute      |
       | keys.footer.original                         | Footer content     |
 
-  Scenario: Rosey namespace doesn't apply to self element
+  Scenario: Rosey namespace applies to self element
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -51,11 +51,11 @@ Feature: Rosey Generate Complex
     When I run my program with the flags:
       | generate |
     Then I should see "rosey/base.json" containing the values:
-      | version           | int:2 |
-      | keys.b.original   | c     |
-      | keys.two.original | three |
+      | version               | int:2 |
+      | keys.a:b.original     | c     |
+      | keys.one:two.original | three |
 
-  Scenario: Rosey root doesn't apply to self element
+  Scenario: Rosey root applies to self element
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -68,6 +68,6 @@ Feature: Rosey Generate Complex
     When I run my program with the flags:
       | generate |
     Then I should see "rosey/base.json" containing the values:
-      | version           | int:2 |
-      | keys.2.original   | 3     |
-      | keys.two.original | three |
+      | version               | int:2 |
+      | keys.1:2.original     | 3     |
+      | keys.one:two.original | three |
