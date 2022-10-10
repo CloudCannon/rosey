@@ -14,6 +14,7 @@ Feature: Rosey Links
       <h3><a href="/posts/hello-world/">Hello World Trailing Slash</a></h3>
       <h4><a href="/posts/hello-world.png">Hello World Asset</a></h4>
       <h5><a href="posts/hello-world/">Hello World Relative</a></h5>
+      <h6><a href="/posts/hello-world.html">Hello World Extension</a></h6>
       </body>
       </html>
       """
@@ -38,6 +39,10 @@ Feature: Rosey Links
     Then I should see a selector 'h5>a' in "dist/translated_site/blank/index.html" with the attributes:
       | href      | posts/hello-world/   |
       | innerText | Hello World Relative |
+    Then I should see a selector 'h6>a' in "dist/translated_site/blank/index.html" with the attributes:
+      | href      | /blank/posts/hello-world.html |
+      | innerText | Hello World Extension         |
+
 
   Scenario: Rosey doesn't update links already pointing to a locale
     Given I have a "dist/site/index.html" file with the content:

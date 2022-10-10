@@ -112,10 +112,10 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                             }
                         }
                         ("a", "href", _) if !has_download => {
-                            let href_path = Path::new(&attr.value as &str);
-                            let ext = href_path.extension().map(|ext| ext.to_str().unwrap());
+                            let href = &attr.value as &str;   
+                            let ext = href.rfind('.').map(|index| href.split_at(index + 1).1);
 
-                            if !href_path.is_absolute()
+                            if !href.starts_with('/')
                                 || !matches!(ext, Some("html") | Some("htm") | None)
                                 || self
                                     .translations

@@ -240,7 +240,7 @@ impl<'a> RoseyPage<'a> {
         for element in self.dom.select("a[href]").unwrap() {
             let attributes = element.attributes.borrow();
             let src = attributes.get("href").unwrap();
-            let ext = src.rfind('.').map(|index| src.split_at(index).1);
+            let ext = src.rfind('.').map(|index| src.split_at(index + 1).1);
 
             if src.starts_with('/')
                 && matches!(ext, Some("html") | Some("htm") | None)
