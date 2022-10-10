@@ -5,7 +5,7 @@ nav_section: Tagging
 weight: 4
 ---
 
-Rosey supports hierarchical namespacing, allowing you to build up translation key names based on the page or elements that a tag is placed within. This is particularly useful when building components, as your component may be tagged with generic key names that are combined with the namespace in which that component is used.
+Rosey supports hierarchical namespacing, where an element can scope the translation keys for all of its children. This is particularly useful when building components, as your component may be tagged with generic key names that are combined with the namespace in which that component is used.
 
 ## Defining a namespace
 
