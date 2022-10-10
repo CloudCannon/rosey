@@ -95,7 +95,7 @@ impl RoseyBuilder {
     pub fn process_assets(&self) {
         let config = &self.options.config;
         let re = Regex::new(&config.exclusions).expect("Invalid regex");
-        let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.source, &["**/*"])
+        let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.source, &["*.*"])
             .build()
             .unwrap()
             .into_iter()
@@ -128,7 +128,7 @@ impl RoseyBuilder {
         let config = &self.options.config;
         let source_folder = &config.source;
         let walker: (Vec<_>, Vec<_>) =
-            globwalk::GlobWalkerBuilder::from_patterns(&source_folder, &["**/*{.html,.json}"])
+            globwalk::GlobWalkerBuilder::from_patterns(&source_folder, &["*.{html,json}"])
                 .build()
                 .unwrap()
                 .into_iter()
