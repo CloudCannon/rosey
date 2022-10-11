@@ -23,7 +23,7 @@ enum RoseyCheckStates {
 #[serde(rename_all = "camelCase")]
 struct RoseyCheck {
     current: bool,
-    source_total: i32,
+    base_total: i32,
     total: i32,
     states: HashMap<RoseyCheckStates, i32>,
     keys: HashMap<String, RoseyCheckStates>,
@@ -96,7 +96,7 @@ impl RoseyChecker {
     fn check_translation(&mut self, target_keys: &mut RoseyTranslation) -> RoseyCheck {
         let mut check = RoseyCheck {
             current: true,
-            source_total: self.base_locale.keys.len() as i32,
+            base_total: self.base_locale.keys.len() as i32,
             total: target_keys.len() as i32,
             ..Default::default()
         };

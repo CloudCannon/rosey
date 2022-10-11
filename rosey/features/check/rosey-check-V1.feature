@@ -21,7 +21,7 @@ Feature: Rosey check v1
 			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:true |
-			| em.sourceTotal     | int:1     |
+			| em.baseTotal       | int:1     |
 			| em.total           | int:1     |
 			| em.states.current  | int:1     |
 			| em.states.outdated | int:0     |
@@ -44,7 +44,7 @@ Feature: Rosey check v1
 			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:false |
-			| em.sourceTotal     | int:1      |
+			| em.baseTotal       | int:1      |
 			| em.total           | int:0      |
 			| em.states.current  | int:0      |
 			| em.states.outdated | int:0      |
@@ -67,7 +67,7 @@ Feature: Rosey check v1
 			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:false |
-			| em.sourceTotal     | int:0      |
+			| em.baseTotal       | int:0      |
 			| em.total           | int:1      |
 			| em.states.current  | int:0      |
 			| em.states.outdated | int:0      |

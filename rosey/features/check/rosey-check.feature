@@ -28,7 +28,7 @@ Feature: Rosey check v2
 			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:true |
-			| em.sourceTotal     | int:1     |
+			| em.baseTotal       | int:1     |
 			| em.total           | int:1     |
 			| em.states.current  | int:1     |
 			| em.states.outdated | int:0     |
@@ -60,7 +60,7 @@ Feature: Rosey check v2
 			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:false |
-			| em.sourceTotal     | int:1      |
+			| em.baseTotal       | int:1      |
 			| em.total           | int:1      |
 			| em.states.outdated | int:1      |
 			| em.states.current  | int:0      |
@@ -88,7 +88,7 @@ Feature: Rosey check v2
 			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:false |
-			| em.sourceTotal     | int:1      |
+			| em.baseTotal       | int:1      |
 			| em.total           | int:0      |
 			| em.states.outdated | int:0      |
 			| em.states.current  | int:0      |
@@ -116,7 +116,7 @@ Feature: Rosey check v2
 			| check |
 		Then I should see "rosey/checks.json" containing the values:
 			| em.current         | bool:false |
-			| em.sourceTotal     | int:0      |
+			| em.baseTotal       | int:0      |
 			| em.total           | int:1      |
 			| em.states.outdated | int:0      |
 			| em.states.current  | int:0      |
@@ -159,6 +159,6 @@ Feature: Rosey check v2
 		When I run my program with the flags:
 			| check |
 		Then I should see "rosey/checks.json" containing the values:
-			| em.current     | bool:false |
-			| em.sourceTotal | int:4      |
-			| em.total       | int:2      |
+			| em.current   | bool:false |
+			| em.baseTotal | int:4      |
+			| em.total     | int:2      |
