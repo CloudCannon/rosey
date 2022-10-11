@@ -21,9 +21,17 @@ impl RoseyGenerator {
         namespace: Option<String>,
     ) {
         let config = &self.options.config;
-        let (root, namespace) = if let Some(element) = node.as_element() {
+        let mut root = root;
+        let mut namespace = namespace;
+
+        if let Some(element) = node.as_element() {
             let attributes = element.attributes.borrow();
             let mut prefix = String::default();
+
+            if let Some(new_root) = attributes.get(format!("{}-root", config.tag)) {
+                root = Some(String::from(new_root));
+                namespace = None;
+            }
 
             if let Some(root) = &root {
                 if !root.is_empty() {
@@ -31,6 +39,16 @@ impl RoseyGenerator {
                         .expect("Failed to write root to prefix");
                 }
             }
+
+            namespace = match (namespace, attributes.get(format!("{}-ns", config.tag))) {
+                (Some(namespace), Some(new_namespace)) => Some(format!(
+                    "{}{}{}",
+                    namespace, &config.separator, new_namespace
+                )),
+                (Some(namespace), None) => Some(namespace),
+                (None, Some(new_namespace)) => Some(String::from(new_namespace)),
+                _ => None,
+            };
 
             if let Some(namespace) = &namespace {
                 write!(prefix, "{}{}", &namespace, &config.separator)
@@ -78,26 +96,6 @@ impl RoseyGenerator {
                     }
                 }
             }
-
-            let (new_root, namespace) =
-                if let Some(new_root) = attributes.get(format!("{}-root", config.tag)) {
-                    (Some(String::from(new_root)), None)
-                } else {
-                    (root, namespace)
-                };
-
-            let new_namespace = match (namespace, attributes.get(format!("{}-ns", config.tag))) {
-                (Some(namespace), Some(new_namespace)) => {
-                    Some(format!("{}:{}", namespace, new_namespace))
-                }
-                (Some(namespace), None) => Some(namespace),
-                (None, Some(new_namespace)) => Some(String::from(new_namespace)),
-                _ => None,
-            };
-
-            (new_root, new_namespace)
-        } else {
-            (root, namespace)
         };
 
         for child in node.children() {

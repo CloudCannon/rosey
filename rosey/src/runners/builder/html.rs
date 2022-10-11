@@ -578,8 +578,17 @@ impl<'a> RoseyPage<'a> {
     }
 
     fn process_node(&mut self, node: &NodeRef, root: Option<String>, namespace: Option<String>) {
-        let (root, namespace) = if let Some(element) = node.as_element() {
+        let mut root = root;
+        let mut namespace = namespace;
+
+        if let Some(element) = node.as_element() {
             let mut prefix = String::default();
+            let attributes = element.attributes.borrow();
+
+            if let Some(new_root) = attributes.get(format!("{}-root", &self.tag)) {
+                root = Some(String::from(new_root));
+                namespace = None;
+            }
 
             if let Some(root) = &root {
                 if !root.is_empty() {
@@ -588,24 +597,28 @@ impl<'a> RoseyPage<'a> {
                 }
             }
 
+            namespace = match (namespace, attributes.get(format!("{}-ns", &self.tag))) {
+                (Some(namespace), Some(new_namespace)) => {
+                    Some(format!("{}{}{}", namespace, &self.separator, new_namespace))
+                }
+                (Some(namespace), None) => Some(namespace),
+                (None, Some(new_namespace)) => Some(String::from(new_namespace)),
+                _ => None,
+            };
+
             if let Some(namespace) = &namespace {
                 write!(prefix, "{}{}", &namespace, &self.separator)
                     .expect("Failed to write namespace to prefix");
             }
 
-            let attributes = element.attributes.borrow();
-
             if let Some(key) = attributes.get(&self.tag[..]) {
-                let content = node.to_string();
                 let key = if key.is_empty() {
-                    let hash = {
-                        let mut hasher = Sha256::new();
-                        hasher.update(&content);
-                        encode_config(
-                            hasher.finalize(),
-                            Config::new(CharacterSet::Standard, false),
-                        )
-                    };
+                    let mut hasher = Sha256::new();
+                    hasher.update(node.to_string());
+                    let hash = encode_config(
+                        hasher.finalize(),
+                        Config::new(CharacterSet::Standard, false),
+                    );
                     format!("{}{}", &prefix, hash)
                 } else {
                     format!("{}{}", &prefix, key)
@@ -623,11 +636,7 @@ impl<'a> RoseyPage<'a> {
                     }
                 }
 
-                let mut inner_html = String::default();
-                node.children().for_each(|child| {
-                    inner_html.push_str(&child.to_string());
-                });
-
+                let inner_html: String = node.children().map(|child| child.to_string()).collect();
                 self.edits
                     .push(RoseyEdit::Content(key, inner_html, node.clone()));
             }
@@ -643,27 +652,7 @@ impl<'a> RoseyPage<'a> {
                     ));
                 }
             }
-
-            let (new_root, namespace) =
-                if let Some(new_root) = attributes.get(format!("{}-root", self.tag)) {
-                    (Some(String::from(new_root)), None)
-                } else {
-                    (root, namespace)
-                };
-
-            let new_namespace = match (namespace, attributes.get(format!("{}-ns", self.tag))) {
-                (Some(namespace), Some(new_namespace)) => {
-                    Some(format!("{}:{}", namespace, new_namespace))
-                }
-                (Some(namespace), None) => Some(namespace),
-                (None, Some(new_namespace)) => Some(String::from(new_namespace)),
-                _ => None,
-            };
-
-            (new_root, new_namespace)
-        } else {
-            (root, namespace)
-        };
+        }
 
         for child in node.children() {
             self.process_node(&child, root.clone(), namespace.clone());
