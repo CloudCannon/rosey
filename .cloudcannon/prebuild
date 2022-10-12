@@ -1,6 +1,5 @@
-cd docs
-if [ -z "$HUGO_ROSEY_VERSION" ]; then
-    export HUGO_ROSEY_VERSION="Unversioned"
+if [ -z "$HUGO_ROSEY_DOCS_VERSION" ]; then
+    export HUGO_ROSEY_DOCS_VERSION=$(node ./.backstage/get_version.cjs)
 fi
-echo "Building documentation for $HUGO_ROSEY_VERSION"
-npm i
+echo "Building documentation for $HUGO_ROSEY_DOCS_VERSION"
+cd docs && npm i

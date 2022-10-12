@@ -3,4 +3,4 @@ default_og_image: /og.png
 logo_image: /logo.svg
 side_nav_title: Docs
 github_url: https://github.com/cloudcannon/rosey
-version_env_var: HUGO_ROSEY_VERSION
+version_env_var: HUGO_ROSEY_DOCS_VERSION
