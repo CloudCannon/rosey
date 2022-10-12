@@ -15,7 +15,8 @@ jobs:
         with:
           application_id: ${{ secrets.CC_BOT_ID }}
           application_private_key: ${{ secrets.CC_BOT_PEM }}
-      - uses: ahmadnassri/action-dependabot-auto-merge@v2
+      - uses: fastify/github-action-merge-dependabot@v3.0.0
         with:
-          target: minor
           github-token: ${{ steps.get_workflow_token.outputs.token }}
+          target: minor
+          approve-only: true
