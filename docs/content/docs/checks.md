@@ -71,10 +71,10 @@ In this case, this new `checks.json` file contains a report on the state of the 
 For each translated locale, and each translation key, one of the following statuses will be reported:
 
 - `current`
-  - A translation for this key exists, and the `original` value matches the `base.json`
+  - A translation for this key exists, and the `original` value matches that of the `base.json` file.
 - `outdated`
-  - A translation for this key exists, but the `original` value does not match the `base.json`, meaning that this translation is out of date and should be re-processed
+  - A translation for this key exists, but the `original` value does not match the `base.json`, meaning that this translation is out of date and should be re-processed,
 - `missing`
-  - This key exists in the `base.json`, but does not exist in this locale file
+  - This key exists in the `base.json`, but does not exist in this locale file.
 - `unused`
-  - This key exists in this locale file, but the `base.json` contains no such key, so this translation will not be used anywhere on the site
+  - This key exists in this locale file, but the `base.json` contains no such key, so this translation will not be used anywhere on the site.
