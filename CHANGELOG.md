@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+* Use the x86_64 build of Rosey on M1 Macs
+
 ## v2.0.0 (October 12, 2022)
 
 The first stable Rosey 2.0 release! 🎉

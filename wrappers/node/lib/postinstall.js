@@ -24,7 +24,7 @@ async function isMusl() {
     } catch (err) {
         stderr = err.stderr;
     }
-    if(stderr.indexOf('musl') > -1) {
+    if (stderr.indexOf('musl') > -1) {
         return true;
     }
     return false;
@@ -35,20 +35,22 @@ async function getTarget() {
 
     switch (os.platform()) {
         case 'darwin':
+            return 'x86_64-apple-darwin';
+            // TODO: Waiting for GitHub actions to build on M1.
             return arch === 'arm64' ? 'aarch64-apple-darwin' :
                 'x86_64-apple-darwin';
         case 'win32':
             return arch === 'x64' ? 'x86_64-pc-windows-msvc' :
                 arch === 'arm' ? 'aarch64-pc-windows-msvc' :
-                'i686-pc-windows-msvc';
+                    'i686-pc-windows-msvc';
         case 'linux':
             return arch === 'x64' ? 'x86_64-unknown-linux-musl' :
                 arch === 'arm' ? 'arm-unknown-linux-gnueabihf' :
-                arch === 'armv7l' ? 'arm-unknown-linux-gnueabihf' :
-                arch === 'arm64' ? await isMusl() ? 'aarch64-unknown-linux-musl' : 'aarch64-unknown-linux-gnu' :
-                arch === 'ppc64' ? 'powerpc64le-unknown-linux-gnu' :
-                arch === 's390x' ? 's390x-unknown-linux-gnu' :
-                    'i686-unknown-linux-musl'
+                    arch === 'armv7l' ? 'arm-unknown-linux-gnueabihf' :
+                        arch === 'arm64' ? await isMusl() ? 'aarch64-unknown-linux-musl' : 'aarch64-unknown-linux-gnu' :
+                            arch === 'ppc64' ? 'powerpc64le-unknown-linux-gnu' :
+                                arch === 's390x' ? 's390x-unknown-linux-gnu' :
+                                    'i686-unknown-linux-musl'
         default: throw new Error('Unknown platform: ' + os.platform());
     }
 }
