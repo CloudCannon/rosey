@@ -1,0 +1,35 @@
+{
+  "name": "rosey",
+  "version": "",
+  "description": "Generate a translated version of your website based on the translation of tagged elements.",
+  "bin": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CloudCannon/rosey"
+  },
+  "scripts": {
+    "postinstall": "node ./lib/postinstall.js"
+  },
+  "author": "Tate Kennington",
+  "license": "MIT",
+  "dependencies": {
+    "https-proxy-agent": "^5.0.0",
+    "proxy-from-env": "^1.1.0"
+  },
+  "overrides": {
+    "agent-base": "^6.0.2"
+  },
+  "keywords": [
+    "CloudCannon",
+    "Cloud",
+    "Cannon",
+    "i18n",
+    "rosey",
+    "translation",
+    "localisation"
+  ],
+  "bugs": {
+    "url": "https://github.com/CloudCannon/rosey/issues"
+  },
+  "homepage": "https://github.com/CloudCannon/rosey#readme"
+}

@@ -1,0 +1,6 @@
+cd docs
+if [ -z "$HUGO_ROSEY_VERSION" ]; then
+    export HUGO_ROSEY_VERSION="Unversioned"
+fi
+echo "Building documentation for $HUGO_ROSEY_VERSION"
+npm i

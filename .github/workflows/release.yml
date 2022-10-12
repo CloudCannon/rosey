@@ -1,0 +1,278 @@
+# Based on: https://github.com/ClementTsang/bottom/blob/master/.github/workflows/deployment.yml
+
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+
+env:
+  CARGO_TERM_COLOR: always
+  HUMANE_VERSION: "0.3.12"
+
+jobs:
+  publish-crate:
+    name: Publish Crate
+    runs-on: ubuntu-20.04
+    needs: publish-github-release
+    steps:
+    - name: Clone
+      uses: actions/checkout@v2
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          ~/.rustup
+          target
+          rosey/target
+        key: ${{ runner.os }}-stable
+    - name: Setup
+      run: |
+        rustup install stable
+    - name: Get Version
+      run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+    - name: Prepare Git
+      run: |
+        git config user.email "github@github.com"
+        git config user.name "Github Actions"
+        git checkout -b main
+        # Use throw-away branch so we don't push the changes to origin
+        git checkout -b deploy_branch
+    - name: Prepare Crates
+      run: |
+        # Update cargo version, 
+        node ./.backstage/version.cjs
+        git add ./rosey/Cargo.toml
+        # Commit changes so cargo doesn't complain about dirty repo
+        git commit -m "Deploy changes."
+
+    - name: Build
+      working-directory: ./rosey
+      run: cargo build --release --verbose
+    - name: Publish
+      working-directory: ./rosey
+      run: cargo publish --allow-dirty
+      env:
+        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+  publish-npm-package:
+    name: Publish NPM package
+    runs-on: ubuntu-20.04
+    needs: publish-github-release
+    defaults:
+      run:
+        working-directory: ./wrappers/node
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v3
+        with:
+          name: release-checksums
+          path: wrappers/node/checksums
+      - name: Prepare package
+        run: |
+          RELEASE_VERSION=${GITHUB_REF#refs/tags/}
+          npm version $(echo $RELEASE_VERSION | cut -c1-)
+      - name: Publish
+        run: npm publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-github-release:
+    name: Publish to GitHub
+    runs-on: ubuntu-20.04
+    needs: test-and-build
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - name: Get Version
+        run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+      - name: Swap to main
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          fetch-depth: 0 # Full fetch
+      - uses: actions/download-artifact@v3
+        with:
+          name: release
+          path: build-artifacts
+      - name: Build Changelog
+        run: |
+          node ./.backstage/changelog.cjs write
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add ./CHANGELOG.md
+          git commit -m "Changelog for $GIT_VERSION"
+          git push
+          git checkout production-docs
+          git merge --no-ff main -m "Release documentation for $GIT_VERSION"
+          git push
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body_path: RELEASE.md
+          files: |
+            build-artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-and-build:
+    name: Test and Build
+    runs-on: ${{matrix.os}}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        include:
+          - build: linux
+            os: ubuntu-latest
+            rust: stable
+            target: x86_64-unknown-linux-musl
+            cross: false
+          - build: windows
+            os: windows-latest
+            rust: stable
+            target: x86_64-pc-windows-msvc
+            cross: false
+          - build: macos
+            os: macos-latest
+            rust: stable
+            target: x86_64-apple-darwin
+            cross: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.rustup
+            target
+            rosey/target
+          key: ${{ runner.os }}-${{ matrix.rust }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      # From https://github.com/Emoun/duplicate/blob/master/.github/workflows/rust.yml
+      - name: Get Version
+        run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+
+      - name: Verify Changelog
+        run: |
+          node ./.backstage/changelog.cjs
+
+      - name: Install Linker
+        if: matrix.cross
+        run: |
+          sudo apt update
+          sudo apt install ${{ matrix.linker }}
+      - name: Install Rust
+        run: |
+          rustup install ${{ matrix.rust }}
+          rustup target add ${{ matrix.target }}
+          rustup show
+
+      - name: Install humane
+        uses: supplypike/setup-bin@v1
+        with:
+          uri: "https://github.com/CloudCannon/humane/releases/download/v${{env.HUMANE_VERSION}}/humane-v${{env.HUMANE_VERSION}}-${{matrix.target}}.tar.gz"
+          name: "humane"
+          version: ${{env.HUMANE_VERSION}}
+
+      - name: Prepare Git
+        run: |
+          git config user.email "github@github.com"
+          git config user.name "Github Actions"
+          git checkout -b main
+          # Use throw-away branch so we don't push the changes to origin
+          git checkout -b deploy_branch
+      - name: Prepare Crates
+        run: |
+          # Update cargo version, 
+          node ./.backstage/version.cjs
+          git add ./rosey/Cargo.toml
+          # Commit changes so cargo doesn't complain about dirty repo
+          git commit -m "Deploy changes."
+
+      - name: Build
+        working-directory: ./rosey
+        run: RELEASE_VERSION=${GITHUB_REF#refs/tags/} cargo build --release --target ${{ matrix.target }}
+
+      - name: Test CLI
+        working-directory: ./rosey
+        run: TEST_BINARY=./target/${{ matrix.target }}/release/rosey humane
+
+      - name: Package Artifacts
+        run: |
+          src=$(pwd)
+          stage=
+          case $RUNNER_OS in
+              Windows)
+                  stage=$(mktemp -d)
+                  ;;
+              Linux)
+                  stage=$(mktemp -d)
+                  ;;
+              macOS)
+                  stage=$(mktemp -d -t tmp)
+                  ;;
+          esac
+          cp target/${{ matrix.target }}/release/rosey $stage/
+          cd $stage
+          RELEASE_VERSION=${GITHUB_REF#refs/tags/}
+
+          EXEC_NAME="pagefind"
+          ASSET_NAME="$EXEC_NAME-$RELEASE_VERSION-${{ matrix.target }}.tar.gz"
+          ASSET_PATH="$src/$ASSET_NAME"
+
+          CHECKSUM_PATH="$ASSET_PATH.sha256"
+
+          tar czf $ASSET_PATH $EXEC_NAME
+
+          cd $src
+          case $RUNNER_OS in
+              Windows)
+                  sha256sum $ASSET_NAME > $CHECKSUM_PATH
+                  ;;
+              Linux)
+                  sha256sum $ASSET_NAME > $CHECKSUM_PATH
+                  ;;
+              macOS)
+                  shasum -a 256 $ASSET_NAME > $CHECKSUM_PATH
+                  ;;
+          esac
+          if [ "$RUNNER_OS" == "Windows" ]; then
+              ASSET_PATH=$(echo "$ASSET_PATH" | sed -e 's/^\///' -e 's/\//\\/g' -e 's/^./\0:/')
+              CHECKSUM_PATH=$(echo "$CHECKSUM_PATH" | sed -e 's/^\///' -e 's/\//\\/g' -e 's/^./\0:/')
+          fi
+
+          echo "ASSET_PATH=$ASSET_PATH" >> $GITHUB_ENV
+          echo "CHECKSUM_PATH=$CHECKSUM_PATH" >> $GITHUB_ENV
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: release
+          path: |
+            ${{ env.ASSET_PATH }}
+            ${{ env.CHECKSUM_PATH }}
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-checksums
+          path: |
+            ${{ env.CHECKSUM_PATH }}

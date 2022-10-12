@@ -1,0 +1,72 @@
+name: Test
+
+on:
+  push:
+    branches: [rust]
+  pull_request:
+    branches: [rust]
+
+env:
+  CARGO_TERM_COLOR: always
+  HUMANE_VERSION: "0.3.12"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{matrix.os}}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        include:
+          - build: linux
+            os: ubuntu-latest
+            rust: stable
+            target: x86_64-unknown-linux-musl
+            cross: false
+          - build: macos
+            os: macos-latest
+            rust: stable
+            target: x86_64-apple-darwin
+            cross: false
+          - build: windows
+            os: windows-latest
+            rust: stable
+            target: x86_64-pc-windows-msvc
+            cross: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.rustup
+            target
+            rosey/target
+          key: ${{ runner.os }}-${{ matrix.rust }}
+
+      - name: Install Rust
+        run: |
+          rustup install ${{ matrix.rust }}
+
+      - name: Install humane
+        uses: supplypike/setup-bin@v1
+        with:
+          uri: "https://github.com/CloudCannon/humane/releases/download/v${{env.HUMANE_VERSION}}/humane-v${{env.HUMANE_VERSION}}-${{matrix.target}}.tar.gz"
+          name: "humane"
+          version: ${{env.HUMANE_VERSION}}
+
+      - name: Build
+        working-directory: ./rosey
+        run: cargo build --release
+
+      - name: Test CLI
+        working-directory: ./rosey
+        run: TEST_BINARY=./target/release/rosey humane
