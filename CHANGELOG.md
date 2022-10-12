@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.0.0 (October 12, 2022)
+
 The first stable Rosey 2.0 release! 🎉
 
 This release includes some breaking changes from Rosey 1.0, some of which are changes to previously undocumented behaviour. For anyone migrating from Rosey 1.0 to 2.0, the new documentation website at https://rosey.app should be read through to understand any differences between an existing implementation and the 2.0 feature-set.
