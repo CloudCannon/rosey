@@ -9,13 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Get token
-        id: get_token
-        uses: machine-learning-apps/actions-app-token@master
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v2
         with:
-          APP_PEM: ${{ secrets.CC_BOT_PEM }}
-          APP_ID: ${{ secrets.CC_BOT_ID }}
+          application_id: ${{ secrets.CC_BOT_ID }}
+          application_private_key: ${{ secrets.CC_BOT_PEM }}
       - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
           target: minor
-          github-token: ${{ steps.get_token.outputs.app_token }}
+          github-token: ${{ steps.get_workflow_token.outputs.token }}
