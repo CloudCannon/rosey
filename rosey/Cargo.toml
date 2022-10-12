@@ -15,7 +15,7 @@ globwalk = "0.8.1"
 base64 = "0.13.0"
 sha2 = "0.9.8"
 serde = { version = "1.0", features = ["derive"] }
-html5ever = "0.25.1"
+html5ever = "0.26.0"
 regex = "1.5.4"
 rayon = "1.5.1"
 portpicker = "0.1"
