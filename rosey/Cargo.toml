@@ -13,7 +13,7 @@ kuchiki = "0.8.1"
 serde_json = { version = "1.0", features = ["preserve_order"] }
 globwalk = "0.8.1"
 base64 = "0.13.0"
-sha2 = "0.9.8"
+sha2 = "0.10.5"
 serde = { version = "1.0", features = ["derive"] }
 html5ever = "0.25.2"
 regex = "1.5.4"
