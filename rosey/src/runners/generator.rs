@@ -49,7 +49,7 @@ impl RoseyGenerator {
         create_dir_all(locale_folder).unwrap();
         let output = self.locale.output(config.version);
 
-        if let Ok(file) = File::create(&locale_dest) {
+        if let Ok(file) = File::create(locale_dest) {
             let mut writer = BufWriter::new(file);
             if writer.write(output.as_bytes()).is_err() {
                 eprintln!("Failed to write: {locale_dest:?}")

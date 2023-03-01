@@ -20,7 +20,7 @@ impl RoseyBuilder {
             return;
         }
 
-        let content = read_to_string(&file).unwrap();
+        let content = read_to_string(file).unwrap();
         let source = serde_json::from_str::<Value>(&content);
         let schema = serde_json::from_str::<Value>(&read_to_string(&schema_path).unwrap());
 
@@ -38,13 +38,13 @@ impl RoseyBuilder {
         let schema = schema.unwrap();
 
         let source_folder = &config.source;
-        let relative_path = file.strip_prefix(&source_folder).unwrap();
+        let relative_path = file.strip_prefix(source_folder).unwrap();
 
         self.output_file(&config.default_language, relative_path, content);
 
         self.translations.par_iter().for_each(|(key, translation)| {
             let mut source = source.clone();
-            self.process_json_node(&mut source, &schema, None, translation);
+            RoseyBuilder::process_json_node(&mut source, &schema, None, translation);
 
             let content = serde_json::to_string_pretty(&source).unwrap();
             self.output_file(key, relative_path, content);
@@ -52,7 +52,6 @@ impl RoseyBuilder {
     }
 
     fn process_json_node(
-        &self,
         source: &mut Value,
         schema: &Value,
         namespace: Option<String>,
@@ -90,7 +89,7 @@ impl RoseyBuilder {
                     } else if let (Some(source_value), Some(schema_value)) =
                         (source_map.get_mut(key), schema_map.get(key))
                     {
-                        self.process_json_node(
+                        RoseyBuilder::process_json_node(
                             source_value,
                             schema_value,
                             Some(namespace.clone()),
@@ -132,7 +131,12 @@ impl RoseyBuilder {
                         })
                     }
                     Some(schema_value) => source_array.iter_mut().for_each(|source_value| {
-                        self.process_json_node(source_value, schema_value, None, translation)
+                        RoseyBuilder::process_json_node(
+                            source_value,
+                            schema_value,
+                            None,
+                            translation,
+                        )
                     }),
                     _ => eprintln!("Schema mismatch in array: Expected String|Object"),
                 }
