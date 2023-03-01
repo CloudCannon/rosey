@@ -5,7 +5,7 @@ nav_section: Rosey CLI
 weight: 11
 ---
 
-Rosey's `generate` command ingests your built static site, and produces a `source.json` file containing all content that needs to be translated.
+Rosey's `generate` command ingests your built static site, and produces a `base.json` file containing all content that needs to be translated.
 
 ## Required options
 
@@ -20,7 +20,7 @@ The directory of your built static website (the output folder of your SSG build)
 
 ### Base
 
-The path to generate the Rosey base locale file to. Defaults to `rosey/source.json`
+The path to generate the Rosey base locale file to. Defaults to `rosey/base.json`
 
 | CLI Flag        | ENV Variable | Config Key |
 |-----------------|--------------|------------|
