@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+* Fixes an issue where asset attributes inside translation text would be deleted if they had no translation
+
 ## v2.0.1 (October 12, 2022)
 
 * Use the x86_64 build of Rosey on M1 Macs
