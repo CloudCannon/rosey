@@ -49,3 +49,28 @@ Feature: Rosey Build Resilience
       | loop |  |
     And I should see '<!--Comment-->' in "dist/translated_site/airy/index.html"
     And I should see '<!DOCTYPE html>' in "dist/translated_site/airy/index.html"
+
+  Scenario: Rosey build doesn't break in translation img srcs
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <div data-rosey="container">
+        <img src="https://ryancollins.website/images/rodents/souslik.png" />
+      </div>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/fr.json" file with the content:
+      """
+      {
+        "container": {
+          "original": "<img src=\"https://ryancollins.website/images/rodents/souslik.png\">",
+          "value": "<img src=\"https://ryancollins.website/images/rodents/souslik.png\">"
+        }
+      }
+      """
+    When I run my program with the flags:
+      | build |
+    Then I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
+      | src | https://ryancollins.website/images/rodents/souslik.png |
