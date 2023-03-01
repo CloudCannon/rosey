@@ -17,7 +17,7 @@ impl RoseyGenerator {
             return;
         }
 
-        let source = serde_json::from_str::<Value>(&read_to_string(&file).unwrap());
+        let source = serde_json::from_str::<Value>(&read_to_string(file).unwrap());
         let schema = serde_json::from_str::<Value>(&read_to_string(&schema_path).unwrap());
 
         if source.is_err() {

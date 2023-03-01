@@ -91,6 +91,8 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                 self.locale_key,
                             ) {
                                 write!(self.result, "/{translated_asset}").expect("Failed to rewrite content - custom asset attribute");
+                            } else {
+                                write!(self.result, "{}", attr.value).expect("Failed to rewrite content - skipping custom asset attribute");
                             }
                         }
                         ("img" | "video" | "audio" | "source", "src", _) => {
@@ -100,6 +102,8 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                 self.locale_key,
                             ) {
                                 write!(self.result, "/{translated_asset}").expect("Failed to rewrite content - asset attribute");
+                            } else {
+                                write!(self.result, "{}", attr.value).expect("Failed to rewrite content - skipping asset attribute");
                             }
                         }
                         ("a", "href", _) if has_download => {
@@ -109,6 +113,8 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                 self.locale_key,
                             ) {
                                 write!(self.result, "/{translated_asset}").expect("Failed to rewrite content - download link");
+                            } else {
+                                write!(self.result, "{}", attr.value).expect("Failed to rewrite content - skipping download link");
                             }
                         }
                         ("a", "href", _) if !has_download => {
@@ -144,6 +150,8 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                             self.locale_key,
                                         ) {
                                             return format!("/{} {}", translated_src, width);
+                                        } else {
+                                            return format!("/{} {}", src, width);
                                         }
                                     }
                                     original_part.to_string()
