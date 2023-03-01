@@ -128,7 +128,7 @@ impl RoseyBuilder {
         let config = &self.options.config;
         let source_folder = &config.source;
         let walker: (Vec<_>, Vec<_>) =
-            globwalk::GlobWalkerBuilder::from_patterns(&source_folder, &["**/*.{html,json}"])
+            globwalk::GlobWalkerBuilder::from_patterns(source_folder, &["**/*.{html,json}"])
                 .build()
                 .unwrap()
                 .into_iter()
@@ -149,7 +149,7 @@ impl RoseyBuilder {
     fn find_locale_overwrite(&self, path: &Path) -> Option<&String> {
         let config = &self.options.config;
         let source_folder = &config.source;
-        let relative_path = path.strip_prefix(&source_folder).unwrap();
+        let relative_path = path.strip_prefix(source_folder).unwrap();
         self.translations.keys().find(|key| {
             relative_path
                 .parent()
@@ -192,7 +192,7 @@ impl RoseyBuilder {
     pub fn process_file_overrides(&self, path: &Path) {
         let config = &self.options.config;
         let source_folder = &config.source;
-        let relative_path = path.strip_prefix(&source_folder).unwrap();
+        let relative_path = path.strip_prefix(source_folder).unwrap();
         self.translations
             .par_iter()
             .filter(|(locale, _)| source_folder.join(locale).join(relative_path).exists())
@@ -204,7 +204,7 @@ impl RoseyBuilder {
     pub fn output_file(&self, locale: &str, relative_path: &Path, content: String) {
         let config = &self.options.config;
         let dest_folder = &config.dest.join(locale);
-        let dest_path = dest_folder.join(&relative_path);
+        let dest_path = dest_folder.join(relative_path);
         if let Some(parent) = dest_path.parent() {
             create_dir_all(parent).unwrap();
         }

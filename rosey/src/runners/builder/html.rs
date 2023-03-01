@@ -33,7 +33,7 @@ impl RoseyBuilder {
     pub fn process_html_file(&self, file: &Path) {
         let config = &self.options.config;
         let source_folder = &config.source;
-        let relative_path = file.strip_prefix(&source_folder).unwrap();
+        let relative_path = file.strip_prefix(source_folder).unwrap();
         let dest_folder = &config.dest;
         let images_source = config.images_source.as_ref().unwrap_or(&config.source);
 
@@ -60,7 +60,7 @@ impl RoseyBuilder {
             page.rewrite_assets();
             page.rewrite_anchors();
 
-            let output_path = dest_folder.join(&relative_path);
+            let output_path = dest_folder.join(relative_path);
             page.output_file(&output_path);
             return;
         }
@@ -70,7 +70,7 @@ impl RoseyBuilder {
 
         let output_path = dest_folder
             .join(&config.default_language)
-            .join(&relative_path);
+            .join(relative_path);
         page.output_file(&output_path);
         self.output_redirect_file(&config.default_language, relative_path);
 
@@ -82,7 +82,7 @@ impl RoseyBuilder {
             page.rewrite_assets();
             page.rewrite_anchors();
 
-            let output_path = dest_folder.join(key).join(&relative_path);
+            let output_path = dest_folder.join(key).join(relative_path);
             page.output_file(&output_path);
         });
     }
@@ -105,9 +105,9 @@ impl RoseyBuilder {
         };
 
         let mut alternates = String::default();
-        for key in (&self.translations)
-            .iter()
-            .map(|(key, _)| key)
+        for key in self
+            .translations
+            .keys()
             .chain(std::iter::once(&config.default_language))
             .filter(|key| *key != locale)
         {
@@ -119,9 +119,9 @@ impl RoseyBuilder {
         }
 
         let mut lookup: BTreeMap<String, &str> = BTreeMap::default();
-        for key in (&self.translations)
-            .iter()
-            .map(|(key, _)| key)
+        for key in self
+            .translations
+            .keys()
             .chain(std::iter::once(&config.default_language))
         {
             let mut split = key.split('-');
@@ -664,7 +664,7 @@ impl<'a> RoseyPage<'a> {
             create_dir_all(parent).unwrap();
         }
 
-        if let Ok(file) = File::create(&output_path) {
+        if let Ok(file) = File::create(output_path) {
             let writer = BufWriter::new(file);
             let mut serializer = RoseySerializer::new(writer);
             if Serialize::serialize(
