@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.0.2 (March 1, 2023)
+
 * Fixes an issue where asset attributes inside translation text would be deleted if they had no translation
 
 ## v2.0.1 (October 12, 2022)
