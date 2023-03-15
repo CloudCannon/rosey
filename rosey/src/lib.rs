@@ -9,7 +9,7 @@ use runners::{builder::RoseyBuilder, checker::RoseyChecker};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, env, path::PathBuf, str::FromStr};
 
-const SUPPORTED_WRAP_LANGS: [&str; 3] = ["ja", "he", "zh"];
+const SUPPORTED_WRAP_LANGS: [&str; 4] = ["ja", "he", "th", "zh"];
 
 pub enum RoseyCommand {
     Generate,

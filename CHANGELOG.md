@@ -9,6 +9,10 @@
 
 ## Unreleased
 
+## v2.0.3 (March 15, 2023)
+
+* Add support for wordwrapping Thai, with `rosey build --wrap "th"`.
+
 ## v2.0.2 (March 1, 2023)
 
 * Fixes an issue where asset attributes inside translation text would be deleted if they had no translation

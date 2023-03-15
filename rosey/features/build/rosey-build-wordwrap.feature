@@ -104,7 +104,7 @@ Feature: Rosey Build Word Wrap
       | class     | my-class |
       | innerText | 世界     |
 
-  Scenario: Rosey build can word wrap chinese and hebrew
+  Scenario: Rosey build can word wrap chinese, hebrew and thai
     Given I have a "dist/site/index.html" file with the content:
       """
       <html>
@@ -131,9 +131,18 @@ Feature: Rosey Build Word Wrap
         }
       }
       """
+    And I have a "rosey/locales/th.json" file with the content:
+      """
+      {
+        "p": {
+          "original": "Hello World",
+          "value": "สวัสดีชาวโลก"
+        }
+      }
+      """
     When I run my program with the flags:
-      | build                    |
-      | --wrap "zh-hans-tw" "he" |
+      | build                         |
+      | --wrap "zh-hans-tw" "he" "th" |
     Then I should see a selector 'p > span:nth-of-type(1)' in "dist/translated_site/zh-hans-tw/index.html" with the attributes:
       | style     | white-space: nowrap; |
       | innerText | 你好                 |
@@ -146,6 +155,12 @@ Feature: Rosey Build Word Wrap
     Then I should see a selector 'p > span:nth-of-type(2)' in "dist/translated_site/he/index.html" with the attributes:
       | style     | white-space: nowrap; |
       | innerText | עולם                 |
+    Then I should see a selector 'p > span:nth-of-type(1)' in "dist/translated_site/th/index.html" with the attributes:
+      | style     | white-space: nowrap; |
+      | innerText | สวัสดี                 |
+    Then I should see a selector 'p > span:nth-of-type(2)' in "dist/translated_site/th/index.html" with the attributes:
+      | style     | white-space: nowrap; |
+      | innerText | ชาวโลก               |
 
   Scenario: Rosey build doesn't wrap languages with whitespace
     Given I have a "dist/site/index.html" file with the content:
