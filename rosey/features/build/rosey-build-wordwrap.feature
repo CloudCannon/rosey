@@ -190,9 +190,9 @@ Feature: Rosey Build Word Wrap
       """
       <html>
       <body>
-        <div data-rosey="p">
-          <p>Hello World</p>
-        </div>
+      <div data-rosey="p">
+      <p>Hello World</p>
+      </div>
       </body>
       </html>
       """
@@ -214,3 +214,38 @@ Feature: Rosey Build Word Wrap
     Then I should see a selector 'div > p > span:nth-of-type(2)' in "dist/translated_site/ja-jp/index.html" with the attributes:
       | style     | white-space: nowrap; |
       | innerText | 世界                 |
+
+  Scenario: Rosey build won't wordwrap elements which shouldn't contain HTML
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <head>
+      <title data-rosey="hello">Hello World</title>
+      </head>
+      <body>
+      <script data-rosey="hello">Hello World</script>
+      <style data-rosey="hello">Hello World</style>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/ja-jp.json" file with the content:
+      """
+      {
+        "hello": {
+          "original": "Hello World",
+          "value": "こんにちは世界"
+        }
+      }
+      """
+    When I run my program with the flags:
+      | build          |
+      | --wrap "ja-jp" |
+    Then I should see a selector 'title' in "dist/translated_site/ja-jp/index.html" with the attributes:
+      | innerText  | こんにちは世界 |
+      | data-rosey | hello        |
+    Then I should see a selector 'style' in "dist/translated_site/ja-jp/index.html" with the attributes:
+      | innerText  | こんにちは世界 |
+      | data-rosey | hello        |
+    Then I should see a selector 'script' in "dist/translated_site/ja-jp/index.html" with the attributes:
+      | innerText  | こんにちは世界 |
+      | data-rosey | hello        |

@@ -29,6 +29,8 @@ use sha2::{Digest, Sha256};
 
 use crate::RoseyTranslation;
 
+const UNSUPPORTED_WRAP_ELEMENTS: [&str; 3] = ["title", "script", "style"];
+
 impl RoseyBuilder {
     pub fn process_html_file(&self, file: &Path) {
         let config = &self.options.config;
@@ -283,6 +285,9 @@ impl<'a> RoseyPage<'a> {
                         child.detach();
                     });
 
+                    let element_data = node.as_element().unwrap();
+                    let should_prevent_wrap = UNSUPPORTED_WRAP_ELEMENTS.contains(&&element_data.name.local[..]);
+
                     if let Some(content) = translation.get(key) {
                         let content = if content.contains('<') {
                             let mut rewriter = TranslationRewriter::new(
@@ -301,7 +306,7 @@ impl<'a> RoseyPage<'a> {
                             let _ = tokenizer.feed(&mut buffer);
                             tokenizer.end();
                             rewriter.finish()
-                        } else if self.should_wrap {
+                        } else if self.should_wrap && !should_prevent_wrap {
                             content
                                 .as_str()
                                 .segment_str()
