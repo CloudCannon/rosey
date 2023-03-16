@@ -9,6 +9,10 @@
 
 ## Unreleased
 
+## v2.0.4 (March 16, 2023)
+
+* `<title>`, `<script>` and `<style>` elements will no longer be wordwrapped when the `--wrap` flag is used.
+
 ## v2.0.3 (March 15, 2023)
 
 * Add support for wordwrapping Thai, with `rosey build --wrap "th"`.
