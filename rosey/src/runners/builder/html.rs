@@ -286,8 +286,7 @@ impl<'a> RoseyPage<'a> {
                     });
 
                     let element_data = node.as_element().unwrap();
-                    let element_name = element_data.name.local.to_string();
-                    let should_prevent_wrap = UNSUPPORTED_WRAP_ELEMENTS.contains(&element_name.as_str());
+                    let should_prevent_wrap = UNSUPPORTED_WRAP_ELEMENTS.contains(&&element_data.name.local[..]);
 
                     if let Some(content) = translation.get(key) {
                         let content = if content.contains('<') {
