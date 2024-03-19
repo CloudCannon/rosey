@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+* Fixes an issue where `<template>` elements were being ignored by generate and build. 
+
 ## v2.0.4 (March 16, 2023)
 
 * `<title>`, `<script>` and `<style>` elements will no longer be wordwrapped when the `--wrap` flag is used.

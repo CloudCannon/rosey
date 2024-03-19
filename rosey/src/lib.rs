@@ -310,3 +310,16 @@ impl RoseyLocale {
         }
     }
 }
+
+pub fn inline_templates(dom: &kuchiki::NodeRef) {
+    dom.inclusive_descendants().for_each(|node| {
+        if let Some(kuchiki::ElementData {
+            template_contents: Some(contents),
+            ..
+        }) = node.as_element()
+        {
+            inline_templates(contents);
+            node.append(contents.clone());
+        }
+    })
+}
