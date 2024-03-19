@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.0.5 (March 19, 2024)
+
 * Fixes an issue where `<template>` elements were being ignored by generate and build. 
 * Fixes an issue where `rosey check` would error when run without a source
 
