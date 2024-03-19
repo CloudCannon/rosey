@@ -18,9 +18,9 @@ jobs:
     needs: publish-github-release
     steps:
     - name: Clone
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cargo/registry
@@ -67,7 +67,7 @@ jobs:
         working-directory: ./wrappers/node
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
           name: release-checksums
@@ -89,39 +89,95 @@ jobs:
       run:
         working-directory: ./
     steps:
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v2
+        with:
+          application_id: ${{ secrets.CC_OSS_BOT_ID }}
+          application_private_key: ${{ secrets.CC_OSS_BOT_PEM }}
       - name: Clone
-        uses: actions/checkout@v2
-      - name: Get Version
-        run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+        uses: actions/checkout@v3
+        with:
+          token: ${{ steps.get_workflow_token.outputs.token }}
       - name: Swap to main
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
           fetch-depth: 0 # Full fetch
+          token: ${{ steps.get_workflow_token.outputs.token }}
+
+      - name: Get Version
+        run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+      - name: Get Tag
+        run: echo GIT_TAG="$(node ./.backstage/get_tag.cjs)" >> $GITHUB_ENV
+
       - uses: actions/download-artifact@v3
         with:
           name: release
           path: build-artifacts
-      - name: Build Changelog
+
+      - name: Build CHANGELOG
+        if: env.GIT_TAG == 'latest'
         run: |
           node ./.backstage/changelog.cjs write
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git add ./CHANGELOG.md
-          git commit -m "Changelog for $GIT_VERSION"
-          git push
-          git checkout production-docs
-          git merge --no-ff main -m "Release documentation for $GIT_VERSION"
-          git push
+          echo CHANGELOG=\"$(base64 -w 0 -i CHANGELOG.md)\" >> $GITHUB_ENV
+          echo SHA=\"$( git rev-parse main:CHANGELOG.md )\" >> $GITHUB_ENV
+      - name: Build CHANGELOG
+        if: env.GIT_TAG != 'latest'
+        run: |
+          echo "## Prerelease" > RELEASE.md
+          node ./.backstage/changelog.cjs write || true
+
+      - name: Commit new CHANGELOG
+        uses: octokit/request-action@v2.x
+        if: env.GIT_TAG == 'latest'
+        id: push_changes
+        with:
+          route: PUT /repos/{owner}/{repo}/contents/CHANGELOG.md
+          owner: cloudcannon
+          repo: rosey
+          branch: main
+          message: Changelog for ${{ env.GIT_VERSION }}
+          sha: ${{ env.SHA }}
+          content: ${{ env.CHANGELOG }}
+        env:
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+      - name: Release documentation branch
+        uses: octokit/request-action@v2.x
+        if: env.GIT_TAG == 'latest'
+        id: merge_docs
+        with:
+          route: POST /repos/{owner}/{repo}/merges
+          owner: cloudcannon
+          repo: rosey
+          base: production-docs
+          head: main
+          commit_message: Release documentation for ${{ env.GIT_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && env.GIT_TAG == 'latest'
         with:
+          repository: cloudcannon/rosey
+          prerelease: false
           body_path: RELEASE.md
           files: |
             build-artifacts/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/') && env.GIT_TAG != 'latest'
+        with:
+          repository: cloudcannon/rosey
+          prerelease: true
+          body_path: RELEASE.md
+          files: |
+            build-artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
 
   test-and-build:
     name: Test and Build
@@ -152,12 +208,12 @@ jobs:
             musl: false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 1
 
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
@@ -174,8 +230,11 @@ jobs:
       # From https://github.com/Emoun/duplicate/blob/master/.github/workflows/rust.yml
       - name: Get Version
         run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+      - name: Get Tag
+        run: echo GIT_TAG="$(node ./.backstage/get_tag.cjs)" >> $GITHUB_ENV
 
       - name: Verify Changelog
+        if: env.GIT_TAG == 'latest'
         run: |
           node ./.backstage/changelog.cjs
 
@@ -189,12 +248,16 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y musl-tools musl-dev
-      - name: Install Rust
-        run: |
-          rustup install ${{ matrix.rust }}
-          rustup target add ${{ matrix.target }}
-          rustup show
 
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: ${{ matrix.rust }}
+            target: ${{ matrix.target }}
+            override: true
+            default: true
+            components: rustfmt, clippy
+            
       - name: Install humane
         uses: supplypike/setup-bin@v1
         with:
