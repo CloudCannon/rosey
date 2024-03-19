@@ -221,13 +221,13 @@ async fn main() {
         std::process::exit(1);
     });
 
-    let options = RoseyOptions::load_with_flags(matches);
-    options
-        .run(RoseyCommand::from_str(subcommand).unwrap_or_else(|e| {
-            eprintln!("Error running Rosey: {e}");
-            std::process::exit(1);
-        }))
-        .await;
+    let subcommand = RoseyCommand::from_str(subcommand).unwrap_or_else(|e| {
+        eprintln!("Error running Rosey: {e}");
+        std::process::exit(1);
+    });
+
+    let options = RoseyOptions::load_with_flags(matches, &subcommand);
+    options.run(subcommand).await;
 
     let duration = start.elapsed();
     println!(

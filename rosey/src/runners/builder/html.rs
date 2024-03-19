@@ -194,6 +194,7 @@ impl<'a> RoseyPage<'a> {
         wrap_class: &'a Option<String>,
     ) -> Self {
         let dom = kuchiki::parse_html().one(content);
+        crate::inline_templates(&dom);
 
         RoseyPage {
             dom,
@@ -286,7 +287,8 @@ impl<'a> RoseyPage<'a> {
                     });
 
                     let element_data = node.as_element().unwrap();
-                    let should_prevent_wrap = UNSUPPORTED_WRAP_ELEMENTS.contains(&&element_data.name.local[..]);
+                    let should_prevent_wrap =
+                        UNSUPPORTED_WRAP_ELEMENTS.contains(&&element_data.name.local[..]);
 
                     if let Some(content) = translation.get(key) {
                         let content = if content.contains('<') {

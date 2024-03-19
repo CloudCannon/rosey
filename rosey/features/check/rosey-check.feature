@@ -1,8 +1,7 @@
 Feature: Rosey check v2
 	Background:
 		Given I have the environment variables:
-			| ROSEY_SOURCE | dist/site            |
-			| ROSEY_DEST   | dist/translated_site |
+			| ROSEY_DEST | dist/translated_site |
 
 	Scenario: Rosey check finds current translations
 		Given I have a "rosey/base.json" file with the content:

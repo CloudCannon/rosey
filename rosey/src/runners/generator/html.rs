@@ -9,6 +9,7 @@ impl RoseyGenerator {
     pub fn process_html_file(&mut self, file: &Path) {
         let config = &self.options.config;
         let dom = kuchiki::parse_html().one(read_to_string(file).unwrap());
+        crate::inline_templates(&dom);
         self.current_file =
             String::from(file.strip_prefix(&config.source).unwrap().to_str().unwrap());
         self.process_html_node(dom, None, None);
