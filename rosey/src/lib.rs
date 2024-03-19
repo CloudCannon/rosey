@@ -60,7 +60,7 @@ pub struct RoseyOptions {
 }
 
 impl RoseyOptions {
-    pub fn load_with_flags(matches: &ArgMatches) -> RoseyOptions {
+    pub fn load_with_flags(matches: &ArgMatches, subcommand: &RoseyCommand) -> RoseyOptions {
         let base = match options::load_config_files() {
             Ok(config) => config,
             Err(e) => {
@@ -76,7 +76,7 @@ impl RoseyOptions {
             std::process::exit(1);
         });
 
-        if original_source.to_string_lossy().is_empty() {
+        if !matches!(subcommand, RoseyCommand::Check) && original_source.to_string_lossy().is_empty() {
             eprintln!(
                 "Rosey requires a source directory to process. Provide either: \n\
                        • A `--source <PATH>` CLI flag \n\
