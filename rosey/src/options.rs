@@ -15,6 +15,7 @@ pub struct RoseyPublicConfig {
     pub tag: String,
     pub separator: String,
     pub base: PathBuf,
+    pub base_urls: PathBuf,
     pub locales: PathBuf,
     pub languages: Option<Vec<String>>,
     pub exclusions: String,
@@ -35,6 +36,7 @@ impl Default for RoseyPublicConfig {
             tag: "data-rosey".into(),
             separator: ":".into(),
             base: "rosey/base.json".into(),
+            base_urls: "rosey/base.urls.json".into(),
             locales: "rosey/locales".into(),
             languages: None,
             exclusions: r#"\.(html?|json)$"#.into(),
@@ -69,6 +71,7 @@ impl Display for RoseyPublicConfig {
         writeln!(f, "   - Source:              {}", self.source.display())?;
         writeln!(f, "   - Destination:         {}", self.dest.display())?;
         writeln!(f, "   - Base locale file:    {}", self.base.display())?;
+        writeln!(f, "   - Base urls file:      {}", self.base_urls.display())?;
         writeln!(f, "   - Locales directory:   {}", self.locales.display())?;
         match &self.images_source {
             Some(s) => writeln!(f, "   - Images source:       {}", s.display())?,

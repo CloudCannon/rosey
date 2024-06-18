@@ -22,6 +22,7 @@ use crate::{RoseyOptions, RoseyTranslation};
 pub struct RoseyBuilder {
     options: RoseyOptions,
     pub translations: BTreeMap<String, RoseyTranslation>,
+    pub url_translations: BTreeMap<String, RoseyTranslation>,
 }
 
 impl From<RoseyOptions> for RoseyBuilder {
@@ -29,6 +30,7 @@ impl From<RoseyOptions> for RoseyBuilder {
         RoseyBuilder {
             options,
             translations: BTreeMap::default(),
+            url_translations: BTreeMap::default(),
         }
     }
 }
@@ -98,7 +100,6 @@ impl RoseyBuilder {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.source, &["**/*"])
             .build()
             .unwrap()
-            .into_iter()
             .filter_map(Result::ok)
             .filter(|file| {
                 file.file_type().is_file() && !re.is_match(&file.path().to_string_lossy())
@@ -131,7 +132,6 @@ impl RoseyBuilder {
             globwalk::GlobWalkerBuilder::from_patterns(source_folder, &["**/*.{html,json}"])
                 .build()
                 .unwrap()
-                .into_iter()
                 .filter_map(Result::ok)
                 .partition(|file| self.find_locale_overwrite(file.path()).is_none());
 
@@ -163,7 +163,6 @@ impl RoseyBuilder {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.locales, &["**/*.json"])
             .build()
             .unwrap()
-            .into_iter()
             .filter_map(Result::ok);
 
         walker.for_each(|file| {
@@ -176,7 +175,12 @@ impl RoseyBuilder {
             let value = read_to_string(file.path()).expect("Failed to read locale file");
             let value = serde_json::from_str(&value);
             if let Ok(value) = value {
-                self.translations.insert(locale, value);
+                if locale.ends_with(".urls") {
+                    self.url_translations
+                        .insert(locale.trim_end_matches(".urls").to_string(), value);
+                } else {
+                    self.translations.insert(locale, value);
+                }
             }
         });
     }

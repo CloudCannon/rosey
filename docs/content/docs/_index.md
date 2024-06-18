@@ -93,6 +93,7 @@ _site/
 index.liquid
 +rosey/
 +>> base.json
++>> base.urls.json
 {{< /tree >}}
 
 This `base.json` file contains all text that needs to be translated. For the layout we tagged above, this will look like the following:

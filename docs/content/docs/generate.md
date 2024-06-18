@@ -26,6 +26,14 @@ The path to generate the Rosey base locale file to. Defaults to `rosey/base.json
 |-----------------|--------------|------------|
 | `--base <FILE>` | `ROSEY_BASE` | `base`     |
 
+### Base URLs
+
+The path to generate the Rosey base urls file to. Defaults to `rosey/base.urls.json`
+
+| CLI Flag             | ENV Variable      | Config Key  |
+|----------------------|-------------------|-------------|
+| `--base-urls <FILE>` | `ROSEY_BASE_URLS` | `base_urls` |
+
 ### Separator
 
 The separator to use between Rosey namespaces when generating keys. Defaults to `:`
