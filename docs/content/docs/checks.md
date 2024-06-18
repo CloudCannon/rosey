@@ -2,7 +2,7 @@
 title: "Rosey Checks File"
 nav_title: "Rosey Checks File"
 nav_section: Workflow
-weight: 6
+weight: 7
 ---
 
 The Rosey checks file highlights any discrepancies between your base translation file and your translated locale files, such as out of date or missing translations.
