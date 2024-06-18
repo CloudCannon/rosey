@@ -59,6 +59,15 @@ async fn main() {
                         )),
                 )
                 .arg(
+                    Arg::with_name("base-urls")
+                        .long("base-urls")
+                        .value_name("PATH")
+                        .help(&format!(
+                            "The file to generate the Rosey base URLs file to. \n ─ Defaults to '{}'",
+                            example_defaults.base_urls.display()
+                        )),
+                )
+                .arg(
                     Arg::with_name("separator")
                         .long("separator")
                         .value_name("CHAR")

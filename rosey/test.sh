@@ -2,7 +2,7 @@
 
 cargo build
 if [ -z "$1" ]; then
-    TEST_BINARY=./target/debug/rosey npx -y humane@latest
+    TEST_BINARY=./target/debug/rosey npx -y humane@v0.3.12
 else
-    TEST_BINARY=./target/debug/rosey npx -y humane@latest --name "$1"
+    TEST_BINARY=./target/debug/rosey npx -y humane@v0.3.12 --name "$1"
 fi
