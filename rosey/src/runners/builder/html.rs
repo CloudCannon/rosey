@@ -26,6 +26,8 @@ use html5ever::{
 };
 use kuchiki::{traits::TendrilSink, Attribute, ExpandedName, NodeRef};
 use sha2::{Digest, Sha256};
+use url::Url;
+use utils::filepath_to_output_url;
 
 use crate::RoseyTranslation;
 
@@ -55,46 +57,73 @@ impl RoseyBuilder {
 
         //If the file is already in a locale folder, then output it only for that locale
         if let Some(key) = self.find_locale_overwrite(file) {
+            let url_translations = self.url_translations.get(key);
+
             page.set_locale_key(key);
             page.rewrite_html();
-            page.rewrite_meta_tags(relative_path);
+            page.rewrite_meta_tags(relative_path, relative_path, &self.url_translations);
             page.rewrite_image_tags();
             page.rewrite_assets();
-            page.rewrite_anchors();
+            page.rewrite_anchors(url_translations);
 
             let output_path = dest_folder.join(relative_path);
             page.output_file(&output_path);
             return;
         }
 
-        page.rewrite_meta_tags(relative_path);
-        page.rewrite_anchors();
+        page.rewrite_meta_tags(relative_path, relative_path, &self.url_translations);
+
+        let default_url_translations = self.url_translations.get(&config.default_language);
+        page.rewrite_anchors(default_url_translations);
+
+        let translated_default_url = default_url_translations
+            .map(|t| t.get(&relative_path.to_string_lossy()))
+            .flatten()
+            .map(Into::into)
+            .unwrap_or_else(|| relative_path.to_owned());
 
         let output_path = dest_folder
             .join(&config.default_language)
-            .join(relative_path);
+            .join(translated_default_url);
         page.output_file(&output_path);
-        self.output_redirect_file(&config.default_language, relative_path);
+
+        self.output_redirect_file(
+            &config.default_language,
+            relative_path,
+            &self.url_translations,
+        );
 
         self.translations.keys().for_each(|key| {
+            let url_translations = self.url_translations.get(key);
+
+            let translated_url = url_translations
+                .map(|t| t.get(&relative_path.to_string_lossy()))
+                .flatten()
+                .map(Into::into)
+                .unwrap_or_else(|| relative_path.to_owned());
+
             page.set_locale_key(key);
             page.rewrite_html();
-            page.rewrite_meta_tags(relative_path);
+            page.rewrite_meta_tags(&translated_url, relative_path, &self.url_translations);
             page.rewrite_image_tags();
             page.rewrite_assets();
-            page.rewrite_anchors();
+            page.rewrite_anchors(url_translations);
 
-            let output_path = dest_folder.join(key).join(relative_path);
+            let output_path = dest_folder.join(key).join(translated_url);
             page.output_file(&output_path);
         });
     }
 
-    pub fn output_redirect_file(&self, locale: &str, relative_path: &Path) {
+    pub fn output_redirect_file(
+        &self,
+        locale: &str,
+        relative_path: &Path,
+        url_translations: &BTreeMap<String, RoseyTranslation>,
+    ) {
         let config = &self.options.config;
         let dest_folder = &config.dest;
         let dest_file = dest_folder.join(relative_path);
-        let path = relative_path.display().to_string();
-        let path = path.trim_end_matches("index.html").replace('\\', "/");
+        let path = filepath_to_output_url(&relative_path.to_string_lossy());
 
         if let Some(parent) = dest_file.parent() {
             create_dir_all(parent).unwrap();
@@ -113,9 +142,16 @@ impl RoseyBuilder {
             .chain(std::iter::once(&config.default_language))
             .filter(|key| *key != locale)
         {
+            let translated_path = url_translations
+                .get(key)
+                .map(|t| t.get(&relative_path.to_string_lossy()))
+                .flatten()
+                .map(|p| filepath_to_output_url(p))
+                .unwrap_or_else(|| path.clone());
+
             write!(
                 alternates,
-                r#"<link rel="alternate" href="/{key}/{path}" hreflang="{key}">"#
+                r#"<link rel="alternate" href="/{key}/{translated_path}" hreflang="{key}">"#
             )
             .expect("Failed to output redirect - alternate link");
         }
@@ -137,9 +173,19 @@ impl RoseyBuilder {
             }
         }
 
+        let translated_default_url = if let Some(translated_url) = url_translations
+            .get(locale)
+            .map(|t| t.get(&relative_path.to_string_lossy()))
+            .flatten()
+        {
+            filepath_to_output_url(translated_url)
+        } else {
+            path
+        };
+
         let mut output = output
             .replace("DEFAULT_LANGUAGE", locale)
-            .replace("SITE_PATH", &format!("/{path}"))
+            .replace("SITE_PATH", &format!("/{translated_default_url}"))
             .replace("ALTERNATES", &alternates);
 
         if let Ok(lookup) = serde_json::to_string(&lookup) {
@@ -240,12 +286,21 @@ impl<'a> RoseyPage<'a> {
     }
 
     pub fn process_anchors(&mut self) {
+        let base_url = Url::parse("https://example.com").unwrap();
+
         for element in self.dom.select("a[href]").unwrap() {
             let attributes = element.attributes.borrow();
             let src = attributes.get("href").unwrap();
-            let ext = src.rfind('.').map(|index| src.split_at(index + 1).1);
+            let Ok(parsed) = base_url.join(src) else {
+                continue;
+            };
+            let ext = parsed
+                .path()
+                .rfind('.')
+                .map(|index| parsed.path().split_at(index + 1).1);
 
             if src.starts_with('/')
+                && parsed.host_str() == base_url.host_str()
                 && matches!(ext, Some("html") | Some("htm") | None)
                 && !self
                     .translations
@@ -259,13 +314,41 @@ impl<'a> RoseyPage<'a> {
         }
     }
 
-    pub fn rewrite_anchors(&mut self) {
+    pub fn rewrite_anchors(&mut self, url_translations: Option<&RoseyTranslation>) {
         let locale_key = self.get_locale_key();
+        let base_url = Url::parse("https://example.com").unwrap();
         for (original, node) in &self.anchor_tags {
             let element = node.as_element().unwrap();
             let mut attributes = element.attributes.borrow_mut();
+
+            let Ok(mut parsed) = base_url.join(original) else {
+                continue;
+            };
+
+            if parsed.host_str() != base_url.host_str() {
+                continue;
+            }
+
+            if let Some(urlmap) = url_translations {
+                let rel_url = parsed.path().trim_start_matches("/");
+
+                let candidate_url = if rel_url.ends_with("/") {
+                    format!("{rel_url}index.html")
+                } else if rel_url.ends_with(".html") || rel_url.ends_with(".htm") {
+                    rel_url.to_string()
+                } else {
+                    format!("{rel_url}/index.html")
+                };
+
+                if let Some(modified_url) = urlmap.get(&candidate_url) {
+                    parsed.set_path(&filepath_to_output_url(&modified_url));
+                }
+            }
+
+            let output = parsed.as_str().trim_start_matches(base_url.as_str());
+
             attributes.remove("href");
-            attributes.insert("href", format!("/{locale_key}{original}"));
+            attributes.insert("href", format!("/{locale_key}/{output}"));
         }
     }
 
@@ -479,11 +562,15 @@ impl<'a> RoseyPage<'a> {
         }
     }
 
-    pub fn rewrite_meta_tags(&mut self, relative_path: &Path) {
+    pub fn rewrite_meta_tags(
+        &mut self,
+        relative_path: &Path,
+        original_relative_path: &Path,
+        url_translations: &BTreeMap<String, RoseyTranslation>,
+    ) {
         let locale_key = self.get_locale_key();
 
-        let path = relative_path.display().to_string();
-        let path = path.trim_end_matches("index.html");
+        let path = filepath_to_output_url(&relative_path.to_string_lossy());
 
         let html_tag = self.html_tag.as_ref().unwrap();
         let mut attributes = html_tag.as_element().unwrap().attributes.borrow_mut();
@@ -504,6 +591,15 @@ impl<'a> RoseyPage<'a> {
             .filter(|key| *key != locale_key)
             .enumerate()
         {
+            let translated_path = url_translations
+                .get(key)
+                .map(|t| t.get(&original_relative_path.to_string_lossy()))
+                .flatten()
+                .map(|p| filepath_to_output_url(p))
+                .unwrap_or_else(|| {
+                    filepath_to_output_url(&original_relative_path.to_string_lossy())
+                });
+
             let mut attributes = self.link_tags[i]
                 .as_element()
                 .unwrap()
@@ -517,9 +613,9 @@ impl<'a> RoseyPage<'a> {
             }
 
             if let Some(href) = attributes.get_mut("href") {
-                *href = format!("/{key}/{path}");
+                *href = format!("/{key}/{translated_path}");
             } else {
-                attributes.insert("href", format!("/{key}/{path}"));
+                attributes.insert("href", format!("/{key}/{translated_path}"));
             }
         }
     }

@@ -107,6 +107,7 @@ impl RoseyOptions {
                 separator: matches.get("separator", base.separator),
                 locales: working_dir.join(matches.get("locales", base.locales)),
                 base: working_dir.join(matches.get("base", base.base)),
+                base_urls: working_dir.join(matches.get("base-urls", base.base_urls)),
                 default_language: matches.get("default-language", base.default_language),
                 redirect_page: matches
                     .get_opt("redirect-page", base.redirect_page)
@@ -196,6 +197,19 @@ impl RoseyTranslation {
                     let page = pages.entry(page.replace('\\', "/")).or_insert(0);
                     *page += 1;
                 }
+            }
+        }
+    }
+
+    pub fn insert_uncounted(&mut self, key: String, value: String) {
+        match self {
+            RoseyTranslation::V1(keys) => {
+                keys.insert(key, value);
+            }
+            RoseyTranslation::V2(keys) => {
+                let translation = keys
+                    .entry(key)
+                    .or_insert_with(|| RoseyTranslationEntry::new(value));
             }
         }
     }
@@ -300,6 +314,10 @@ impl RoseyLocale {
 
     pub fn insert(&mut self, key: String, value: String, page: &str) {
         self.keys.insert(key, value, page);
+    }
+
+    pub fn insert_uncounted(&mut self, key: String, value: String) {
+        self.keys.insert_uncounted(key, value);
     }
 
     pub fn output(&mut self, version: u8) -> String {

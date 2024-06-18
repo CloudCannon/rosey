@@ -22,6 +22,7 @@ use crate::{RoseyOptions, RoseyTranslation};
 pub struct RoseyBuilder {
     options: RoseyOptions,
     pub translations: BTreeMap<String, RoseyTranslation>,
+    pub url_translations: BTreeMap<String, RoseyTranslation>,
 }
 
 impl From<RoseyOptions> for RoseyBuilder {
@@ -29,6 +30,7 @@ impl From<RoseyOptions> for RoseyBuilder {
         RoseyBuilder {
             options,
             translations: BTreeMap::default(),
+            url_translations: BTreeMap::default(),
         }
     }
 }
@@ -176,7 +178,12 @@ impl RoseyBuilder {
             let value = read_to_string(file.path()).expect("Failed to read locale file");
             let value = serde_json::from_str(&value);
             if let Ok(value) = value {
-                self.translations.insert(locale, value);
+                if locale.ends_with(".urls") {
+                    self.url_translations
+                        .insert(locale.trim_end_matches(".urls").to_string(), value);
+                } else {
+                    self.translations.insert(locale, value);
+                }
             }
         });
     }

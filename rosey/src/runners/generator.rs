@@ -13,6 +13,7 @@ use crate::{RoseyLocale, RoseyOptions};
 pub struct RoseyGenerator {
     pub options: RoseyOptions,
     pub locale: RoseyLocale,
+    pub urls_locale: RoseyLocale,
     pub current_file: String,
 }
 
@@ -22,6 +23,7 @@ impl From<RoseyOptions> for RoseyGenerator {
         RoseyGenerator {
             options,
             locale: RoseyLocale::new(version),
+            urls_locale: RoseyLocale::new(version),
             current_file: String::default(),
         }
     }
@@ -40,6 +42,7 @@ impl RoseyGenerator {
         walker.for_each(|file| self.process_file(file));
 
         self.output_locale();
+        self.output_urls();
     }
 
     fn output_locale(&mut self) {
@@ -56,6 +59,23 @@ impl RoseyGenerator {
             }
         } else {
             eprintln!("Failed to open: {locale_dest:?}")
+        }
+    }
+
+    fn output_urls(&mut self) {
+        let config = &self.options.config;
+        let urls_dest = &config.base_urls;
+        let urls_folder = urls_dest.parent().unwrap();
+        create_dir_all(urls_folder).unwrap();
+        let output = self.urls_locale.output(config.version);
+
+        if let Ok(file) = File::create(urls_dest) {
+            let mut writer = BufWriter::new(file);
+            if writer.write(output.as_bytes()).is_err() {
+                eprintln!("Failed to write: {urls_dest:?}")
+            }
+        } else {
+            eprintln!("Failed to open: {urls_dest:?}")
         }
     }
 

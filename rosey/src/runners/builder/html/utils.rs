@@ -11,6 +11,10 @@ use crate::RoseyTranslation;
 
 use super::get_translated_asset;
 
+pub fn filepath_to_output_url(p: &str) -> String {
+    p.trim_end_matches("index.html").replace('\\', "/")
+}
+
 pub struct TranslationRewriter<'a> {
     result: String,
     images_source: &'a Path,

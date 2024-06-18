@@ -12,6 +12,8 @@ impl RoseyGenerator {
         crate::inline_templates(&dom);
         self.current_file =
             String::from(file.strip_prefix(&config.source).unwrap().to_str().unwrap());
+        self.urls_locale
+            .insert_uncounted(self.current_file.clone(), self.current_file.clone());
         self.process_html_node(dom, None, None);
     }
 
