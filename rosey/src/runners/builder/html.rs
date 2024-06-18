@@ -78,8 +78,7 @@ impl RoseyBuilder {
         page.rewrite_anchors(default_url_translations);
 
         let translated_default_url = default_url_translations
-            .map(|t| t.get(&relative_path.to_slash_lossy()))
-            .flatten()
+            .and_then(|t| t.get(&relative_path.to_slash_lossy()))
             .map(Into::into)
             .unwrap_or_else(|| relative_path.to_owned());
 
@@ -98,8 +97,7 @@ impl RoseyBuilder {
             let url_translations = self.url_translations.get(key);
 
             let translated_url = url_translations
-                .map(|t| t.get(&relative_path.to_slash_lossy()))
-                .flatten()
+                .and_then(|t| t.get(&relative_path.to_slash_lossy()))
                 .map(Into::into)
                 .unwrap_or_else(|| relative_path.to_owned());
 
@@ -145,8 +143,7 @@ impl RoseyBuilder {
         {
             let translated_path = url_translations
                 .get(key)
-                .map(|t| t.get(&relative_path.to_slash_lossy()))
-                .flatten()
+                .and_then(|t| t.get(&relative_path.to_slash_lossy()))
                 .map(|p| filepath_to_output_url(p))
                 .unwrap_or_else(|| path.clone());
 
@@ -176,8 +173,7 @@ impl RoseyBuilder {
 
         let translated_default_url = if let Some(translated_url) = url_translations
             .get(locale)
-            .map(|t| t.get(&relative_path.to_slash_lossy()))
-            .flatten()
+            .and_then(|t| t.get(&relative_path.to_slash_lossy()))
         {
             filepath_to_output_url(translated_url)
         } else {
@@ -331,9 +327,9 @@ impl<'a> RoseyPage<'a> {
             }
 
             if let Some(urlmap) = url_translations {
-                let rel_url = parsed.path().trim_start_matches("/");
+                let rel_url = parsed.path().trim_start_matches('/');
 
-                let candidate_url = if rel_url.ends_with("/") {
+                let candidate_url = if rel_url.ends_with('/') {
                     format!("{rel_url}index.html")
                 } else if rel_url.ends_with(".html") || rel_url.ends_with(".htm") {
                     rel_url.to_string()
@@ -342,7 +338,7 @@ impl<'a> RoseyPage<'a> {
                 };
 
                 if let Some(modified_url) = urlmap.get(&candidate_url) {
-                    parsed.set_path(&filepath_to_output_url(&modified_url));
+                    parsed.set_path(&filepath_to_output_url(modified_url));
                 }
             }
 
@@ -591,8 +587,7 @@ impl<'a> RoseyPage<'a> {
         {
             let translated_path = url_translations
                 .get(key)
-                .map(|t| t.get(&original_relative_path.to_slash_lossy()))
-                .flatten()
+                .and_then(|t| t.get(&original_relative_path.to_slash_lossy()))
                 .map(|p| filepath_to_output_url(p))
                 .unwrap_or_else(|| {
                     filepath_to_output_url(&original_relative_path.to_slash_lossy())

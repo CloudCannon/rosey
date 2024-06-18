@@ -58,7 +58,6 @@ impl RoseyChecker {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.locales, &["**/*.json"])
             .build()
             .unwrap()
-            .into_iter()
             .filter_map(Result::ok);
 
         walker.for_each(|entry| self.process_file(entry));

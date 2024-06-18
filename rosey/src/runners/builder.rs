@@ -100,7 +100,6 @@ impl RoseyBuilder {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.source, &["**/*"])
             .build()
             .unwrap()
-            .into_iter()
             .filter_map(Result::ok)
             .filter(|file| {
                 file.file_type().is_file() && !re.is_match(&file.path().to_string_lossy())
@@ -133,7 +132,6 @@ impl RoseyBuilder {
             globwalk::GlobWalkerBuilder::from_patterns(source_folder, &["**/*.{html,json}"])
                 .build()
                 .unwrap()
-                .into_iter()
                 .filter_map(Result::ok)
                 .partition(|file| self.find_locale_overwrite(file.path()).is_none());
 
@@ -165,7 +163,6 @@ impl RoseyBuilder {
         let walker = globwalk::GlobWalkerBuilder::from_patterns(&config.locales, &["**/*.json"])
             .build()
             .unwrap()
-            .into_iter()
             .filter_map(Result::ok);
 
         walker.for_each(|file| {

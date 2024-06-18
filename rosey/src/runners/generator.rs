@@ -36,7 +36,6 @@ impl RoseyGenerator {
             globwalk::GlobWalkerBuilder::from_patterns(&config.source, &["**/*.{htm,html,json}"])
                 .build()
                 .unwrap()
-                .into_iter()
                 .filter_map(Result::ok);
 
         walker.for_each(|file| self.process_file(file));

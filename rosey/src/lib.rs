@@ -207,9 +207,7 @@ impl RoseyTranslation {
                 keys.insert(key, value);
             }
             RoseyTranslation::V2(keys) => {
-                let translation = keys
-                    .entry(key)
-                    .or_insert_with(|| RoseyTranslationEntry::new(value));
+                keys.insert(key, RoseyTranslationEntry::new(value));
             }
         }
     }

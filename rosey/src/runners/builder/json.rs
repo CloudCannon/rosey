@@ -103,7 +103,7 @@ impl RoseyBuilder {
                 let mut array_namespace = false;
                 let mut key = None;
 
-                match schema_array.get(0) {
+                match schema_array.first() {
                     Some(Value::String(schema_value)) => {
                         schema_value.trim().split('|').for_each(|part| {
                             if part == "rosey-array-ns" {
