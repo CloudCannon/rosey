@@ -62,7 +62,7 @@ impl RoseyBuilder {
 
             page.set_locale_key(key);
             page.rewrite_html();
-            page.rewrite_meta_tags(relative_path, relative_path, &self.url_translations);
+            page.rewrite_meta_tags(relative_path, &self.url_translations);
             page.rewrite_image_tags();
             page.rewrite_assets();
             page.rewrite_anchors(url_translations);
@@ -72,7 +72,7 @@ impl RoseyBuilder {
             return;
         }
 
-        page.rewrite_meta_tags(relative_path, relative_path, &self.url_translations);
+        page.rewrite_meta_tags(relative_path, &self.url_translations);
 
         let default_url_translations = self.url_translations.get(&config.default_language);
         page.rewrite_anchors(default_url_translations);
@@ -105,7 +105,7 @@ impl RoseyBuilder {
 
             page.set_locale_key(key);
             page.rewrite_html();
-            page.rewrite_meta_tags(&translated_url, relative_path, &self.url_translations);
+            page.rewrite_meta_tags(relative_path, &self.url_translations);
             page.rewrite_image_tags();
             page.rewrite_assets();
             page.rewrite_anchors(url_translations);
@@ -565,13 +565,10 @@ impl<'a> RoseyPage<'a> {
 
     pub fn rewrite_meta_tags(
         &mut self,
-        relative_path: &Path,
         original_relative_path: &Path,
         url_translations: &BTreeMap<String, RoseyTranslation>,
     ) {
         let locale_key = self.get_locale_key();
-
-        let path = filepath_to_output_url(&relative_path.to_slash_lossy());
 
         let html_tag = self.html_tag.as_ref().unwrap();
         let mut attributes = html_tag.as_element().unwrap().attributes.borrow_mut();
