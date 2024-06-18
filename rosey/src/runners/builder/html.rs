@@ -25,6 +25,7 @@ use html5ever::{
     QualName,
 };
 use kuchiki::{traits::TendrilSink, Attribute, ExpandedName, NodeRef};
+use path_slash::PathExt as _;
 use sha2::{Digest, Sha256};
 use url::Url;
 use utils::filepath_to_output_url;
@@ -77,7 +78,7 @@ impl RoseyBuilder {
         page.rewrite_anchors(default_url_translations);
 
         let translated_default_url = default_url_translations
-            .map(|t| t.get(&relative_path.to_string_lossy()))
+            .map(|t| t.get(&relative_path.to_slash_lossy()))
             .flatten()
             .map(Into::into)
             .unwrap_or_else(|| relative_path.to_owned());
@@ -97,7 +98,7 @@ impl RoseyBuilder {
             let url_translations = self.url_translations.get(key);
 
             let translated_url = url_translations
-                .map(|t| t.get(&relative_path.to_string_lossy()))
+                .map(|t| t.get(&relative_path.to_slash_lossy()))
                 .flatten()
                 .map(Into::into)
                 .unwrap_or_else(|| relative_path.to_owned());
@@ -123,7 +124,7 @@ impl RoseyBuilder {
         let config = &self.options.config;
         let dest_folder = &config.dest;
         let dest_file = dest_folder.join(relative_path);
-        let path = filepath_to_output_url(&relative_path.to_string_lossy());
+        let path = filepath_to_output_url(&relative_path.to_slash_lossy());
 
         if let Some(parent) = dest_file.parent() {
             create_dir_all(parent).unwrap();
@@ -144,7 +145,7 @@ impl RoseyBuilder {
         {
             let translated_path = url_translations
                 .get(key)
-                .map(|t| t.get(&relative_path.to_string_lossy()))
+                .map(|t| t.get(&relative_path.to_slash_lossy()))
                 .flatten()
                 .map(|p| filepath_to_output_url(p))
                 .unwrap_or_else(|| path.clone());
@@ -175,7 +176,7 @@ impl RoseyBuilder {
 
         let translated_default_url = if let Some(translated_url) = url_translations
             .get(locale)
-            .map(|t| t.get(&relative_path.to_string_lossy()))
+            .map(|t| t.get(&relative_path.to_slash_lossy()))
             .flatten()
         {
             filepath_to_output_url(translated_url)
@@ -570,7 +571,7 @@ impl<'a> RoseyPage<'a> {
     ) {
         let locale_key = self.get_locale_key();
 
-        let path = filepath_to_output_url(&relative_path.to_string_lossy());
+        let path = filepath_to_output_url(&relative_path.to_slash_lossy());
 
         let html_tag = self.html_tag.as_ref().unwrap();
         let mut attributes = html_tag.as_element().unwrap().attributes.borrow_mut();
@@ -593,11 +594,11 @@ impl<'a> RoseyPage<'a> {
         {
             let translated_path = url_translations
                 .get(key)
-                .map(|t| t.get(&original_relative_path.to_string_lossy()))
+                .map(|t| t.get(&original_relative_path.to_slash_lossy()))
                 .flatten()
                 .map(|p| filepath_to_output_url(p))
                 .unwrap_or_else(|| {
-                    filepath_to_output_url(&original_relative_path.to_string_lossy())
+                    filepath_to_output_url(&original_relative_path.to_slash_lossy())
                 });
 
             let mut attributes = self.link_tags[i]
