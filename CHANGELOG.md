@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.1.0 (June 18, 2024)
+
 * Adds the ability to translate page URLs
   * See [Docs > Translating URLs](https://rosey.app/docs/urls/)
 * Fixes an issue where some internal links with query strings or hash fragments would not be rewritten
