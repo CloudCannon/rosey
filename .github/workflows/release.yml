@@ -17,46 +17,46 @@ jobs:
     runs-on: ubuntu-20.04
     needs: publish-github-release
     steps:
-    - name: Clone
-      uses: actions/checkout@v3
-    - name: Cache
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          ~/.rustup
-          target
-          rosey/target
-        key: ${{ runner.os }}-stable
-    - name: Setup
-      run: |
-        rustup install stable
-    - name: Get Version
-      run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
-    - name: Prepare Git
-      run: |
-        git config user.email "github@github.com"
-        git config user.name "Github Actions"
-        git checkout -b main
-        # Use throw-away branch so we don't push the changes to origin
-        git checkout -b deploy_branch
-    - name: Prepare Crates
-      run: |
-        # Update cargo version, 
-        node ./.backstage/version.cjs
-        git add ./rosey/Cargo.toml
-        # Commit changes so cargo doesn't complain about dirty repo
-        git commit -m "Deploy changes."
+      - name: Clone
+        uses: actions/checkout@v3
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.rustup
+            target
+            rosey/target
+          key: ${{ runner.os }}-stable
+      - name: Setup
+        run: |
+          rustup install stable
+      - name: Get Version
+        run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+      - name: Prepare Git
+        run: |
+          git config user.email "github@github.com"
+          git config user.name "Github Actions"
+          git checkout -b main
+          # Use throw-away branch so we don't push the changes to origin
+          git checkout -b deploy_branch
+      - name: Prepare Crates
+        run: |
+          # Update cargo version,
+          node ./.backstage/version.cjs
+          git add ./rosey/Cargo.toml
+          # Commit changes so cargo doesn't complain about dirty repo
+          git commit -m "Deploy changes."
 
-    - name: Build
-      working-directory: ./rosey
-      run: cargo build --release --verbose
-    - name: Publish
-      working-directory: ./rosey
-      run: cargo publish --allow-dirty
-      env:
-        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Build
+        working-directory: ./rosey
+        run: cargo build --release --verbose
+      - name: Publish
+        working-directory: ./rosey
+        run: cargo publish --allow-dirty
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
   publish-npm-package:
     name: Publish NPM package
@@ -68,10 +68,11 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: release-checksums
           path: wrappers/node/checksums
+          pattern: release-checksums-*
+          merge-multiple: true
       - name: Prepare package
         run: |
           RELEASE_VERSION=${GITHUB_REF#refs/tags/}
@@ -111,10 +112,11 @@ jobs:
       - name: Get Tag
         run: echo GIT_TAG="$(node ./.backstage/get_tag.cjs)" >> $GITHUB_ENV
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: release
           path: build-artifacts
+          pattern: release-*
+          merge-multiple: true
 
       - name: Build CHANGELOG
         if: env.GIT_TAG == 'latest'
@@ -252,12 +254,12 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-            toolchain: ${{ matrix.rust }}
-            target: ${{ matrix.target }}
-            override: true
-            default: true
-            components: rustfmt, clippy
-            
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.target }}
+          override: true
+          default: true
+          components: rustfmt, clippy
+
       - name: Install humane
         uses: supplypike/setup-bin@v1
         with:
@@ -274,7 +276,7 @@ jobs:
           git checkout -b deploy_branch
       - name: Prepare Crates
         run: |
-          # Update cargo version, 
+          # Update cargo version,
           node ./.backstage/version.cjs
           git add ./rosey/Cargo.toml
           # Commit changes so cargo doesn't complain about dirty repo
@@ -290,60 +292,49 @@ jobs:
 
       - name: Package Artifacts
         run: |
-          src=$(pwd)
-          stage=
-          case $RUNNER_OS in
-              Windows)
-                  stage=$(mktemp -d)
-                  ;;
-              Linux)
-                  stage=$(mktemp -d)
-                  ;;
-              macOS)
-                  stage=$(mktemp -d -t tmp)
-                  ;;
-          esac
-          cp rosey/target/${{ matrix.target }}/release/rosey $stage/
-          cd $stage
           RELEASE_VERSION=${GITHUB_REF#refs/tags/}
-
           EXEC_NAME="rosey"
-          ASSET_NAME="$EXEC_NAME-$RELEASE_VERSION-${{ matrix.target }}.tar.gz"
-          ASSET_PATH="$src/$ASSET_NAME"
-
+          ASSET_PATH="$EXEC_NAME-$RELEASE_VERSION-${{ matrix.target }}.tar.gz"
           CHECKSUM_PATH="$ASSET_PATH.sha256"
 
-          tar czf $ASSET_PATH $EXEC_NAME
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            EXEC_NAME="rosey.exe"
+          fi
 
-          cd $src
+          tar czf $ASSET_PATH -C rosey/target/${{ matrix.target }}/release $EXEC_NAME
+
+          if command -v gtar &> /dev/null; then
+            echo "Using gtar"
+            gtar czf $ASSET_PATH -C rosey/target/${{ matrix.target }}/release $EXEC_NAME
+          else
+            echo "Using system tar"
+            tar czf $ASSET_PATH -C rosey/target/${{ matrix.target }}/release $EXEC_NAME
+          fi
+
           case $RUNNER_OS in
               Windows)
-                  sha256sum $ASSET_NAME > $CHECKSUM_PATH
+                  sha256sum $ASSET_PATH > $CHECKSUM_PATH
                   ;;
               Linux)
-                  sha256sum $ASSET_NAME > $CHECKSUM_PATH
+                  sha256sum $ASSET_PATH > $CHECKSUM_PATH
                   ;;
               macOS)
-                  shasum -a 256 $ASSET_NAME > $CHECKSUM_PATH
+                  shasum -a 256 $ASSET_PATH > $CHECKSUM_PATH
                   ;;
           esac
-          if [ "$RUNNER_OS" == "Windows" ]; then
-              ASSET_PATH=$(echo "$ASSET_PATH" | sed -e 's/^\///' -e 's/\//\\/g' -e 's/^./\0:/')
-              CHECKSUM_PATH=$(echo "$CHECKSUM_PATH" | sed -e 's/^\///' -e 's/\//\\/g' -e 's/^./\0:/')
-          fi
 
           echo "ASSET_PATH=$ASSET_PATH" >> $GITHUB_ENV
           echo "CHECKSUM_PATH=$CHECKSUM_PATH" >> $GITHUB_ENV
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: release
+          name: release-${{ matrix.target }}
           path: |
             ${{ env.ASSET_PATH }}
             ${{ env.CHECKSUM_PATH }}
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: release-checksums
+          name: release-checksums-${{ matrix.target }}
           path: |
             ${{ env.CHECKSUM_PATH }}

@@ -1,6 +1,6 @@
 # Changelog
 
-<!-- 
+<!--
     Add changes to the Unreleased section during development.
     Do not change this header — the GitHub action that releases
     this project will edit this file and add the version header for you.
@@ -8,6 +8,10 @@
 -->
 
 ## Unreleased
+
+## v2.1.1 (August 13, 2024)
+
+* Fixes the Windows release of Rosey via npm
 
 ## v2.1.0 (June 18, 2024)
 
@@ -17,7 +21,7 @@
 
 ## v2.0.5 (March 19, 2024)
 
-* Fixes an issue where `<template>` elements were being ignored by generate and build. 
+* Fixes an issue where `<template>` elements were being ignored by generate and build.
 * Fixes an issue where `rosey check` would error when run without a source
 
 ## v2.0.4 (March 16, 2023)
