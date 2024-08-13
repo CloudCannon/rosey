@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.1.1 (August 13, 2024)
+
 * Fixes the Windows release of Rosey via npm
 
 ## v2.1.0 (June 18, 2024)
