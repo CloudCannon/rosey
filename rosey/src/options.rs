@@ -22,6 +22,7 @@ pub struct RoseyPublicConfig {
     pub images_source: Option<PathBuf>,
     pub default_language: String,
     pub redirect_page: Option<PathBuf>,
+    pub default_language_at_root: bool,
     pub wrap: Option<Vec<String>>,
     pub wrap_class: Option<String>,
     pub verbose: bool,
@@ -43,6 +44,7 @@ impl Default for RoseyPublicConfig {
             images_source: None,
             default_language: "en".into(),
             redirect_page: None,
+            default_language_at_root: false,
             wrap: None,
             wrap_class: None,
             verbose: false,
@@ -73,6 +75,7 @@ impl Display for RoseyPublicConfig {
         writeln!(f, "   - Base locale file:    {}", self.base.display())?;
         writeln!(f, "   - Base urls file:      {}", self.base_urls.display())?;
         writeln!(f, "   - Locales directory:   {}", self.locales.display())?;
+
         match &self.images_source {
             Some(s) => writeln!(f, "   - Images source:       {}", s.display())?,
             None => writeln!(
@@ -80,12 +83,24 @@ impl Display for RoseyPublicConfig {
                 "   - Images source:       * unset, using source directory *"
             )?,
         }
-        match &self.redirect_page {
-            Some(s) => writeln!(f, "   - Redirect page:       {}", s.display())?,
-            None => writeln!(
+
+        if self.default_language_at_root {
+            writeln!(f, "   - Root URLs:           Default language")?;
+
+            writeln!(
                 f,
-                "   - Redirect page:       * unset, using default redirect template *"
-            )?,
+                "   - Redirect page:       * ignored, root urls are default language *"
+            )?
+        } else {
+            writeln!(f, "   - Root URLs:           Generated redirect page")?;
+
+            match &self.redirect_page {
+                Some(s) => writeln!(f, "   - Redirect page:       {}", s.display())?,
+                None => writeln!(
+                    f,
+                    "   - Redirect page:       * unset, using default redirect template *"
+                )?,
+            }
         }
 
         writeln!(f, "  Options:")?;

@@ -50,6 +50,7 @@ impl RoseyBuilder {
             &config.tag,
             images_source.to_owned(),
             &config.default_language,
+            config.default_language_at_root,
             &self.translations,
             &config.wrap,
             &config.wrap_class,
@@ -82,16 +83,21 @@ impl RoseyBuilder {
             .map(Into::into)
             .unwrap_or_else(|| relative_path.to_owned());
 
-        let output_path = dest_folder
-            .join(&config.default_language)
-            .join(translated_default_url);
-        page.output_file(&output_path);
+        if config.default_language_at_root {
+            let output_path = dest_folder.join(translated_default_url);
+            page.output_file(&output_path);
+        } else {
+            let output_path = dest_folder
+                .join(&config.default_language)
+                .join(translated_default_url);
+            page.output_file(&output_path);
 
-        self.output_redirect_file(
-            &config.default_language,
-            relative_path,
-            &self.url_translations,
-        );
+            self.output_redirect_file(
+                &config.default_language,
+                relative_path,
+                &self.url_translations,
+            );
+        }
 
         self.translations.keys().for_each(|key| {
             let url_translations = self.url_translations.get(key);
@@ -216,6 +222,7 @@ struct RoseyPage<'a> {
     assets: Vec<(String, String, NodeRef)>,
     locale_key: Option<&'a str>,
     should_wrap: bool,
+    default_language_at_root: bool,
     wrap: &'a Option<Vec<String>>,
     wrap_class: &'a Option<String>,
     pub tag: String,
@@ -232,6 +239,7 @@ impl<'a> RoseyPage<'a> {
         tag: &str,
         images_source: PathBuf,
         default_language: &str,
+        default_language_at_root: bool,
         translations: &'a BTreeMap<String, RoseyTranslation>,
         wrap: &'a Option<Vec<String>>,
         wrap_class: &'a Option<String>,
@@ -255,6 +263,7 @@ impl<'a> RoseyPage<'a> {
             translations,
             locale_key: None,
             should_wrap: false,
+            default_language_at_root,
             wrap,
             wrap_class,
         }
@@ -344,8 +353,15 @@ impl<'a> RoseyPage<'a> {
 
             let output = parsed.as_str().trim_start_matches(base_url.as_str());
 
+            let output_href =
+                if locale_key == self.default_language && self.default_language_at_root {
+                    format!("/{output}")
+                } else {
+                    format!("/{locale_key}/{output}")
+                };
+
             attributes.remove("href");
-            attributes.insert("href", format!("/{locale_key}/{output}"));
+            attributes.insert("href", output_href);
         }
     }
 
@@ -605,10 +621,16 @@ impl<'a> RoseyPage<'a> {
                 attributes.insert("hreflang", String::from(key));
             }
 
-            if let Some(href) = attributes.get_mut("href") {
-                *href = format!("/{key}/{translated_path}");
+            let output_href = if key == self.default_language && self.default_language_at_root {
+                format!("/{translated_path}")
             } else {
-                attributes.insert("href", format!("/{key}/{translated_path}"));
+                format!("/{key}/{translated_path}")
+            };
+
+            if let Some(href) = attributes.get_mut("href") {
+                *href = output_href;
+            } else {
+                attributes.insert("href", output_href);
             }
         }
     }

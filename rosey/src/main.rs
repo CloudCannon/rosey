@@ -152,6 +152,13 @@ async fn main() {
                         .help("The source folder that Rosey should look for translated images within. \n ─ Defaults to the source folder"),
                 )
                 .arg(
+                    Arg::with_name("default-language-at-root")
+                        .long("default-language-at-root")
+                        .takes_value(false)
+                        .conflicts_with("redirect-page")
+                        .help("Configures Rosey to leave all input URLs in-place for the default language, and omit generating redirect files"),
+                )
+                .arg(
                     Arg::with_name("redirect-page")
                         .long("redirect-page")
                         .value_name("PATH")

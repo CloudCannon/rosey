@@ -76,7 +76,9 @@ impl RoseyOptions {
             std::process::exit(1);
         });
 
-        if !matches!(subcommand, RoseyCommand::Check) && original_source.to_string_lossy().is_empty() {
+        if !matches!(subcommand, RoseyCommand::Check)
+            && original_source.to_string_lossy().is_empty()
+        {
             eprintln!(
                 "Rosey requires a source directory to process. Provide either: \n\
                        • A `--source <PATH>` CLI flag \n\
@@ -109,6 +111,7 @@ impl RoseyOptions {
                 base: working_dir.join(matches.get("base", base.base)),
                 base_urls: working_dir.join(matches.get("base-urls", base.base_urls)),
                 default_language: matches.get("default-language", base.default_language),
+                default_language_at_root: matches.is_present("default-language-at-root") || base.default_language_at_root,
                 redirect_page: matches
                     .get_opt("redirect-page", base.redirect_page)
                     .map(|p| working_dir.join(p)),
@@ -117,8 +120,8 @@ impl RoseyOptions {
                     .get_opt("images-source", base.images_source)
                     .map(|p| working_dir.join(p)),
                 wrap: match matches.values_of("wrap") {
-                    Some(langs) => Some(langs.map(|l|{ 
-                        
+                    Some(langs) => Some(langs.map(|l|{
+
                         if !SUPPORTED_WRAP_LANGS.iter().any(|lang| l.starts_with(lang)) {
                             eprintln!("Cannot wrap text for language '{l}'. Languages with supported text wrapping: {SUPPORTED_WRAP_LANGS:?}");
                             std::process::exit(1);

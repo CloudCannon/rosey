@@ -50,6 +50,21 @@ The default language for the site (i.e. the language of 'source.json'). Defaults
 |-------------------------------|--------------------------|--------------------|
 | `--default-language <STRING>` | `ROSEY_DEFAULT_LANGUAGE` | `default_language` |
 
+### Default language at root
+
+Configures Rosey to retain input URLs for the default language.
+
+By default, Rosey will place the default language under a language code, e.g. `/en/index.html`,
+and will generate a redirect file at `/index.html`.
+
+By setting this flag, Rosey will output the default language at the root path, e.g. `/index.html`.
+
+By setting this flag, Rosey will not generate any redirect pages.
+
+| CLI Flag                      | ENV Variable                     | Config Key                 |
+|-------------------------------|----------------------------------|----------------------------|
+| `--default-language-at-root`  | `ROSEY_DEFAULT_LANGUAGE_AT_ROOT` | `default_language_at_root` |
+
 ### Exclusions
 
 A regular expression used to determine which files not to copy as assets. Defaults to `\.(html?|json)$`
@@ -69,6 +84,8 @@ The source folder that Rosey should look for translated images within. If omitte
 ### Redirect page
 
 Path to a custom redirect template that Rosey should use for the base URL.
+
+This option is ignored if you have set the "Default language at root" flag.
 
 | CLI Flag                 | ENV Variable          | Config Key      |
 |--------------------------|-----------------------|-----------------|
