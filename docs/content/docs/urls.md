@@ -7,6 +7,9 @@ weight: 6
 
 Rosey URL locale files can contain translated URLs for your website in a given language.
 
+If you just want to move one language to the root of the site, e.g. serve `/en/index.html` at `index.html` instead, see the
+[Default language at root](/docs/build/#default-language-at-root) option for Rosey's build step.
+
 ## Creating translated URL locale files
 
 Creating URL locale files is not a step performed by Rosey. This part of the translation workflow is left open ended, usually integrating into an existing translation workflow for a company, or being programmatically created by transforming the input URLs.
@@ -51,7 +54,7 @@ The `rosey/locales/ja-jp.urls.json` locale file should match the structure:
 }
 ```
 
-Each of these keys is an object with `original` and `value` strings. The `value` string should contain the translated destination file, and will be used by Rosey when building your final multilingual site. 
+Each of these keys is an object with `original` and `value` strings. The `value` string should contain the translated destination file, and will be used by Rosey when building your final multilingual site.
 
 The output should always include the `.html` extension. Rosey will remove any trailing `index.html` filename where able.
 

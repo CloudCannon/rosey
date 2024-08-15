@@ -9,6 +9,11 @@
 
 ## Unreleased
 
+## v2.2.0 (August 15, 2024)
+
+* Adds the ability to build the default language to the root path, rather than placing it under a language code.
+  * See [Docs > Build > Default language at root](https://rosey.app/docs/build/#default-language-at-root) for more information.
+
 ## v2.1.1 (August 13, 2024)
 
 * Fixes the Windows release of Rosey via npm
