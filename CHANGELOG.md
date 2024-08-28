@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.2.1 (August 28, 2024)
+
 * Ensures the JSON output of the check command is sorted to avoid changes in git between runs
 
 ## v2.2.0 (August 15, 2024)
