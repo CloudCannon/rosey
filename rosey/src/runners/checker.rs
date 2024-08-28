@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::{BTreeMap, HashMap},
+    collections::BTreeMap,
     fs::{create_dir_all, read_to_string, File},
     io::{BufWriter, Write},
     str::FromStr,
@@ -10,7 +10,7 @@ use globwalk::DirEntry;
 
 use crate::{RoseyLocale, RoseyOptions, RoseyTranslation};
 
-#[derive(Serialize, Deserialize, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "camelCase")]
 enum RoseyCheckStates {
     Current,
@@ -25,8 +25,8 @@ struct RoseyCheck {
     current: bool,
     base_total: i32,
     total: i32,
-    states: HashMap<RoseyCheckStates, i32>,
-    keys: HashMap<String, RoseyCheckStates>,
+    states: BTreeMap<RoseyCheckStates, i32>,
+    keys: BTreeMap<String, RoseyCheckStates>,
 }
 
 pub struct RoseyChecker {
