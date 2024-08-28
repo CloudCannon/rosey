@@ -29,9 +29,15 @@ jobs:
             target
             rosey/target
           key: ${{ runner.os }}-stable
-      - name: Setup
-        run: |
-          rustup install stable
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          default: true
+          components: rustfmt, clippy
+
       - name: Get Version
         run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
       - name: Prepare Git
@@ -51,7 +57,7 @@ jobs:
 
       - name: Build
         working-directory: ./rosey
-        run: cargo build --release --verbose
+        run: RELEASE_VERSION=${GITHUB_REF#refs/tags/} cargo build --release --verbose
       - name: Publish
         working-directory: ./rosey
         run: cargo publish --allow-dirty

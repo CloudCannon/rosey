@@ -9,6 +9,10 @@
 
 ## Unreleased
 
+## v2.2.1 (August 28, 2024)
+
+* Ensures the JSON output of the check command is sorted to avoid changes in git between runs
+
 ## v2.2.0 (August 15, 2024)
 
 * Adds the ability to build the default language to the root path, rather than placing it under a language code.
