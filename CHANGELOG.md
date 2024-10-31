@@ -9,6 +9,11 @@
 
 ## Unreleased
 
+## v2.3.0 (October 31, 2024)
+
+* Added `data-rosey-ignore` attribute to ignore hrefs when rewriting pages.
+  * See [Docs > URLS](https://rosey.app/docs/urls/) for more information.
+
 ## v2.2.1 (August 28, 2024)
 
 * Ensures the JSON output of the check command is sorted to avoid changes in git between runs
