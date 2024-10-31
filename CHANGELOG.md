@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.3.0 (October 31, 2024)
+
 * Added `data-rosey-ignore` attribute to ignore hrefs when rewriting pages.
   * See [Docs > URLS](https://rosey.app/docs/urls/) for more information.
 
