@@ -1,14 +1,27 @@
 ---
-title: "Translated URLs"
-nav_title: "Translated URLs"
+title: "Managing URLs"
+nav_title: "Managing URLs"
 nav_section: Workflow
 weight: 6
 ---
 
-Rosey URL locale files can contain translated URLs for your website in a given language.
+Rosey provides some options for managing URLs.
+Rosey can ignore some URLs altogether, and Rosey URL locale files can contain translated URLs for your website in a given language.
 
 If you just want to move one language to the root of the site, e.g. serve `/en/index.html` at `index.html` instead, see the
 [Default language at root](/docs/build/#default-language-at-root) option for Rosey's build step.
+
+## Telling Rosey to ignore URLs
+
+If you have a URL on a page that you do not want Rosey to rewrite, you can add the `data-rosey-ignore` attribute to it.
+
+```html
+<a href="/posts/"> Posts </a>
+
+<a data-rosey-ignore href="/contact/"> Contact </a>
+```
+
+When built to a page in an `fr` locale, the first tag would link to `/fr/posts/`, while the tag with `data-rosey-ignore` would remain pointing at `/contact/`.
 
 ## Creating translated URL locale files
 

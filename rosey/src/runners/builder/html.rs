@@ -296,6 +296,9 @@ impl<'a> RoseyPage<'a> {
 
         for element in self.dom.select("a[href]").unwrap() {
             let attributes = element.attributes.borrow();
+            if attributes.contains(format!("{}-ignore", self.tag)) {
+                continue;
+            }
             let src = attributes.get("href").unwrap();
             let Ok(parsed) = base_url.join(src) else {
                 continue;
