@@ -74,3 +74,29 @@ Feature: Rosey Links
     Then I should see a selector 'h2>a' in "dist/translated_site/blank/index.html" with the attributes:
       | href      | /blank/hello |
       | innerText | Hello        |
+
+
+  Scenario: Rosey can ignore links
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <h1><a data-rosey-ignore href="/">Home</a></h1>
+      <h2><a data-rosey-ignore href="/posts/hello-world">Hello World</a></h2>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/blank.json" file with the content:
+      """
+      {}
+      """
+    When I run my program with the flags:
+      | build |
+    Then I should see a selector 'h1>a' in "dist/translated_site/blank/index.html" with the attributes:
+      | href              | /    |
+      | data-rosey-ignore |      |
+      | innerText         | Home |
+    Then I should see a selector 'h2>a' in "dist/translated_site/blank/index.html" with the attributes:
+      | href              | /posts/hello-world |
+      | data-rosey-ignore |                    |
+      | innerText         | Hello World        |
