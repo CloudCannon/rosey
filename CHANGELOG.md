@@ -9,6 +9,10 @@
 
 ## Unreleased
 
+## v2.3.1 (December 2, 2024)
+
+* Fix issue where Rosey would unescape characters that were entity encoded in the source HTML.
+
 ## v2.3.0 (October 31, 2024)
 
 * Added `data-rosey-ignore` attribute to ignore hrefs when rewriting pages.

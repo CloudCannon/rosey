@@ -246,6 +246,7 @@ impl<'a> RoseyPage<'a> {
     ) -> Self {
         let dom = kuchiki::parse_html().one(content);
         crate::inline_templates(&dom);
+        crate::escape_source_text(&dom);
 
         RoseyPage {
             dom,
