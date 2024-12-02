@@ -342,3 +342,14 @@ pub fn inline_templates(dom: &kuchiki::NodeRef) {
         }
     })
 }
+
+pub fn escape_source_text(dom: &kuchiki::NodeRef) {
+    dom.children().for_each(|node| {
+        if let Some(text_node) = node.as_text() {
+            text_node.replace_with(|old| old.replace('<', "&lt;").replace('>', "&gt;"));
+        } else {
+            node.descendants()
+                .for_each(|node| escape_source_text(&node));
+        }
+    });
+}
