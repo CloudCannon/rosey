@@ -48,6 +48,7 @@ impl RoseyBuilder {
             content,
             &config.separator,
             &config.tag,
+            &config.base_url,
             images_source.to_owned(),
             &config.default_language,
             config.default_language_at_root,
@@ -226,6 +227,7 @@ struct RoseyPage<'a> {
     wrap: &'a Option<Vec<String>>,
     wrap_class: &'a Option<String>,
     pub tag: String,
+    pub base_url: String,
     pub separator: String,
     pub images_source: PathBuf,
     pub default_language: String,
@@ -237,6 +239,7 @@ impl<'a> RoseyPage<'a> {
         content: String,
         separator: &str,
         tag: &str,
+        base_url: &str,
         images_source: PathBuf,
         default_language: &str,
         default_language_at_root: bool,
@@ -257,6 +260,7 @@ impl<'a> RoseyPage<'a> {
             assets: Vec::new(),
             separator: separator.to_string(),
             tag: tag.to_string(),
+            base_url: base_url.to_string(),
             html_tag: None,
             meta_tag: None,
             images_source,
@@ -626,9 +630,9 @@ impl<'a> RoseyPage<'a> {
             }
 
             let output_href = if key == self.default_language && self.default_language_at_root {
-                format!("/{translated_path}")
+                format!("{0}/{translated_path}", self.base_url)
             } else {
-                format!("/{key}/{translated_path}")
+                format!("{0}/{key}/{translated_path}", self.base_url)
             };
 
             if let Some(href) = attributes.get_mut("href") {
