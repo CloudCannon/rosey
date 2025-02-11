@@ -53,8 +53,13 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.rust }}
 
       - name: Install Rust
-        run: |
-          rustup install ${{ matrix.rust }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: beta
+          target: ${{ matrix.target }}
+          override: true
+          default: true
+          components: rustfmt, clippy, rust-src
 
       - name: Install humane
         uses: supplypike/setup-bin@v1
