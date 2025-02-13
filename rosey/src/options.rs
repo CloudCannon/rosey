@@ -15,6 +15,7 @@ pub struct RoseyPublicConfig {
     pub tag: String,
     pub separator: String,
     pub base: PathBuf,
+    pub base_url: String,
     pub base_urls: PathBuf,
     pub locales: PathBuf,
     pub languages: Option<Vec<String>>,
@@ -37,6 +38,7 @@ impl Default for RoseyPublicConfig {
             tag: "data-rosey".into(),
             separator: ":".into(),
             base: "rosey/base.json".into(),
+            base_url: "".into(),
             base_urls: "rosey/base.urls.json".into(),
             locales: "rosey/locales".into(),
             languages: None,
@@ -109,6 +111,7 @@ impl Display for RoseyPublicConfig {
         writeln!(f, "   - Tag:                 {}", self.tag)?;
         writeln!(f, "   - Separator:           {}", self.separator)?;
         writeln!(f, "   - Exclusions:          {}", self.exclusions)?;
+        writeln!(f, "   - Base url:            {}", self.base_url)?;
         match &self.languages {
             Some(langs) => writeln!(f, "   - Languages:           {}", langs.join(", "))?,
             None => writeln!(

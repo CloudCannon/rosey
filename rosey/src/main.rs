@@ -152,6 +152,13 @@ async fn main() {
                         .help("The source folder that Rosey should look for translated images within. \n ─ Defaults to the source folder"),
                 )
                 .arg(
+                    Arg::with_name("base-url")
+                        .long("base-url")
+                        .value_name("URL")
+                        .takes_value(true)
+                        .help("The base URL for the site. Used to prefix alternate links. \n ─ Defaults to an empty string"),
+                )
+                .arg(
                     Arg::with_name("default-language-at-root")
                         .long("default-language-at-root")
                         .takes_value(false)
