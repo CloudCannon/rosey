@@ -65,6 +65,14 @@ By setting this flag, Rosey will not generate any redirect pages.
 |-------------------------------|----------------------------------|----------------------------|
 | `--default-language-at-root`  | `ROSEY_DEFAULT_LANGUAGE_AT_ROOT` | `default_language_at_root` |
 
+### Base URL
+
+The base URL for the site. Used to prefix alternate links. Defaults to an empty string, making alternative links absolute rather than fully-qualified.
+
+| CLI Flag           | ENV Variable     | Config Key  |
+|--------------------|------------------|-------------|
+| `--base-url <URL>` | `ROSEY_BASE_URL` | `base_url`  |
+
 ### Exclusions
 
 A regular expression used to determine which files not to copy as assets. Defaults to `\.(html?|json)$`
