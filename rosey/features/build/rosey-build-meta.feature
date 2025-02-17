@@ -72,6 +72,37 @@ Feature: Rosey Build Meta
       | href     | /nada/    |
       | hreflang | nada      |
 
+  Scenario: Rosey adds alternates to meta with base url
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      </html>
+      """
+    And I have a "dist/site/about.html" file with the content:
+      """
+      <html>
+      </html>
+      """
+    And I have a "rosey/locales/blank.json" file with the content:
+      """
+      {}
+      """
+    And I have a "rosey/locales/nada.json" file with the content:
+      """
+      {}
+      """
+    When I run my program with the flags:
+      | build                          |
+      | --base-url "https://rosey.app" |
+    Then I should see a selector 'link' in "dist/translated_site/en/index.html" with the attributes:
+      | rel      | alternate                |
+      | href     | https://rosey.app/blank/ |
+      | hreflang | blank                    |
+    Then I should see a selector 'link' in "dist/translated_site/en/index.html" with the attributes:
+      | rel      | alternate               |
+      | href     | https://rosey.app/nada/ |
+      | hreflang | nada                    |
+
   Scenario: Rosey adds content-language to meta
     Given I have a "dist/site/index.html" file with the content:
       """

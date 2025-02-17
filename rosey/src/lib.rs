@@ -109,6 +109,7 @@ impl RoseyOptions {
                 separator: matches.get("separator", base.separator),
                 locales: working_dir.join(matches.get("locales", base.locales)),
                 base: working_dir.join(matches.get("base", base.base)),
+                base_url: matches.get("base-url", base.base_url),
                 base_urls: working_dir.join(matches.get("base-urls", base.base_urls)),
                 default_language: matches.get("default-language", base.default_language),
                 default_language_at_root: matches.is_present("default-language-at-root") || base.default_language_at_root,
