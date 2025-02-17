@@ -9,6 +9,9 @@
 
 ## Unreleased
 
+* Added configuration for Base URL to prefix alternate links.
+  * See [Docs > Build > Base URL](https://rosey.app/docs/build/#base-url) for more information.
+
 ## v2.3.1 (December 2, 2024)
 
 * Fix issue where Rosey would unescape characters that were entity encoded in the source HTML.
