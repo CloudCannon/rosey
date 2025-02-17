@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.3.2 (February 17, 2025)
+
 * Added configuration for Base URL to prefix alternate links.
   * See [Docs > Build > Base URL](https://rosey.app/docs/build/#base-url) for more information.
 
