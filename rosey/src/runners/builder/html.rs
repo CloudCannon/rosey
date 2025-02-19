@@ -564,6 +564,22 @@ impl<'a> RoseyPage<'a> {
         };
         meta_node.insert_after(NodeRef::new_text(&indentation));
 
+        let mut attributes = BTreeMap::new();
+        attributes.insert(
+            ExpandedName::new("", "rel"),
+            Attribute {
+                prefix: None,
+                value: String::from("alternate"),
+            },
+        );
+        let locale_key_node = NodeRef::new_element(
+            QualName::new(None, ns!(html), local_name!("link")),
+            attributes,
+        );
+        self.link_tags.push(locale_key_node.clone());
+        meta_node.insert_after(locale_key_node.clone());
+        meta_node.insert_after(NodeRef::new_text(&indentation));
+
         for _i in 0..self.translations.len() {
             let mut attributes = BTreeMap::new();
             attributes.insert(
@@ -606,7 +622,6 @@ impl<'a> RoseyPage<'a> {
             .iter()
             .map(|(key, _)| key.as_str())
             .chain(std::iter::once(&self.default_language[..]))
-            .filter(|key| *key != locale_key)
             .enumerate()
         {
             let translated_path = url_translations

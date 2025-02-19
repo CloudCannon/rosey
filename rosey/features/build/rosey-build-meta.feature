@@ -39,6 +39,10 @@ Feature: Rosey Build Meta
       | hreflang | nada             |
 
     Then I should see a selector 'link' in "dist/translated_site/en/about.html" with the attributes:
+      | rel      | alternate      |
+      | href     | /en/about.html |
+      | hreflang | en             |
+    Then I should see a selector 'link' in "dist/translated_site/en/about.html" with the attributes:
       | rel      | alternate         |
       | href     | /blank/about.html |
       | hreflang | blank             |
@@ -46,6 +50,10 @@ Feature: Rosey Build Meta
       | rel      | alternate        |
       | href     | /nada/about.html |
       | hreflang | nada             |
+    Then I should see a selector 'link' in "dist/translated_site/blank/about.html" with the attributes:
+      | rel      | alternate         |
+      | href     | /blank/about.html |
+      | hreflang | blank             |
     Then I should see a selector 'link' in "dist/translated_site/blank/about.html" with the attributes:
       | rel      | alternate      |
       | href     | /en/about.html |
@@ -57,12 +65,20 @@ Feature: Rosey Build Meta
 
     Then I should see a selector 'link' in "dist/translated_site/en/index.html" with the attributes:
       | rel      | alternate |
+      | href     | /en/   |
+      | hreflang | en     |
+    Then I should see a selector 'link' in "dist/translated_site/en/index.html" with the attributes:
+      | rel      | alternate |
       | href     | /blank/   |
       | hreflang | blank     |
     Then I should see a selector 'link' in "dist/translated_site/en/index.html" with the attributes:
       | rel      | alternate |
       | href     | /nada/    |
       | hreflang | nada      |
+    Then I should see a selector 'link' in "dist/translated_site/blank/index.html" with the attributes:
+      | rel      | alternate |
+      | href     | /blank/   |
+      | hreflang | blank     |
     Then I should see a selector 'link' in "dist/translated_site/blank/index.html" with the attributes:
       | rel      | alternate |
       | href     | /en/      |
