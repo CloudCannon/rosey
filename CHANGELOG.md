@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+* Added the current language URL as an alternate tag on the page.
+
 ## v2.3.2 (February 17, 2025)
 
 * Added configuration for Base URL to prefix alternate links.
