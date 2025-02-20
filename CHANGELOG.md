@@ -9,6 +9,11 @@
 
 ## Unreleased
 
+## v2.3.3 (February 20, 2025)
+
+* Added the current language URL as an alternate tag on the page.
+* Fixed an issue where some html entities inside script and style tags would be incorrectly escaped.
+
 ## v2.3.2 (February 17, 2025)
 
 * Added configuration for Base URL to prefix alternate links.
