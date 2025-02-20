@@ -10,6 +10,7 @@
 ## Unreleased
 
 * Added the current language URL as an alternate tag on the page.
+* Fixed an issue where some html entities inside script and style tags would be incorrectly escaped.
 
 ## v2.3.2 (February 17, 2025)
 
