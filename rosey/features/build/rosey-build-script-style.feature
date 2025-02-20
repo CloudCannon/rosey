@@ -26,5 +26,5 @@ Feature: Rosey Build Script Style
     Then I should see a selector '[data-rosey="seal"]' in "dist/translated_site/manuka/index.html" with the attributes:
       | data-rosey | seal               |
       | innerText  | Pollen From A Tree |
-    Then DEBUG I should see "<script>if (a < 4 && b > 2) { ... }</script>" in "dist/translated_site/manuka/index.html"
+    Then I should see "<script>if (a < 4 && b > 2) { ... }</script>" in "dist/translated_site/manuka/index.html"
     Then I should see "<style>.alpha { invalid: < irrelevant > ; }</style>" in "dist/translated_site/manuka/index.html"
