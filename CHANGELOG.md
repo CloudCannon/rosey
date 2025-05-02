@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.3.4 (May 2, 2025)
+
 * Updated clap to 4.5.37
 * Updated figment to 0.10.19
 * Updated globwalk to 0.9.1
