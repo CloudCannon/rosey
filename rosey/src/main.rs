@@ -1,4 +1,4 @@
-use clap::{App, AppSettings, Arg};
+use clap::{Arg, ArgAction, Command};
 use rosey::{RoseyCommand, RoseyOptions};
 use std::str::FromStr;
 use std::time::Instant;
@@ -9,31 +9,31 @@ async fn main() {
 
     let example_defaults = rosey::options::RoseyPublicConfig::default();
 
-    let matches = App::new("Rosey")
+    let matches = Command::new("Rosey")
         .version(option_env!("RELEASE_VERSION").unwrap_or("Development"))
         .author("CloudCannon")
         .about("The CLI for the CloudCannon rosey package, an open-source tool for managing translations on static websites.")
-        .setting(AppSettings::SubcommandRequiredElseHelp)
+        .subcommand_required(true)
         .arg(
-            Arg::with_name("verbose")
+            Arg::new("verbose")
                 .long("verbose")
+                .action(ArgAction::SetTrue)
                 .help("Print verbose logs while running the Rosey CLI. Does not affect the output website")
-                .takes_value(false),
         )
         .subcommand(
-            App::new("generate")
+            Command::new("generate")
                 .arg(
-                    Arg::with_name("source")
-                        .short("s")
+                    Arg::new("source")
+                        .short('s')
                         .long("source")
                         .value_name("PATH")
                         .help("The directory of your built static website (the output folder of your SSG build)\n ! Required either in a config file or via the CLI"),
                 )
                 .arg(
-                    Arg::with_name("version")
-                        .short("v")
+                    Arg::new("version")
+                        .short('v')
                         .long("version")
-                        .possible_values(&["1", "2"])
+                        .value_parser(["1", "2"])
                         .value_name("VERSION")
                         .help(&format!(
                             "The Rosey locale version to generate and build from. \n ─ Defaults to '{}'",
@@ -41,7 +41,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("tag")
+                    Arg::new("tag")
                         .long("tag")
                         .value_name("ATTRIBUTE")
                         .help(&format!(
@@ -50,7 +50,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("base")
+                    Arg::new("base")
                         .long("base")
                         .value_name("PATH")
                         .help(&format!(
@@ -59,7 +59,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("base-urls")
+                    Arg::new("base-urls")
                         .long("base-urls")
                         .value_name("PATH")
                         .help(&format!(
@@ -68,7 +68,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("separator")
+                    Arg::new("separator")
                         .long("separator")
                         .value_name("CHAR")
                         .help(&format!(
@@ -77,30 +77,30 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("config-dump")
+                    Arg::new("config-dump")
                         .long("config-dump")
-                        .help("Print all resolved configuration and exit without taking any action")
-                        .takes_value(false),
+                        .action(ArgAction::SetTrue)
+                        .help("Print all resolved configuration and exit without taking any action"),
                 ),
         )
         .subcommand(
-            App::new("build")
+            Command::new("build")
                 .arg(
-                    Arg::with_name("source")
-                        .short("s")
+                    Arg::new("source")
+                        .short('s')
                         .long("source")
                         .value_name("PATH")
                         .help("The directory of your built static website (the output folder of your SSG build)\n ! Required either in a config file or via the CLI"),
                 )
                 .arg(
-                    Arg::with_name("dest")
-                        .short("d")
+                    Arg::new("dest")
+                        .short('d')
                         .long("dest")
                         .value_name("PATH")
                         .help("The directory to output the multilingual site to. \n ─ Defaults to your source directory suffixed with _translated"),
                 )
                 .arg(
-                    Arg::with_name("tag")
+                    Arg::new("tag")
                         .long("tag")
                         .value_name("ATTRIBUTE")
                         .help(&format!(
@@ -109,7 +109,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("locales")
+                    Arg::new("locales")
                         .long("locales")
                         .value_name("PATH")
                         .help(&format!(
@@ -118,7 +118,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("default-language")
+                    Arg::new("default-language")
                         .long("default-language")
                         .value_name("LANG")
                         .help(&format!(
@@ -127,7 +127,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("exclusions")
+                    Arg::new("exclusions")
                         .long("exclusions")
                         .value_name("REGEX")
                         .help(&format!(
@@ -136,7 +136,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("separator")
+                    Arg::new("separator")
                         .long("separator")
                         .value_name("CHAR")
                         .help(&format!(
@@ -145,63 +145,60 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("images-source")
+                    Arg::new("images-source")
                         .long("images-source")
                         .value_name("PATH")
-                        .takes_value(true)
                         .help("The source folder that Rosey should look for translated images within. \n ─ Defaults to the source folder"),
                 )
                 .arg(
-                    Arg::with_name("base-url")
+                    Arg::new("base-url")
                         .long("base-url")
                         .value_name("URL")
-                        .takes_value(true)
                         .help("The base URL for the site. Used to prefix alternate links. \n ─ Defaults to an empty string"),
                 )
                 .arg(
-                    Arg::with_name("default-language-at-root")
+                    Arg::new("default-language-at-root")
                         .long("default-language-at-root")
-                        .takes_value(false)
+                        .action(ArgAction::SetTrue)
                         .conflicts_with("redirect-page")
                         .help("Configures Rosey to leave all input URLs in-place for the default language, and omit generating redirect files"),
                 )
                 .arg(
-                    Arg::with_name("redirect-page")
+                    Arg::new("redirect-page")
                         .long("redirect-page")
                         .value_name("PATH")
-                        .takes_value(true)
                         .help("Path to a redirect template that Rosey should use instead of the default file"),
                 )
                 .arg(
-                    Arg::with_name("wrap")
+                    Arg::new("wrap")
                         .long("wrap")
-                        .takes_value(true)
+                        .action(ArgAction::Append)
                         .help("For languages without significant whitespace, add spans around detected words to break lines cleanly")
-                        .multiple(true)
+                        .num_args(0..)
                 )
                 .arg(
-                    Arg::with_name("wrap-class")
+                    Arg::new("wrap-class")
                         .long("wrap-class")
                         .value_name("CLASS")
-                        .takes_value(true)
                         .help("When wrapping languages, use the given classname instead of inline styles")
                 )
-                .arg(Arg::with_name("serve")
+                .arg(
+                    Arg::new("serve")
                         .long("serve")
-                        .takes_value(false)
+                        .action(ArgAction::SetTrue)
                         .help("Runs a local webserver on the dest folder after a successful build. Useful for local development")
                 )
                 .arg(
-                    Arg::with_name("config-dump")
+                    Arg::new("config-dump")
                         .long("config-dump")
-                        .help("Print all resolved configuration and exit without taking any action")
-                        .takes_value(false),
+                        .action(ArgAction::SetTrue)
+                        .help("Print all resolved configuration and exit without taking any action"),
                 ),
         )
         .subcommand(
-            App::new("check")
+            Command::new("check")
                 .arg(
-                    Arg::with_name("locales")
+                    Arg::new("locales")
                         .long("locales")
                         .value_name("PATH")
                         .help(&format!(
@@ -210,7 +207,7 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("base")
+                    Arg::new("base")
                         .long("base")
                         .value_name("PATH")
                         .help(&format!(
@@ -219,27 +216,26 @@ async fn main() {
                         )),
                 )
                 .arg(
-                    Arg::with_name("version")
-                        .short("v")
+                    Arg::new("version")
+                        .short('v')
                         .long("version")
                         .value_name("VERSION")
-                        .possible_values(&["1", "2"])
+                        .value_parser(["1", "2"])
                         .help(&format!(
                             "The Rosey locale version to generate and build from. \n ─ Defaults to '{}'",
                             example_defaults.version
                         )),
                 )
                 .arg(
-                    Arg::with_name("config-dump")
+                    Arg::new("config-dump")
                         .long("config-dump")
-                        .help("Print all resolved configuration and exit without taking any action")
-                        .takes_value(false),
+                        .action(ArgAction::SetTrue)
+                        .help("Print all resolved configuration and exit without taking any action"),
                 ),
         )
         .get_matches();
 
-    let (subcommand, matches) = matches.subcommand();
-    let matches = matches.unwrap_or_else(|| {
+    let (subcommand, submatches) = matches.subcommand().unwrap_or_else(|| {
         eprintln!("Failed to match any subcommand arguments");
         std::process::exit(1);
     });
@@ -249,7 +245,7 @@ async fn main() {
         std::process::exit(1);
     });
 
-    let options = RoseyOptions::load_with_flags(matches, &subcommand);
+    let options = RoseyOptions::load_with_flags(submatches, &subcommand);
     options.run(subcommand).await;
 
     let duration = start.elapsed();

@@ -9,6 +9,19 @@
 
 ## Unreleased
 
+## v2.3.4 (May 2, 2025)
+
+* Updated clap to 4.5.37
+* Updated figment to 0.10.19
+* Updated globwalk to 0.9.1
+* Updated base64 to 0.22.1
+* Updated sha2 to 0.10.9
+* Updated regex to 1.11.1
+* Updated rayon to 1.10.0
+* Updated tokio to 1.44.2
+* Updated notify to 8.0.0
+* Updated charabia to 0.9.3
+
 ## v2.3.3 (February 20, 2025)
 
 * Added the current language URL as an alternate tag on the page.
