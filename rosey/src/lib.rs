@@ -37,19 +37,32 @@ trait GetGeneric {
     fn get_opt<'a, T>(&'a self, flag: &str, fallback: Option<T>) -> Option<T>
     where
         T: std::convert::From<&'a str>;
+    fn is_present(&self, flag: &str) -> bool;
 }
-impl GetGeneric for ArgMatches<'_> {
+impl GetGeneric for ArgMatches {
     fn get<'a, T>(&'a self, flag: &str, fallback: T) -> T
     where
         T: std::convert::From<&'a str>,
     {
-        self.value_of(flag).map(Into::into).unwrap_or(fallback)
+        match self.try_get_one::<String>(flag) {
+            Ok(Some(value)) => Into::into(&value[..]),
+            _ => fallback,
+        }
     }
     fn get_opt<'a, T>(&'a self, flag: &str, fallback: Option<T>) -> Option<T>
     where
         T: std::convert::From<&'a str>,
     {
-        self.value_of(flag).map(Into::into).or(fallback)
+        match self.try_get_one::<String>(flag) {
+            Ok(Some(value)) => Some(Into::into(&value[..])),
+            _ => fallback,
+        }
+    }
+    fn is_present(&self, flag: &str) -> bool {
+        match self.try_get_one::<bool>(flag) {
+            Ok(Some(value)) => *value,
+            _ => false,
+        }
     }
 }
 
@@ -101,8 +114,11 @@ impl RoseyOptions {
                     }
                     _ => dest,
                 }),
-                version: match matches.value_of("version").map(|s| s.parse()) {
-                    Some(Ok(v)) => v,
+                version: match matches
+                    .try_get_one("version")
+                    .map(|o| o.map(|s: &String| s.parse()))
+                {
+                    Ok(Some(Ok(v))) => v,
                     _ => base.version,
                 },
                 tag: matches.get("tag", base.tag),
@@ -112,7 +128,8 @@ impl RoseyOptions {
                 base_url: matches.get("base-url", base.base_url),
                 base_urls: working_dir.join(matches.get("base-urls", base.base_urls)),
                 default_language: matches.get("default-language", base.default_language),
-                default_language_at_root: matches.is_present("default-language-at-root") || base.default_language_at_root,
+                default_language_at_root: matches.is_present("default-language-at-root")
+                    || base.default_language_at_root,
                 redirect_page: matches
                     .get_opt("redirect-page", base.redirect_page)
                     .map(|p| working_dir.join(p)),
@@ -120,9 +137,8 @@ impl RoseyOptions {
                 images_source: matches
                     .get_opt("images-source", base.images_source)
                     .map(|p| working_dir.join(p)),
-                wrap: match matches.values_of("wrap") {
-                    Some(langs) => Some(langs.map(|l|{
-
+                wrap: match matches.try_get_many("wrap") {
+                    Ok(Some(langs)) => Some(langs.map(|l: &String|{
                         if !SUPPORTED_WRAP_LANGS.iter().any(|lang| l.starts_with(lang)) {
                             eprintln!("Cannot wrap text for language '{l}'. Languages with supported text wrapping: {SUPPORTED_WRAP_LANGS:?}");
                             std::process::exit(1);

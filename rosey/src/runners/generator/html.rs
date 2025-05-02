@@ -1,4 +1,4 @@
-use base64::{encode_config, CharacterSet, Config};
+use base64::prelude::*;
 use kuchiki::{traits::TendrilSink, NodeRef};
 use path_slash::PathExt;
 use sha2::{Digest, Sha256};
@@ -66,10 +66,7 @@ impl RoseyGenerator {
                 let key = if key.is_empty() {
                     let mut hasher = Sha256::new();
                     hasher.update(node.to_string());
-                    let hash = encode_config(
-                        hasher.finalize(),
-                        Config::new(CharacterSet::Standard, false),
-                    );
+                    let hash = BASE64_STANDARD_NO_PAD.encode(hasher.finalize());
                     format!("{}{}", &prefix, hash)
                 } else {
                     format!("{}{}", &prefix, key)
