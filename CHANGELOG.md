@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.3.5 (May 22, 2025)
+
 * Fixed translating srcset assets inside HTML translation values
 
 ## v2.3.4 (May 2, 2025)
