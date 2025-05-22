@@ -485,7 +485,7 @@ impl<'a> RoseyPage<'a> {
                 let srcset = original
                     .split(',')
                     .map(|part| {
-                        let mut split = part.split(' ');
+                        let mut split = part.trim().split(' ');
                         (split.next(), split.next(), part)
                     })
                     .map(|(src, width, original)| {
