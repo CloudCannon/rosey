@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+* Fixed translating srcset assets inside HTML translation values
+
 ## v2.3.4 (May 2, 2025)
 
 * Updated clap to 4.5.37

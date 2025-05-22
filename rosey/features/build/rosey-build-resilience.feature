@@ -75,6 +75,31 @@ Feature: Rosey Build Resilience
     Then I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
       | src | https://ryancollins.website/images/rodents/souslik.png |
 
+  Scenario: Rosey build doesn't break srcsets in translation img srcs
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <div data-rosey="container">
+        <img srcset="https://ryancollins.website/images/rodents/souslik.png 100w, https://ryancollins.website/images/rodents/souslik2.png 200w" />
+      </div>
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/fr.json" file with the content:
+      """
+      {
+        "container": {
+          "original": "<img srcset=\"https://ryancollins.website/images/rodents/souslik.png 100w, https://ryancollins.website/images/rodents/souslik2.png 200w\">",
+          "value": "<img srcset=\"https://ryancollins.website/images/rodents/souslik.png 100w, https://ryancollins.website/images/rodents/souslik2.png 200w\">"
+        }
+      }
+      """
+    When I run my program with the flags:
+      | build |
+    Then I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
+      | srcset | https://ryancollins.website/images/rodents/souslik.png 100w, https://ryancollins.website/images/rodents/souslik2.png 200w |
+
   Scenario: Rosey builds from locales with templates
     Given I have a "dist/site/index.html" file with the content:
       """
