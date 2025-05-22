@@ -122,7 +122,7 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                             }
                         }
                         ("a", "href", _) if !has_download => {
-                            let href = &attr.value as &str;   
+                            let href = &attr.value as &str;
                             let ext = href.rfind('.').map(|index| href.split_at(index + 1).1);
 
                             if !href.starts_with('/')
@@ -143,7 +143,7 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                 .value
                                 .split(',')
                                 .map(|part| {
-                                    let mut split = part.split(' ');
+                                    let mut split = part.trim().split(' ');
                                     (split.next(), split.next(), part)
                                 })
                                 .map(|(src, width, original_part)| {
@@ -154,8 +154,6 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                             self.locale_key,
                                         ) {
                                             return format!("/{} {}", translated_src, width);
-                                        } else {
-                                            return format!("/{} {}", src, width);
                                         }
                                     }
                                     original_part.to_string()
