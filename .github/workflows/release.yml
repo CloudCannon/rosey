@@ -354,6 +354,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Install humane
+        if: matrix.run_tests == true
         uses: supplypike/setup-bin@v1
         with:
           uri: "https://github.com/CloudCannon/humane/releases/download/v${{env.HUMANE_VERSION}}/humane-v${{env.HUMANE_VERSION}}-${{matrix.target}}.tar.gz"
@@ -380,6 +381,7 @@ jobs:
         run: RELEASE_VERSION=${GITHUB_REF#refs/tags/} cargo build --release --target ${{ matrix.target }}
 
       - name: Test CLI
+        if: matrix.run_tests == true
         working-directory: ./rosey
         run: TEST_BINARY=./target/${{ matrix.target }}/release/rosey humane
 

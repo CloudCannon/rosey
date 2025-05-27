@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+* Updates the Rosey publishing workflow and improved the reliability of the npx/npm wrapper.
+
 ## v2.3.5 (May 22, 2025)
 
 * Fixed translating srcset assets inside HTML translation values
