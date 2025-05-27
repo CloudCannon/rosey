@@ -1,7 +1,6 @@
 {
   "name": "rosey",
   "version": "0.0.0",
-  "type": "module",
   "description": "Generate a translated version of your website based on the translation of tagged elements.",
   "bin": {
     "rosey": "lib/index.js"
