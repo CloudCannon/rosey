@@ -1,20 +1,27 @@
 {
   "name": "rosey",
   "version": "0.0.0",
+  "type": "module",
   "description": "Generate a translated version of your website based on the translation of tagged elements.",
-  "bin": "lib/index.js",
+  "bin": {
+    "rosey": "lib/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/CloudCannon/rosey"
-  },
-  "scripts": {
-    "postinstall": "node ./lib/postinstall.js"
   },
   "author": "Tate Kennington",
   "license": "MIT",
   "dependencies": {
     "https-proxy-agent": "^7.0.0",
     "proxy-from-env": "^1.1.0"
+  },
+  "optionalDependencies": {
+    "@roseyapp/linux-x64": "0.0.0",
+    "@roseyapp/linux-arm64": "0.0.0",
+    "@roseyapp/darwin-x64": "0.0.0",
+    "@roseyapp/darwin-arm64": "0.0.0",
+    "@roseyapp/windows-x64": "0.0.0"
   },
   "overrides": {
     "agent-base": "^6.0.2"

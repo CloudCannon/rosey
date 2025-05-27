@@ -67,24 +67,96 @@ jobs:
   publish-npm-package:
     name: Publish NPM package
     runs-on: ubuntu-24.04
-    needs: publish-github-release
-    defaults:
-      run:
-        working-directory: ./wrappers/node
+    needs: publish-binary-npm-packages
     steps:
       - name: Clone
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
       - uses: actions/download-artifact@v4
         with:
           path: wrappers/node/checksums
           pattern: release-checksums-*
           merge-multiple: true
-      - name: Prepare package
+
+      - name: Get Version
+        run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+      - name: Get Tag
+        run: echo GIT_TAG="$(node ./.backstage/get_tag.cjs)" >> $GITHUB_ENV
+
+      - name: Version optional dependencies
         run: |
-          RELEASE_VERSION=${GITHUB_REF#refs/tags/}
-          npm version $(echo $RELEASE_VERSION | cut -c1-)
+          node ./.backstage/version_main_package.cjs
+
+      - name: Prepare package
+        working-directory: ./wrappers/node
+        run: |
+          npm version $GIT_VERSION
       - name: Publish
-        run: npm publish
+        working-directory: ./wrappers/node
+        run: npm publish --tag $GIT_TAG
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-binary-npm-packages:
+    name: Publish Binary NPM packages
+    runs-on: ubuntu-24.04
+    needs: publish-github-release
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+            package: windows-x64
+            os: win32
+            cpu: x64
+          - target: x86_64-unknown-linux-musl
+            package: linux-x64
+            os: linux
+            cpu: x64
+          - target: aarch64-unknown-linux-musl
+            package: linux-arm64
+            os: linux
+            cpu: arm64
+          - target: x86_64-apple-darwin
+            package: darwin-x64
+            os: darwin
+            cpu: x64
+          - target: aarch64-apple-darwin
+            package: darwin-arm64
+            os: darwin
+            cpu: arm64
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: build-artifacts
+
+      - name: Get Version
+        run: echo GIT_VERSION="$(git describe --tags | sed 's/^v\(.*\)$/\1/')" >> $GITHUB_ENV
+      - name: Get Tag
+        run: echo GIT_TAG="$(node ./.backstage/get_tag.cjs)" >> $GITHUB_ENV
+
+      - name: Create Package
+        run: |
+          mkdir -p ${{ matrix.package }}/bin/
+          cd ${{ matrix.package }}
+          node ../.backstage/create_package.cjs ${{ matrix.os }} ${{ matrix.cpu }}
+          cp ../wrappers/node/.npmrc .
+
+      - name: Extract Binary
+        working-directory: build-artifacts
+        run: |
+          tar xzf rosey-v$GIT_VERSION-${{ matrix.target }}.tar.gz
+          rm *.tar.gz
+          mv * ../${{ matrix.package }}/bin/
+
+      - name: Prepare package
+        working-directory: ${{ matrix.package }}
+        run: |
+          npm version $GIT_VERSION
+      - name: Publish
+        working-directory: ${{ matrix.package }}
+        run: npm publish --tag $GIT_TAG --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -196,24 +268,36 @@ jobs:
     strategy:
       matrix:
         include:
-          - build: linux
-            os: ubuntu-latest
-            rust: stable
-            target: x86_64-unknown-linux-musl
-            cross: false
-            musl: true
           - build: windows
             os: windows-latest
             rust: stable
             target: x86_64-pc-windows-msvc
             cross: false
-            musl: false
+            run_tests: true
+          - build: linux
+            os: ubuntu-latest
+            rust: stable
+            target: x86_64-unknown-linux-musl
+            cross: false
+            run_tests: true
+          - build: linux
+            os: ubuntu-latest
+            rust: stable
+            target: aarch64-unknown-linux-musl
+            cross: false
+            run_tests: false
           - build: macos
             os: macos-latest
             rust: stable
             target: x86_64-apple-darwin
             cross: false
-            musl: false
+            run_tests: true
+          - build: macos-m1
+            os: macos-latest
+            rust: stable
+            target: aarch64-apple-darwin
+            cross: false
+            run_tests: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -251,11 +335,14 @@ jobs:
         run: |
           sudo apt update
           sudo apt install ${{ matrix.linker }}
-      - name: Install Musl Tools
-        if: matrix.musl
+      - name: Install Tooling
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt update
-          sudo apt install -y musl-tools musl-dev
+          sudo apt update -y
+          sudo apt install -y musl-tools musl-dev clang gcc-aarch64-linux-gnu
+          echo "TARGET_CC=clang" >> $GITHUB_ENV
+          echo "CFLAGS_aarch64_unknown_linux_musl=--sysroot=/usr/aarch64-linux-gnu" >> $GITHUB_ENV
+          echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=/usr/aarch64-linux-gnu/bin/ld" >> $GITHUB_ENV
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -306,8 +393,6 @@ jobs:
           if [ "$RUNNER_OS" == "Windows" ]; then
             EXEC_NAME="rosey.exe"
           fi
-
-          tar czf $ASSET_PATH -C rosey/target/${{ matrix.target }}/release $EXEC_NAME
 
           if command -v gtar &> /dev/null; then
             echo "Using gtar"
