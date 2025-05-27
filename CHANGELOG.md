@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.3.6 (May 27, 2025)
+
 * Updates the Rosey publishing workflow and improved the reliability of the npx/npm wrapper.
 
 ## v2.3.5 (May 22, 2025)
