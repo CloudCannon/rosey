@@ -7,7 +7,7 @@ license = "MIT"
 
 [dependencies]
 anyhow = "1.0"
-clap = "4.5.40"
+clap = "4.5.41"
 figment = { version = "0.10.19", features = ["env", "toml", "json", "yaml"] }
 kuchiki = "0.8.1"
 serde_json = { version = "1.0", features = ["preserve_order"] }
