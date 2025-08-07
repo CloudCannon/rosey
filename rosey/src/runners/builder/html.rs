@@ -218,7 +218,7 @@ struct RoseyPage<'a> {
     html_tag: Option<NodeRef>,
     meta_tag: Option<NodeRef>,
     link_tags: Vec<NodeRef>,
-    image_tags: Vec<(Option<String>, Option<String>, NodeRef)>,
+    image_tags: Vec<(Option<String>, Option<String>, NodeRef, Option<BTreeMap<String, String>>)>,
     anchor_tags: Vec<(String, NodeRef)>,
     assets: Vec<(String, String, NodeRef)>,
     locale_key: Option<&'a str>,
@@ -469,43 +469,56 @@ impl<'a> RoseyPage<'a> {
 
     pub fn rewrite_image_tags(&mut self) {
         let locale_key = self.get_locale_key();
-        for (original_src, original_srcset, img) in self.image_tags.iter() {
+        for (original_src, original_srcset, img, explicit_attrs) in self.image_tags.iter() {
             let mut attributes = img.as_element().unwrap().attributes.borrow_mut();
-            if let Some(original) = original_src {
-                if let Some(translated_asset) =
-                    get_translated_asset(original, &self.images_source, locale_key)
-                {
-                    attributes.insert("src", format!("/{translated_asset}"));
-                } else {
-                    attributes.insert("src", original.clone());
+            let has_explicit_src = explicit_attrs.as_ref().map(|attrs| {
+                return attrs.contains_key("src")
+            }).unwrap_or(false);
+
+            if !has_explicit_src {
+                if let Some(original) = original_src {
+                    if let Some(translated_asset) =
+                        get_translated_asset(original, &self.images_source, locale_key)
+                    {
+                        eprintln!("rewrite_image_tags src: {}, translated_asset: {}", original, translated_asset);
+                        attributes.insert("src", format!("/{translated_asset}"));
+                    } else {
+                        attributes.insert("src", original.clone());
+                    }
                 }
             }
 
-            if let Some(original) = original_srcset {
-                let srcset = original
-                    .split(',')
-                    .map(|part| {
-                        let mut split = part.trim().split(' ');
-                        (split.next(), split.next(), part)
-                    })
-                    .map(|(src, width, original)| {
-                        if let (Some(src), Some(width)) = (src, width) {
-                            if let Some(translated_src) =
-                                get_translated_asset(src, &self.images_source, locale_key)
-                            {
-                                return format!("/{} {}", translated_src, width);
+            let has_explicit_srcset = explicit_attrs.as_ref().map(|attrs| {
+                return attrs.contains_key("srcset")
+            }).unwrap_or(false);
+
+            if !has_explicit_srcset {
+                if let Some(original) = original_srcset {
+                    let srcset = original
+                        .split(',')
+                        .map(|part| {
+                            let mut split = part.trim().split(' ');
+                            (split.next(), split.next(), part)
+                        })
+                        .map(|(src, width, original)| {
+                            if let (Some(src), Some(width)) = (src, width) {
+                                if let Some(translated_src) =
+                                    get_translated_asset(src, &self.images_source, locale_key)
+                                {
+                                    return format!("/{} {}", translated_src, width);
+                                }
                             }
-                        }
-                        original.to_string()
-                    })
-                    .fold(String::default(), |mut acc, part| {
-                        if !acc.is_empty() {
-                            acc.push(',');
-                        }
-                        acc.push_str(&part);
-                        acc
-                    });
-                attributes.insert("srcset", srcset);
+                            original.to_string()
+                        })
+                        .fold(String::default(), |mut acc, part| {
+                            if !acc.is_empty() {
+                                acc.push(',');
+                            }
+                            acc.push_str(&part);
+                            acc
+                        });
+                    attributes.insert("srcset", srcset);
+                }
             }
         }
     }
@@ -647,11 +660,16 @@ impl<'a> RoseyPage<'a> {
             let attributes = img.attributes.borrow();
             let src = attributes.get("src");
             let srcset = attributes.get("srcset");
+            let explicit_attrs = attributes.get(format!("{}-attrs-explicit", self.tag));
+            let explicit_attrs: Option<BTreeMap<String, String>> = if let Some(explicit_attrs) = explicit_attrs {
+                serde_json::from_str(explicit_attrs).ok()
+            } else { None };
 
             self.image_tags.push((
                 src.map(String::from),
                 srcset.map(String::from),
                 img.as_node().clone(),
+                explicit_attrs,
             ));
         }
     }
@@ -764,7 +782,7 @@ impl<'a> RoseyPage<'a> {
             }
 
             if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", self.tag)) {
-                let attrs_map: BTreeMap<String, String> = serde_json::from_str(attrs_map).unwrap();
+                let attrs_map: BTreeMap<String, String> = serde_json::from_str(attrs_map).expect("Failed to parse explicit attrs. Must be a JSON object with string keys and values.");
                 for (attr, key) in attrs_map.iter() {
                     self.edits.push(RoseyEdit::Attribute(
                         format!("{}{}", prefix, key),

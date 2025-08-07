@@ -106,7 +106,7 @@ Feature: Rosey Build
     And I have a "rosey/locales/fr.json" file with the content:
       """
       {
-        "alt-tag": "Ma description",
+        "img-alt": "Ma description",
         "img-src": "/images/assets/image.fr.png"
       }
       """
@@ -117,9 +117,28 @@ Feature: Rosey Build
       | alt                       | My description                      |
       | src                       | /images/assets/image.png            |
     And I should see a selector 'img' in "dist/translated_site/fr/index.html" with the attributes:
-      | data-rosey-attrs-explicit | {"alt":"img-alt", "src": "img-src"}    |
-      | alt                       | Ma description                         |
-      | src                       | /images/assets/image.fr.png            |
+      | data-rosey-attrs-explicit | {"alt":"img-alt", "src": "img-src"} |
+      | alt                       | Ma description                      |
+      | src                       | /images/assets/image.fr.png         |
+
+  Scenario: Rosey builds images from locale files with invalid explicit attrs
+    Given I have a "dist/site/index.html" file with the content:
+      """
+      <html>
+      <body>
+      <img alt="My description" data-rosey-attrs-explicit='["img-src"]' src="/images/assets/image.png">
+      </body>
+      </html>
+      """
+    And I have a "rosey/locales/fr.json" file with the content:
+      """
+      {
+        "img-src": "/images/assets/image.fr.png"
+      }
+      """
+    When I run my program with the flags:
+      | build |
+    Then I should see 'Failed to parse explicit attrs. Must be a JSON object with string keys and values.' in stderr
 
   Scenario: Rosey builds from locale files with namespaces
     Given I have a "dist/site/index.html" file with the content:
