@@ -199,21 +199,29 @@ Feature: Rosey Build Complex
       <html>
       <body>
       <div data-rosey="seal"><p>Kiss From A Rose</p></div>
+      <div data-rosey="frog"><p>Frog</p></div>
+      <div data-rosey="dog"><p>Dog</p></div>
       </body>
       </html>
       """
     And I have a "rosey/locales/jp.json" file with the content:
       """
       {
-        "seal": "これはリンクです <a href=\"/other.html\"/>"
+        "seal": "これはリンクです <a href=\"/other.html\"/>",
+        "frog": "これはリンクです <a href=\"/jp/other.html\"/>",
+        "dog": "これはリンクです <a href=\"/jparty/other.html\"/>"
       }
       """
     When I run my program with the flags:
       | build |
     Then I should see a selector 'div > p' in "dist/translated_site/en/index.html" with the attributes:
       | innerText | Kiss From A Rose |
-    And I should see a selector 'a' in "dist/translated_site/jp/index.html" with the attributes:
+    And I should see a selector '[data-rosey=seal] a' in "dist/translated_site/jp/index.html" with the attributes:
       | href | /jp/other.html |
+    And I should see a selector '[data-rosey=frog] a' in "dist/translated_site/jp/index.html" with the attributes:
+      | href | /jp/other.html |
+    And I should see a selector '[data-rosey=dog] a' in "dist/translated_site/jp/index.html" with the attributes:
+      | href | /jp/jparty/other.html |
     But I should not see a selector 'img' in "dist/translated_site/en/index.html"
 
   Scenario: Rosey build uses translated srcsets inside HTML translations
