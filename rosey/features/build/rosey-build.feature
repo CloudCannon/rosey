@@ -106,8 +106,8 @@ Feature: Rosey Build
     And I have a "rosey/locales/fr.json" file with the content:
       """
       {
-        "alt-tag": "Ma description"
-        "img-src"": "/images/assets/image.fr.png"
+        "alt-tag": "Ma description",
+        "img-src": "/images/assets/image.fr.png"
       }
       """
     When I run my program with the flags:
