@@ -320,7 +320,7 @@ impl<'a> RoseyPage<'a> {
                     .translations
                     .keys()
                     .chain(std::iter::once(&self.default_language))
-                    .any(|key| src.starts_with(&format!("/{key}")))
+                    .any(|key| src.starts_with(&format!("/{key}/")) || src == format!("/{key}"))
             {
                 self.anchor_tags
                     .push((src.to_string(), element.as_node().clone()));
