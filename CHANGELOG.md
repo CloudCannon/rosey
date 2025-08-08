@@ -9,6 +9,8 @@
 
 ## Unreleased
 
+## v2.3.8 (August 8, 2025)
+
 * Updated deployment key to crates.io
 
 ## v2.3.7 (August 8, 2025)
