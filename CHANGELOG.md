@@ -9,6 +9,15 @@
 
 ## Unreleased
 
+## v2.3.7 (August 8, 2025)
+
+* Fixed interactions between attrs-explicit and image src translations. Defining an attrs-explicit attribute on an image will prevent the default image translation for that element and attribute (src or srcset). [#65](https://github.com/CloudCannon/rosey/issues/65).
+* Fixed partial url matches from locale keys incorrectly being skipped by the url rewriter. [#112](https://github.com/CloudCannon/rosey/issues/112).
+* Update clap to 4.5.43
+* Update serde_json to 1.0.142
+* Update tokio to 1.47.1
+* Update notify to 8.2.0
+
 ## v2.3.6 (May 27, 2025)
 
 * Updates the Rosey publishing workflow and improved the reliability of the npx/npm wrapper.

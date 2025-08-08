@@ -89,7 +89,7 @@ impl RoseyGenerator {
             }
 
             if let Some(attrs_map) = attributes.get(format!("{}-attrs-explicit", config.tag)) {
-                let attrs_map: BTreeMap<String, String> = serde_json::from_str(attrs_map).unwrap();
+                let attrs_map: BTreeMap<String, String> = serde_json::from_str(attrs_map).expect("Failed to parse explicit attrs. Must be a JSON object with string keys and values.");
                 for (attr, key) in attrs_map.iter() {
                     if let Some(value) = attributes.get(attr.as_str()) {
                         self.locale.insert(

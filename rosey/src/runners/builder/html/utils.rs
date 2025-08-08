@@ -131,7 +131,7 @@ impl<'a> TokenSink for &mut TranslationRewriter<'a> {
                                     .translations
                                     .keys()
                                     .chain(std::iter::once(&self.default_language.to_string()))
-                                    .any(|key| attr.value.starts_with(&format!("/{key}")))
+                                    .any(|key| attr.value.starts_with(&format!("/{key}/")) || attr.value == format!("/{key}").into())
                             {
                                 self.result.push_str(&attr.value);
                             } else {

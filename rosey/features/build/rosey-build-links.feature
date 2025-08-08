@@ -17,6 +17,9 @@ Feature: Rosey Links
       <h6><a href="/posts/hello-world.html">Hello World Extension</a></h6>
       <h7><a href="/posts/hello-world/#title">Hello World Anchor</a></h7>
       <h8><a href="/posts/hello-world.html?q=a">Hello World Query</a></h8>
+      <h9><a href="/blank-posts/hello-world.html?q=a">Should not match blank locale</a></h9>
+      <h10><a href="/blank/hello-world.html?q=a">Stay the same</a></h10>
+      <h11><a href="/blank">Stay the same</a></h11>
       </body>
       </html>
       """
@@ -49,7 +52,16 @@ Feature: Rosey Links
       | innerText | Hello World Anchor              |
     Then I should see a selector 'h8>a' in "dist/translated_site/blank/index.html" with the attributes:
       | href      | /blank/posts/hello-world.html?q=a |
-      | innerText | Hello World Query                 |
+      | innerText | Hello World Query                 | 
+    Then I should see a selector 'h9>a' in "dist/translated_site/blank/index.html" with the attributes:
+      | href      | /blank/blank-posts/hello-world.html?q=a |
+      | innerText | Should not match blank locale            |
+    Then I should see a selector 'h10>a' in "dist/translated_site/blank/index.html" with the attributes:
+      | href      | /blank/hello-world.html?q=a |
+      | innerText | Stay the same               |
+    Then I should see a selector 'h11>a' in "dist/translated_site/blank/index.html" with the attributes:
+      | href      | /blank                      |
+      | innerText | Stay the same               |
 
 
   Scenario: Rosey doesn't update links already pointing to a locale
