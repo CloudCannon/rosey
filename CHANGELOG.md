@@ -9,6 +9,10 @@
 
 ## Unreleased
 
+## v2.3.8 (August 8, 2025)
+
+* Updated deployment key to crates.io
+
 ## v2.3.7 (August 8, 2025)
 
 * Fixed interactions between attrs-explicit and image src translations. Defining an attrs-explicit attribute on an image will prevent the default image translation for that element and attribute (src or srcset). [#65](https://github.com/CloudCannon/rosey/issues/65).
