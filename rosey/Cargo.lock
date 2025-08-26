@@ -491,9 +491,9 @@ checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
 name = "charabia"
-version = "0.9.6"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b01abfd2db0eb8c4e7a47ccab5d1f67993736f4e76923ed9ae281c49070645d"
+checksum = "7c2f456825b7f15eac01a1cae40c12c3f55e931d4327e6e4fa59508d664e9568"
 dependencies = [
  "aho-corasick",
  "csv",
@@ -1622,9 +1622,9 @@ dependencies = [
 
 [[package]]
 name = "jieba-rs"
-version = "0.7.2"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d1bcad6332969e4d48ee568d430e14ee6dea70740c2549d005d87677ebefb0c"
+checksum = "f5dd552bbb95d578520ee68403bf8aaf0dbbb2ce55b0854d019f9350ad61040a"
 dependencies = [
  "cedarwood",
  "fxhash",
