@@ -61,10 +61,11 @@ impl RoseyBuilder {
         //If the file is already in a locale folder, then output it only for that locale
         if let Some(key) = self.find_locale_overwrite(file) {
             let url_translations = self.url_translations.get(key);
+            let original_relative_path = relative_path.strip_prefix(key).unwrap();
 
             page.set_locale_key(key);
             page.rewrite_html();
-            page.rewrite_meta_tags(relative_path, &self.url_translations);
+            page.rewrite_meta_tags(original_relative_path, &self.url_translations);
             page.rewrite_image_tags();
             page.rewrite_assets();
             page.rewrite_anchors(url_translations);
