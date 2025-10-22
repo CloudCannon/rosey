@@ -9,6 +9,20 @@
 
 ## Unreleased
 
+## v2.3.9 (October 22, 2025)
+
+* Fixed an issue causing incorrect links in meta tags of pre-translated pages [#64](https://github.com/CloudCannon/rosey/issues/64).
+* Updated clap to 4.5.50
+* Updated tokio to 1.48.0
+* Updated regex to 1.12.2
+* Updated serde to 1.0.228
+* Updated serde_json to 1.0.145
+* Updated anyhow to 1.0.100
+* Updated actix-files to 0.6.8
+* Updated url to 2.5.7
+* Updated charabia to 0.9.7
+* Updated rayon to 1.11.0
+
 ## v2.3.8 (August 8, 2025)
 
 * Updated deployment key to crates.io
