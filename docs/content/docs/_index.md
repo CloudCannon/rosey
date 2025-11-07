@@ -147,7 +147,11 @@ This file should contain translation keys, each containing the original and tran
 
 The `original` text here will be used to detect translations that are out of date, and the `value` text will be used to build our multilingual site.
 
-Creating these locale files is currently out of Rosey's scope. For smaller use-cases, these files can be written by hand. For larger sites, Rosey will usually be integrated with an existing translation workflow. In most cases this will involve building some middleware that uploads the strings from your `base.json` to a translation API (e.g. Smartling), and creates `rosey/locales/*.json` files with the translated response.
+Creating these locale files is currently out of Rosey's scope. For smaller use-cases, these files can be written by hand. For larger use-cases, some kind of middleware is required that creates these `rosey/locales/*.json` programmatically. 
+
+In some cases this middleware will simply upload the strings from your `base.json` to a translation API (e.g. Smartling), and creates `rosey/locales/*.json` files with the translated response. In other cases, a piece of middleware could generate translation files that can be edited using a CMS like CloudCannon by non-technical translators, which could then themselves generate the `rosey/locales/*.json` files needed by Rosey.
+
+The [Rosey CloudCannon Connector](https://github.com/CloudCannon/rcc) is a piece of middleware that can both be integrated into Smartling for automatic AI-powered machine translations, and also provide an interface for non-technical editors to enter translations using CloudCannon's CMS. You can install the `rosey-cloudcannon-connector` as an [NPM package](https://www.npmjs.com/package/rosey-cloudcannon-connector), or use it as inspiration for how to write your own custom middleware.
 
 ## Building the multilingual site
 
