@@ -32,7 +32,7 @@ use utils::filepath_to_output_url;
 
 use crate::RoseyTranslation;
 
-const UNSUPPORTED_WRAP_ELEMENTS: [&str; 3] = ["title", "script", "style"];
+const UNSUPPORTED_WRAP_ELEMENTS: [&str; 6] = ["title", "script", "style", "text", "tspan", "textPath"];
 
 impl RoseyBuilder {
     pub fn process_html_file(&self, file: &Path) {
