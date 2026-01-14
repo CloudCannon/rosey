@@ -9,6 +9,10 @@
 
 ## Unreleased
 
+## v2.3.10 (January 14, 2026)
+
+* Fixed an issue where spans could be inserted into SVG elements.
+
 ## v2.3.9 (October 22, 2025)
 
 * Fixed an issue causing incorrect links in meta tags of pre-translated pages [#64](https://github.com/CloudCannon/rosey/issues/64).
