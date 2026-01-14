@@ -225,6 +225,11 @@ Feature: Rosey Build Word Wrap
       <body>
       <script data-rosey="hello">Hello World</script>
       <style data-rosey="hello">Hello World</style>
+      <svg>
+        <text data-rosey="hello">Hello World</text>
+        <text><tspan data-rosey="hello">Hello World</tspan></text>
+        <text><textPath data-rosey="hello">Hello World</textPath></text>
+      </svg>
       </body>
       </html>
       """
@@ -249,3 +254,13 @@ Feature: Rosey Build Word Wrap
     Then I should see a selector 'script' in "dist/translated_site/ja-jp/index.html" with the attributes:
       | innerText  | こんにちは世界 |
       | data-rosey | hello        |
+    Then I should see a selector 'text' in "dist/translated_site/ja-jp/index.html" with the attributes:
+      | innerText  | こんにちは世界 |
+      | data-rosey | hello        |
+    Then I should see a selector 'tspan' in "dist/translated_site/ja-jp/index.html" with the attributes:
+      | innerText  | こんにちは世界 |
+      | data-rosey | hello        |
+    Then I should see a selector 'textPath' in "dist/translated_site/ja-jp/index.html" with the attributes:
+      | innerText  | こんにちは世界 |
+      | data-rosey | hello        |
+    But I should not see a selector 'span' in "dist/translated_site/ja-jp/index.html"
