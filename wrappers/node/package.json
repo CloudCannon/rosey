@@ -14,7 +14,7 @@
   "optionalDependencies": {
     "@roseyapp/linux-x64": "2.3.10",
     "@roseyapp/linux-arm64": "2.3.10",
-    "@roseyapp/darwin-x64": "0.0.0",
+    "@roseyapp/darwin-x64": "2.3.10",
     "@roseyapp/darwin-arm64": "2.3.10",
     "@roseyapp/windows-x64": "2.3.10"
   },
